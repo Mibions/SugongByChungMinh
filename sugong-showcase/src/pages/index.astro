@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CategoryStrip from "../sections/home/CategoryStrip.astro";
+import CustomCta from "../sections/home/CustomCta.astro";
+import FeaturedProducts from "../sections/home/FeaturedProducts.astro";
+import HomeHero from "../sections/home/HomeHero.astro";
+import { createProductService } from "../lib/products";
+import { brand, categories } from "../lib/site-data";
+
+const productService = await createProductService();
+const products = await productService.getHomepageProducts();
+---
+
+<BaseLayout title="Trang chủ" description={brand.description}>
+  <HomeHero />
+  <CategoryStrip categories={categories} />
+  <FeaturedProducts products={products} />
+  <CustomCta />
+</BaseLayout>

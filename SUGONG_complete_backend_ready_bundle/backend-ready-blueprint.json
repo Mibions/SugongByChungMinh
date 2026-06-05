@@ -1,0 +1,28 @@
+{
+  "current_mode": "local",
+  "future_mode": "api",
+  "data_source_env": "PUBLIC_DATA_SOURCE",
+  "frontend_stack": {
+    "framework": "Astro 6",
+    "language": "TypeScript strict",
+    "interactive_components": "React islands",
+    "styling": "Tailwind CSS 4",
+    "validation": "Zod",
+    "server_state": "TanStack Query when needed",
+    "api_contract": "OpenAPI 3.1",
+    "api_client": "openapi-typescript + openapi-fetch",
+    "api_mocking": "MSW",
+    "testing": [
+      "Vitest",
+      "Playwright"
+    ]
+  },
+  "data_access": {
+    "interface": "ProductRepository",
+    "implementations": [
+      "LocalProductRepository",
+      "ApiProductRepository"
+    ],
+    "ui_direct_fetch_allowed": false
+  }
+}

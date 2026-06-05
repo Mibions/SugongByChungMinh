@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600" role="img" aria-label="Vertical placeholder poster for SUGONG handmade tote">
+  <rect width="900" height="1600" fill="#F8F5FC"/>
+  <rect x="72" y="86" width="756" height="1428" rx="58" fill="#FFFDFF" stroke="#E4DAEF" stroke-width="8"/>
+  <rect x="132" y="168" width="636" height="1030" rx="42" fill="#EFE8F8"/>
+  <ellipse cx="450" cy="1114" rx="242" ry="52" fill="#D9C8EC" opacity=".55"/>
+  <path d="M300 520c0-132 62-228 150-228s150 96 150 228" fill="none" stroke="#604A7C" stroke-width="22" stroke-linecap="round"/>
+  <path d="M245 510h410l-44 500H289L245 510Z" fill="#F8F5FC" stroke="#8D6CAF" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M326 632c34-30 65-30 99 0 34 30 65 30 99 0 34-30 65-30 99 0" fill="none" stroke="#F3D8E5" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="362" cy="740" r="21" fill="#8D6CAF"/>
+  <circle cx="478" cy="828" r="18" fill="#6F9B79"/>
+  <circle cx="566" cy="730" r="24" fill="#F3D8E5"/>
+  <rect x="170" y="1260" width="360" height="22" rx="11" fill="#D9C8EC"/>
+  <rect x="170" y="1310" width="220" height="18" rx="9" fill="#E4DAEF"/>
+</svg>

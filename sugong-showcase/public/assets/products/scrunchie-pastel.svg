@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Placeholder product image for pastel scrunchie">
+  <rect width="1200" height="900" fill="#FFFDFF"/>
+  <rect x="90" y="80" width="1020" height="740" rx="48" fill="#F7F0E8"/>
+  <ellipse cx="600" cy="720" rx="350" ry="60" fill="#E4DAEF"/>
+  <path d="M365 455c0-130 105-235 235-235s235 105 235 235-105 235-235 235-235-105-235-235Z" fill="#F3D8E5"/>
+  <path d="M472 455c0-70 58-128 128-128s128 58 128 128-58 128-128 128-128-58-128-128Z" fill="#FFFDFF"/>
+  <path d="M388 410c86-38 151-36 222 4 65 37 132 36 203-18" fill="none" stroke="#D9C8EC" stroke-width="34" stroke-linecap="round"/>
+  <path d="M420 567c80 42 147 41 208 3 66-42 118-38 174 0" fill="none" stroke="#8D6CAF" stroke-width="20" stroke-linecap="round" opacity=".65"/>
+</svg>

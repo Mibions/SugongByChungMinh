@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="675" viewBox="0 0 900 675" role="img" aria-label="Placeholder category image for handmade bags">
+  <rect width="900" height="675" fill="#F8F5FC"/>
+  <rect x="72" y="60" width="756" height="555" rx="40" fill="#FFFDFF"/>
+  <path d="M310 270c0-92 58-160 140-160s140 68 140 160" fill="none" stroke="#604A7C" stroke-width="18" stroke-linecap="round"/>
+  <path d="M250 250h400l-42 300H292L250 250Z" fill="#EFE8F8" stroke="#8D6CAF" stroke-width="14" stroke-linejoin="round"/>
+</svg>

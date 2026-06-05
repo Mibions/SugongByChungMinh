@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Placeholder product image for custom name keychain">
+  <rect width="1200" height="900" fill="#FFFDFF"/>
+  <rect x="90" y="80" width="1020" height="740" rx="48" fill="#F7F0E8"/>
+  <ellipse cx="600" cy="725" rx="320" ry="55" fill="#E4DAEF"/>
+  <circle cx="500" cy="245" r="72" fill="#EFE8F8" stroke="#604A7C" stroke-width="16"/>
+  <path d="M548 292l122 122" stroke="#604A7C" stroke-width="18" stroke-linecap="round"/>
+  <rect x="520" y="390" width="290" height="220" rx="58" fill="#F8F5FC" stroke="#8D6CAF" stroke-width="16"/>
+  <path d="M585 500h150M585 548h105" stroke="#604A7C" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="750" cy="440" r="28" fill="#F3D8E5"/>
+</svg>

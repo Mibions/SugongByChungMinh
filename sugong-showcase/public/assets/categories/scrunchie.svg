@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="675" viewBox="0 0 900 675" role="img" aria-label="Placeholder category image for scrunchies">
+  <rect width="900" height="675" fill="#FFFDFF"/>
+  <rect x="72" y="60" width="756" height="555" rx="40" fill="#F7F0E8"/>
+  <circle cx="450" cy="338" r="174" fill="#F3D8E5"/>
+  <circle cx="450" cy="338" r="86" fill="#FFFDFF"/>
+  <path d="M304 288c72-32 125-28 180 6 52 32 96 30 150-10" fill="none" stroke="#8D6CAF" stroke-width="18" stroke-linecap="round" opacity=".7"/>
+</svg>

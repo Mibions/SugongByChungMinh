@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Placeholder product image for custom embroidered pouch">
+  <rect width="1200" height="900" fill="#FFFDFF"/>
+  <rect x="90" y="80" width="1020" height="740" rx="48" fill="#EFE8F8"/>
+  <ellipse cx="600" cy="720" rx="360" ry="58" fill="#D9C8EC" opacity=".55"/>
+  <path d="M330 325h540l-42 350H372L330 325Z" fill="#F8F5FC" stroke="#8D6CAF" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M330 325c70 58 138 86 270 86s200-28 270-86" fill="none" stroke="#604A7C" stroke-width="16" stroke-linecap="round"/>
+  <path d="M460 520h280M500 575h200" stroke="#604A7C" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="742" cy="450" r="24" fill="#F3D8E5"/>
+  <circle cx="458" cy="450" r="20" fill="#6F9B79"/>
+</svg>

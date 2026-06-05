@@ -1,0 +1,122 @@
+{
+  "brand": {
+    "name": "SUGONG",
+    "tagline": "Quà handmade theo cách riêng của bạn.",
+    "description": "Thiết kế riêng, ý nghĩa riêng. Mỗi món quà là một câu chuyện.",
+    "about": "SUGONG bắt đầu từ tình yêu với những món quà nhỏ nhưng mang nhiều ý nghĩa. Mỗi sản phẩm được làm thủ công tỉ mỉ, chọn lựa kỹ lưỡng từ chất liệu đến từng chi tiết.",
+    "channels": {
+      "tiktok": "@sugongbychungminh23",
+      "instagram": "@sugongbychungminh",
+      "zalo": "Chat với SUGONG"
+    }
+  },
+  "categories": [
+    {
+      "name": "Túi handmade",
+      "image": "assets/categories/bag.jpg"
+    },
+    {
+      "name": "Scrunchie",
+      "image": "assets/categories/scrunchie.jpg"
+    },
+    {
+      "name": "Quà tặng",
+      "image": "assets/categories/giftbox.jpg"
+    },
+    {
+      "name": "Custom",
+      "image": "assets/categories/custom.jpg"
+    }
+  ],
+  "products": [
+    {
+      "id": "bag-lavender",
+      "name": "Túi tote hoa nhí tím",
+      "price": "390.000đ",
+      "category": "Túi handmade",
+      "customizable": true,
+      "short_description": "Túi tote handmade nhẹ nhàng với họa tiết hoa tím.",
+      "images": [
+        "assets/products/bag-lavender-01.jpg",
+        "assets/products/bag-lavender-02.jpg",
+        "assets/products/bag-lavender-detail.jpg"
+      ],
+      "video": "assets/videos/bag-lavender.mp4"
+    },
+    {
+      "id": "scrunchie-pastel",
+      "name": "Scrunchie lụa pastel",
+      "price": "89.000đ",
+      "category": "Scrunchie",
+      "customizable": false,
+      "short_description": "Bộ scrunchie pastel mềm mại, nữ tính.",
+      "images": [
+        "assets/products/scrunchie-pastel.jpg"
+      ]
+    },
+    {
+      "id": "giftbox-bear",
+      "name": "Hộp quà gấu bông hoa nhí",
+      "price": "520.000đ",
+      "category": "Quà tặng",
+      "customizable": true,
+      "short_description": "Hộp quà handmade với gấu bông và phụ kiện phối màu.",
+      "images": [
+        "assets/products/giftbox-bear.jpg"
+      ]
+    },
+    {
+      "id": "graduation-gift",
+      "name": "Set tốt nghiệp handmade",
+      "price": "490.000đ",
+      "category": "Quà tặng",
+      "customizable": true,
+      "short_description": "Set quà tốt nghiệp thiết kế riêng theo yêu cầu.",
+      "images": [
+        "assets/products/graduation-gift.jpg"
+      ]
+    },
+    {
+      "id": "custom-keychain",
+      "name": "Móc khóa custom tên",
+      "price": "Liên hệ",
+      "category": "Custom",
+      "customizable": true,
+      "short_description": "Móc khóa thêu tên và biểu tượng theo yêu cầu.",
+      "images": [
+        "assets/products/custom-keychain.jpg"
+      ]
+    },
+    {
+      "id": "custom-pouch",
+      "name": "Túi thêu tên custom",
+      "price": "290.000đ",
+      "category": "Custom",
+      "customizable": true,
+      "short_description": "Túi nhỏ thêu tên, chọn màu chỉ và họa tiết.",
+      "images": [
+        "assets/products/custom-pouch.jpg"
+      ]
+    }
+  ],
+  "custom_process": [
+    "Chọn sản phẩm",
+    "Gửi ý tưởng",
+    "Xác nhận thiết kế",
+    "Nhận thành phẩm"
+  ],
+  "testimonials": [
+    {
+      "name": "Thu Trang",
+      "text": "Túi xinh, hình thật giống ảnh và đóng gói rất cẩn thận."
+    },
+    {
+      "name": "Minh Anh",
+      "text": "Set tốt nghiệp handmade chỉn chu và bạn mình rất thích."
+    },
+    {
+      "name": "Quỳnh Như",
+      "text": "Hộp quà dễ thương, đúng phong cách nhẹ nhàng mình cần."
+    }
+  ]
+}

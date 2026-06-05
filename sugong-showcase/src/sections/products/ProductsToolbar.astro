@@ -1,0 +1,44 @@
+---
+import type { ProductCategory, ProductQuery } from "../../domain/product/product.types";
+
+interface Props {
+  activeCategory: ProductCategory | "all";
+  search?: string;
+  sort: NonNullable<ProductQuery["sort"]>;
+  total: number;
+}
+
+const { activeCategory, search = "", sort, total } = Astro.props;
+---
+
+<form class="grid gap-4 md:grid-cols-[1fr_auto] md:items-center" method="get" action="/products">
+  {activeCategory !== "all" && <input type="hidden" name="category" value={activeCategory} />}
+  <div class="relative">
+    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-soft" aria-hidden="true">⌕</span>
+    <label class="sr-only" for="product-search">Tìm sản phẩm</label>
+    <input
+      id="product-search"
+      class="min-h-13 w-full rounded-card border border-border bg-background-card px-11 text-sm text-text-primary outline-none transition placeholder:text-text-secondary focus:border-primary-soft"
+      type="search"
+      name="q"
+      value={search}
+      placeholder="Tìm sản phẩm bạn yêu thích..."
+    />
+  </div>
+  <div class="flex items-center gap-3">
+    <label class="sr-only" for="product-sort">Sắp xếp</label>
+    <select
+      id="product-sort"
+      class="min-h-13 rounded-card border border-border bg-background-card px-5 text-sm text-text-primary outline-none transition focus:border-primary-soft"
+      name="sort"
+    >
+      <option value="newest" selected={sort === "newest"}>Sắp xếp: Mới nhất</option>
+      <option value="price-asc" selected={sort === "price-asc"}>Giá thấp đến cao</option>
+      <option value="price-desc" selected={sort === "price-desc"}>Giá cao đến thấp</option>
+    </select>
+    <button class="min-h-13 rounded-card bg-primary px-5 text-sm font-medium text-background-card transition hover:bg-primary-dark" type="submit">
+      Lọc
+    </button>
+  </div>
+  <p class="text-sm text-text-secondary md:col-span-2">{total} sản phẩm đang hiển thị</p>
+</form>

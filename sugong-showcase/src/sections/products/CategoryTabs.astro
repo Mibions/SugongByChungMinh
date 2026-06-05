@@ -1,0 +1,64 @@
+---
+import Container from "../../components/ui/Container.astro";
+import type { ProductCategory } from "../../domain/product/product.types";
+
+type CategoryTab = {
+  label: string;
+  value: ProductCategory | "all";
+  icon: string;
+};
+
+interface Props {
+  activeCategory: ProductCategory | "all";
+  search?: string;
+  sort?: string;
+}
+
+const { activeCategory, search = "", sort = "newest" } = Astro.props;
+
+const tabs: CategoryTab[] = [
+  { label: "Tất cả", value: "all", icon: "✦" },
+  { label: "Túi handmade", value: "bag", icon: "▢" },
+  { label: "Scrunchie", value: "scrunchie", icon: "✿" },
+  { label: "Quà tặng", value: "gift", icon: "□" },
+  { label: "Custom", value: "custom", icon: "✎" },
+];
+
+function getHref(value: ProductCategory | "all") {
+  const params = new URLSearchParams();
+  if (value !== "all") params.set("category", value);
+  if (search) params.set("q", search);
+  if (sort !== "newest") params.set("sort", sort);
+
+  const query = params.toString();
+  return query ? `/products?${query}` : "/products";
+}
+---
+
+<section class="border-b border-border bg-background-card/65 py-4">
+  <Container>
+    <div class="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+      <div class="grid min-w-max grid-cols-5 gap-3">
+        {tabs.map((tab) => {
+          const active = tab.value === activeCategory;
+
+          return (
+            <a
+              class:list={[
+                "flex min-h-14 items-center justify-center gap-3 rounded-button border px-6 text-sm font-medium transition lg:min-w-48",
+                active
+                  ? "border-primary bg-primary text-background-card shadow-soft"
+                  : "border-border bg-background-card text-text-secondary hover:border-primary-soft hover:text-primary-dark",
+              ]}
+              href={getHref(tab.value)}
+              aria-current={active ? "page" : undefined}
+            >
+              <span class="text-xl" aria-hidden="true">{tab.icon}</span>
+              {tab.label}
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </Container>
+</section>

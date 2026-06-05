@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Placeholder product image for lavender handmade tote">
+  <rect width="1200" height="900" fill="#FFFDFF"/>
+  <rect x="90" y="80" width="1020" height="740" rx="48" fill="#EFE8F8"/>
+  <ellipse cx="600" cy="720" rx="320" ry="54" fill="#D9C8EC" opacity=".55"/>
+  <path d="M390 315c0-115 86-205 210-205s210 90 210 205" fill="none" stroke="#604A7C" stroke-width="24" stroke-linecap="round"/>
+  <path d="M330 300h540l-52 430H382L330 300Z" fill="#F8F5FC" stroke="#8D6CAF" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M430 395c40-35 76-35 116 0 40 35 76 35 116 0 40-35 76-35 116 0" fill="none" stroke="#F3D8E5" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="476" cy="500" r="22" fill="#8D6CAF"/>
+  <circle cx="610" cy="560" r="18" fill="#6F9B79"/>
+  <circle cx="722" cy="485" r="24" fill="#F3D8E5"/>
+  <path d="M475 478v-48M451 454h48M722 461v-50M697 436h50" stroke="#604A7C" stroke-width="10" stroke-linecap="round"/>
+</svg>

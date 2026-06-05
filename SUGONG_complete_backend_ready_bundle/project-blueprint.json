@@ -1,0 +1,30 @@
+{
+  "stack": {
+    "framework": "Astro 6",
+    "language": "TypeScript strict",
+    "interactive_ui": "React islands only",
+    "styling": "Tailwind CSS 4 with centralized @theme tokens",
+    "content": "Astro Content Collections + Zod",
+    "images": "Astro Image/Picture",
+    "component_workshop": "Storybook",
+    "e2e_testing": "Playwright",
+    "package_manager": "pnpm",
+    "runtime": "Node.js 22",
+    "deployment": "Vercel static build"
+  },
+  "routes": [
+    "/",
+    "/products",
+    "/products/[slug]",
+    "/custom",
+    "/about"
+  ],
+  "constraints": {
+    "max_page_lines": 120,
+    "max_section_lines": 180,
+    "max_primary_cta_per_section": 1,
+    "desktop_product_columns": 3,
+    "global_state_library": false,
+    "backend_required": false
+  }
+}

@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { createProductService } from "../../lib/products";
+import type { ProductCategory, ProductQuery } from "../../domain/product/product.types";
+import CategoryTabs from "../../sections/products/CategoryTabs.astro";
+import ProductsGridSection from "../../sections/products/ProductsGridSection.astro";
+import ProductsHeader from "../../sections/products/ProductsHeader.astro";
+
+const categoryValues: ProductCategory[] = ["bag", "scrunchie", "gift", "custom"];
+const sortValues: NonNullable<ProductQuery["sort"]>[] = ["newest", "price-asc", "price-desc"];
+const pageSize = 6;
+
+const params = Astro.url.searchParams;
+const rawCategory = params.get("category");
+const activeCategory: ProductCategory | "all" = categoryValues.includes(rawCategory as ProductCategory)
+  ? (rawCategory as ProductCategory)
+  : "all";
+const search = params.get("q")?.trim() ?? "";
+const sort = sortValues.includes(params.get("sort") as NonNullable<ProductQuery["sort"]>)
+  ? (params.get("sort") as NonNullable<ProductQuery["sort"]>)
+  : "newest";
+const currentPage = Math.max(Number(params.get("page") ?? "1") || 1, 1);
+
+const productService = await createProductService();
+const filteredProducts = await productService.getProducts({
+  category: activeCategory === "all" ? undefined : activeCategory,
+  search: search || undefined,
+  sort,
+});
+
+const totalPages = Math.max(Math.ceil(filteredProducts.length / pageSize), 1);
+const safePage = Math.min(currentPage, totalPages);
+const products = filteredProducts.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+function getPageHref(page: number) {
+  const nextParams = new URLSearchParams();
+  if (activeCategory !== "all") nextParams.set("category", activeCategory);
+  if (search) nextParams.set("q", search);
+  if (sort !== "newest") nextParams.set("sort", sort);
+  if (page > 1) nextParams.set("page", String(page));
+
+  const query = nextParams.toString();
+  return query ? `/products?${query}` : "/products";
+}
+
+const paginationLinks = Array.from({ length: totalPages }, (_, index) => {
+  const page = index + 1;
+  return {
+    label: String(page),
+    href: getPageHref(page),
+    active: page === safePage,
+  };
+});
+const nextHref = safePage < totalPages ? getPageHref(safePage + 1) : undefined;
+---
+
+<BaseLayout
+  title="Sản phẩm"
+  description="Khám phá những sản phẩm handmade được làm thủ công và có thể thiết kế theo yêu cầu."
+>
+  <ProductsHeader />
+  <CategoryTabs activeCategory={activeCategory} search={search} sort={sort} />
+  <ProductsGridSection
+    products={products}
+    paginationLinks={paginationLinks}
+    activeCategory={activeCategory}
+    search={search}
+    sort={sort}
+    total={filteredProducts.length}
+    nextHref={nextHref}
+  />
+</BaseLayout>

@@ -1,0 +1,10 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { SeoInput } from "../lib/seo";
+
+interface Props extends SeoInput {}
+---
+
+<BaseLayout {...Astro.props}>
+  <slot />
+</BaseLayout>

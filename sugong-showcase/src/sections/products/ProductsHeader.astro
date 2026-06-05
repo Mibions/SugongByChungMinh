@@ -1,0 +1,24 @@
+---
+import Container from "../../components/ui/Container.astro";
+---
+
+<section class="relative overflow-hidden border-b border-border bg-background-card/45 py-10 sm:py-14">
+  <Container>
+    <div class="max-w-3xl space-y-5">
+      <nav class="text-sm text-text-secondary" aria-label="Breadcrumb">
+        <a class="hover:text-primary-dark" href="/">Trang chủ</a>
+        <span class="px-2 text-primary-soft">›</span>
+        <span class="text-primary-dark">Sản phẩm</span>
+      </nav>
+      <div class="space-y-3">
+        <h1 class="font-heading text-5xl leading-tight text-primary-dark sm:text-6xl">Trang sản phẩm</h1>
+        <p class="text-base leading-7 text-text-secondary">
+          Khám phá bộ sưu tập handmade riêng biệt của SUGONG.
+        </p>
+      </div>
+    </div>
+    <div class="pointer-events-none absolute right-12 top-14 hidden text-7xl font-light text-primary-soft lg:block">
+      ⟡
+    </div>
+  </Container>
+</section>

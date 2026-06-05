@@ -1,0 +1,30 @@
+@theme {
+  --color-background-main: #F8F5FC;
+  --color-background-section: #EFE8F8;
+  --color-background-card: #FFFDFF;
+  --color-primary: #8D6CAF;
+  --color-primary-dark: #604A7C;
+  --color-primary-soft: #D9C8EC;
+  --color-accent-pink: #F3D8E5;
+  --color-accent-cream: #F7F0E8;
+  --color-text-primary: #30283A;
+  --color-text-secondary: #71657D;
+  --color-border: #E4DAEF;
+  --color-success: #6F9B79;
+
+  --font-heading: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-body: "Be Vietnam Pro", Inter, system-ui, sans-serif;
+
+  --radius-card: 18px;
+  --radius-button: 12px;
+
+  --shadow-soft: 0 8px 28px rgb(82 61 110 / 8%);
+  --shadow-feather: 0 16px 42px rgb(82 61 110 / 7%);
+
+  --spacing-header: 64px;
+  --spacing-section-mobile: 56px;
+  --spacing-section-desktop: 88px;
+  --spacing-grid: 24px;
+  --container-page: 1280px;
+  --container-wide: 1500px;
+}
