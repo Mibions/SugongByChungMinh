@@ -13,5 +13,8 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ["react", "react-dom", "react-dom/client", "lucide-react"],
+    },
   },
 });

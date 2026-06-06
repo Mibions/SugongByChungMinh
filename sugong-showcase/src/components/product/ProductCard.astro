@@ -15,7 +15,6 @@ const categoryIcons: Partial<Record<Product["category"], typeof Gift>> = {
   custom: WandSparkles,
 };
 const CategoryIcon = categoryIcons[product.category] ?? Scissors;
-const ctaLabel = product.customizable ? "Tư vấn custom" : "Xem chi tiết";
 ---
 
 <article class="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
@@ -58,7 +57,7 @@ const ctaLabel = product.customizable ? "Tư vấn custom" : "Xem chi tiết";
       class="mt-auto inline-flex items-center gap-2 text-sm font-medium text-primary-dark transition hover:text-text-primary"
       href={withBase(`/products/${product.slug}`)}
     >
-      {ctaLabel}
+      Xem chi tiết
       <Sparkles size={15} aria-hidden="true" />
     </a>
   </div>

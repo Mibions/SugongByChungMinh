@@ -8,7 +8,11 @@ export class LocalProductRepository implements ProductRepository {
     let result = this.products.filter((product) => product.published);
 
     if (query.category) {
-      result = result.filter((product) => product.category === query.category);
+      result = result.filter((product) =>
+        query.category === "custom"
+          ? product.category === "custom" || product.customizable
+          : product.category === query.category,
+      );
     }
 
     if (query.featured !== undefined) {
@@ -17,9 +21,29 @@ export class LocalProductRepository implements ProductRepository {
 
     if (query.search) {
       const term = query.search.trim().toLocaleLowerCase("vi");
-      result = result.filter((product) =>
-        `${product.name} ${product.shortDescription}`.toLocaleLowerCase("vi").includes(term),
-      );
+      const categoryLabels: Record<Product["category"], string> = {
+        bag: "túi handmade bag tote",
+        scrunchie: "scrunchie phụ kiện tóc",
+        gift: "quà tặng gift hộp quà",
+        custom: "custom cá nhân hóa thêu tên",
+        graduation: "tốt nghiệp graduation quà tặng",
+      };
+
+      result = result.filter((product) => {
+        const keywords = [
+          product.name,
+          product.shortDescription,
+          product.description,
+          categoryLabels[product.category],
+          product.customizable ? "custom cá nhân hóa handmade" : "handmade",
+          product.formattedPrice,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("vi");
+
+        return keywords.includes(term);
+      });
     }
 
     if (query.sort === "price-asc") {
@@ -27,7 +51,7 @@ export class LocalProductRepository implements ProductRepository {
     }
 
     if (query.sort === "price-desc") {
-      result = [...result].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+      result = [...result].sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
     }
 
     if (query.page && query.pageSize) {

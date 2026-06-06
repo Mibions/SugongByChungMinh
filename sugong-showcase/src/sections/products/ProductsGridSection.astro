@@ -3,6 +3,8 @@ import ProductCard from "../../components/product/ProductCard.astro";
 import Container from "../../components/ui/Container.astro";
 import type { Product } from "../../domain/product/product.types";
 import type { ProductCategory, ProductQuery } from "../../domain/product/product.types";
+import { MobileFilterDrawer } from "./MobileFilterDrawer";
+import ProductsEmptyState from "./ProductsEmptyState.astro";
 import ProductsSidebar from "./ProductsSidebar.astro";
 import ProductsToolbar from "./ProductsToolbar.astro";
 
@@ -27,14 +29,7 @@ const { products, paginationLinks, activeCategory, search = "", sort, total, nex
 
 <section class="py-section-mobile lg:py-section-desktop">
   <Container>
-    <details class="mb-5 rounded-card border border-primary-soft/60 bg-background-card p-4 shadow-soft lg:hidden">
-      <summary class="cursor-pointer text-sm font-medium text-primary-dark">Mở bộ lọc</summary>
-      <div class="mt-4 grid gap-3 text-sm text-text-secondary">
-        <p>Khoảng giá: 0đ - 600.000đ</p>
-        <p>Màu sắc: Lavender, hồng nhạt, kem</p>
-        <p>Sản phẩm custom và handmade được ưu tiên hiển thị trong bộ sưu tập.</p>
-      </div>
-    </details>
+    <MobileFilterDrawer client:load />
 
     <div class="grid gap-7 lg:grid-cols-[280px_1fr] xl:grid-cols-[300px_1fr]">
       <ProductsSidebar />
@@ -47,10 +42,7 @@ const { products, paginationLinks, activeCategory, search = "", sort, total, nex
               {products.map((product) => <ProductCard product={product} />)}
             </div>
           ) : (
-            <div class="rounded-card border border-primary-soft/60 bg-background-card p-8 text-center shadow-soft">
-              <p class="font-heading text-2xl text-text-primary">Chưa tìm thấy sản phẩm phù hợp</p>
-              <p class="mt-3 text-sm text-text-secondary">Thử đổi từ khóa hoặc chọn lại danh mục.</p>
-            </div>
+            <ProductsEmptyState />
           )
         }
 
