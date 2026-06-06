@@ -5,11 +5,12 @@ import Container from "../components/ui/Container.astro";
 import { MobileNavigation } from "../features/mobile-navigation/MobileNavigation";
 import { createSeo, type SeoInput } from "../lib/seo";
 import { brand, navigationItems } from "../lib/site-data";
+import { withBase, withoutBase } from "../lib/url";
 
 interface Props extends SeoInput {}
 
 const seo = createSeo(Astro.props);
-const currentPath = Astro.url.pathname;
+const currentPath = withoutBase(Astro.url.pathname);
 ---
 
 <!doctype html>
@@ -29,7 +30,7 @@ const currentPath = Astro.url.pathname;
   <body class="bg-background-main text-text-primary antialiased">
     <header class="sticky top-0 z-50 bg-background-main/90 shadow-[0_1px_0_rgb(228_218_239/45%)] backdrop-blur">
       <Container class="flex h-header max-w-wide items-center justify-between gap-6">
-        <a class="font-heading text-2xl font-bold tracking-normal text-primary-dark" href="/">SUGONG</a>
+        <a class="font-heading text-2xl font-bold tracking-normal text-primary-dark" href={withBase("/")}>SUGONG</a>
         <nav class="hidden items-center gap-7 text-sm font-medium text-text-secondary md:flex" aria-label="Điều hướng chính">
           {navigationItems.map((item) => (
             <a
@@ -39,7 +40,7 @@ const currentPath = Astro.url.pathname;
                   ? "text-primary-dark"
                   : "text-text-secondary",
               ]}
-              href={item.href}
+              href={withBase(item.href)}
               aria-current={currentPath === item.href || currentPath.startsWith(`${item.href}/`) ? "page" : undefined}
             >
               {item.label}
@@ -62,11 +63,11 @@ const currentPath = Astro.url.pathname;
           <p class="max-w-sm leading-6">{brand.description}</p>
         </div>
         <nav class="grid gap-3" aria-label="Điều hướng chân trang">
-          {navigationItems.map((item) => <a class="hover:text-primary-dark" href={item.href}>{item.label}</a>)}
+          {navigationItems.map((item) => <a class="hover:text-primary-dark" href={withBase(item.href)}>{item.label}</a>)}
         </nav>
         <div class="grid gap-3">
-          <a class="hover:text-primary-dark" href="/about#tiktok">TikTok {brand.channels.tiktok}</a>
-          <a class="hover:text-primary-dark" href="/about">Instagram {brand.channels.instagram}</a>
+          <a class="hover:text-primary-dark" href={withBase("/about#tiktok")}>TikTok {brand.channels.tiktok}</a>
+          <a class="hover:text-primary-dark" href={withBase("/about")}>Instagram {brand.channels.instagram}</a>
           <a class="hover:text-primary-dark" href={brand.channels.zalo}>Zalo</a>
         </div>
       </Container>

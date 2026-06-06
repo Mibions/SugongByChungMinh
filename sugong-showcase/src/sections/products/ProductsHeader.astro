@@ -1,12 +1,13 @@
 ---
 import Container from "../../components/ui/Container.astro";
+import { withBase } from "../../lib/url";
 ---
 
 <section class="relative overflow-hidden border-b border-border bg-background-card/45 py-10 sm:py-14">
   <Container>
     <div class="max-w-3xl space-y-5">
       <nav class="text-sm text-text-secondary" aria-label="Breadcrumb">
-        <a class="hover:text-primary-dark" href="/">Trang chủ</a>
+        <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
         <span class="px-2 text-primary-soft">›</span>
         <span class="text-primary-dark">Sản phẩm</span>
       </nav>

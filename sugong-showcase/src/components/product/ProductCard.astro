@@ -1,5 +1,6 @@
 ---
 import type { Product } from "../../domain/product/product.types";
+import { withBase } from "../../lib/url";
 
 interface Props {
   product: Product;
@@ -10,11 +11,11 @@ const image = product.images.toSorted((a, b) => a.sortOrder - b.sortOrder)[0];
 ---
 
 <article class="overflow-hidden rounded-card bg-background-card shadow-feather ring-1 ring-primary-soft/20">
-  <a class="group block" href={`/products/${product.slug}`} aria-label={`Xem ${product.name}`}>
+  <a class="group block" href={withBase(`/products/${product.slug}`)} aria-label={`Xem ${product.name}`}>
     <div class="relative aspect-[4/3] overflow-hidden bg-background-section">
       <img
         class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-        src={image.url}
+        src={withBase(image.url)}
         alt={image.alt}
         width={image.width}
         height={image.height}
@@ -36,7 +37,7 @@ const image = product.images.toSorted((a, b) => a.sortOrder - b.sortOrder)[0];
     </div>
     <a
       class="inline-flex items-center gap-2 text-sm font-medium text-primary-dark transition hover:text-text-primary"
-      href={`/products/${product.slug}`}
+      href={withBase(`/products/${product.slug}`)}
     >
       Xem chi tiết <span aria-hidden="true">→</span>
     </a>

@@ -2,6 +2,7 @@
 import Button from "../../components/ui/Button.astro";
 import Container from "../../components/ui/Container.astro";
 import { brand } from "../../lib/site-data";
+import { withBase } from "../../lib/url";
 ---
 
 <section class="bg-background-card pb-section-mobile">
@@ -11,7 +12,7 @@ import { brand } from "../../lib/site-data";
         <div class="min-h-28 bg-background-section">
           <img
             class="h-full min-h-28 w-full object-cover"
-            src="/assets/brand/footer-bag.png"
+            src={withBase("/assets/brand/footer-bag.png")}
             alt="Túi lavender handmade trên nền hoa tím"
             width="2048"
             height="640"

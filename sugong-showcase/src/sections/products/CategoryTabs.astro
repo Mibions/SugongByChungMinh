@@ -1,6 +1,7 @@
 ---
 import Container from "../../components/ui/Container.astro";
 import type { ProductCategory } from "../../domain/product/product.types";
+import { withBase } from "../../lib/url";
 
 type CategoryTab = {
   label: string;
@@ -31,7 +32,7 @@ function getHref(value: ProductCategory | "all") {
   if (sort !== "newest") params.set("sort", sort);
 
   const query = params.toString();
-  return query ? `/products?${query}` : "/products";
+  return withBase(query ? `/products?${query}` : "/products");
 }
 ---
 

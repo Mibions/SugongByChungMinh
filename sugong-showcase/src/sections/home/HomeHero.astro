@@ -2,6 +2,7 @@
 import Button from "../../components/ui/Button.astro";
 import Container from "../../components/ui/Container.astro";
 import { brand } from "../../lib/site-data";
+import { withBase } from "../../lib/url";
 
 const tiktokVideoIds = brand.heroTikTokVideoIds;
 const tiktokEmbedUrl = tiktokVideoIds.length > 0
@@ -14,7 +15,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
   <img
     class="pointer-events-none absolute bottom-0 left-0 z-[-1] hidden h-full w-72 object-cover object-left-bottom opacity-45 md:block"
     style="-webkit-mask-image: linear-gradient(to right, black 0%, black 42%, transparent 100%); mask-image: linear-gradient(to right, black 0%, black 42%, transparent 100%);"
-    src="/assets/brand/header-left.png"
+    src={withBase("/assets/brand/header-left.png")}
     alt=""
     width="1024"
     height="1536"
@@ -23,7 +24,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
   <img
     class="pointer-events-none absolute bottom-0 right-0 z-[-1] hidden h-full w-80 object-cover object-right-bottom opacity-35 lg:block"
     style="-webkit-mask-image: linear-gradient(to left, black 0%, black 46%, transparent 100%); mask-image: linear-gradient(to left, black 0%, black 46%, transparent 100%);"
-    src="/assets/brand/header-right.png"
+    src={withBase("/assets/brand/header-right.png")}
     alt=""
     width="1024"
     height="1536"
@@ -78,7 +79,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
                   <img
                     class="h-full w-full object-cover"
                     style="object-position: 18% center;"
-                    src="/assets/brand/footer-bag.png"
+                    src={withBase("/assets/brand/footer-bag.png")}
                     alt="Túi tote hoa nhí tím trong khung preview TikTok"
                     width="2048"
                     height="640"

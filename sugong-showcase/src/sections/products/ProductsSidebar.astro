@@ -1,5 +1,6 @@
 ---
 import type { ProductCategory } from "../../domain/product/product.types";
+import { withBase } from "../../lib/url";
 
 interface Props {
   activeCategory: ProductCategory | "all";
@@ -32,7 +33,7 @@ const colors = ["bg-primary", "bg-accent-pink", "bg-accent-cream", "bg-primary-s
           const active = activeCategory === item.value;
 
           return (
-            <a class="flex items-center gap-3 text-sm text-text-secondary hover:text-primary-dark" href={item.href}>
+            <a class="flex items-center gap-3 text-sm text-text-secondary hover:text-primary-dark" href={withBase(item.href)}>
               <span
                 class:list={[
                   "h-4 w-4 rounded-full border",

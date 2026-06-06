@@ -5,6 +5,7 @@ import type { ProductCategory, ProductQuery } from "../../domain/product/product
 import CategoryTabs from "../../sections/products/CategoryTabs.astro";
 import ProductsGridSection from "../../sections/products/ProductsGridSection.astro";
 import ProductsHeader from "../../sections/products/ProductsHeader.astro";
+import { withBase } from "../../lib/url";
 
 const categoryValues: ProductCategory[] = ["bag", "scrunchie", "gift", "custom"];
 const sortValues: NonNullable<ProductQuery["sort"]>[] = ["newest", "price-asc", "price-desc"];
@@ -40,7 +41,7 @@ function getPageHref(page: number) {
   if (page > 1) nextParams.set("page", String(page));
 
   const query = nextParams.toString();
-  return query ? `/products?${query}` : "/products";
+  return withBase(query ? `/products?${query}` : "/products");
 }
 
 const paginationLinks = Array.from({ length: totalPages }, (_, index) => {

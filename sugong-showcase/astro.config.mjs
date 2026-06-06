@@ -3,8 +3,13 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+const site = process.env.ASTRO_SITE ?? "https://mibions.github.io";
+const base = process.env.ASTRO_BASE ?? (isGitHubPages ? "/SugongByChungMinh" : "/");
+
 export default defineConfig({
-  site: "https://sugong.example.com",
+  site,
+  base,
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],

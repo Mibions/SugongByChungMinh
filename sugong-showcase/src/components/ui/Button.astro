@@ -1,4 +1,6 @@
 ---
+import { withBase } from "../../lib/url";
+
 interface Props {
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
@@ -27,7 +29,7 @@ const classes = [
 
 {
   href ? (
-    <a class:list={classes} href={href}>
+    <a class:list={classes} href={withBase(href)}>
       <slot />
     </a>
   ) : (

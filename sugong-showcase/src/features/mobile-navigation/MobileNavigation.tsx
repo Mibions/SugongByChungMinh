@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { withBase, withoutBase } from "../../lib/url";
 
 type NavItem = {
   href: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export function MobileNavigation({ items, currentPath = "/" }: Props) {
   const [open, setOpen] = useState(false);
+  const normalizedPath = withoutBase(currentPath);
 
   return (
     <div className="relative md:hidden">
@@ -31,7 +33,7 @@ export function MobileNavigation({ items, currentPath = "/" }: Props) {
       {open && (
         <nav className="absolute right-0 top-12 w-56 rounded-card border border-border bg-background-card p-3 shadow-soft">
           {items.map((item) => {
-            const active = currentPath === item.href || currentPath.startsWith(`${item.href}/`);
+            const active = normalizedPath === item.href || normalizedPath.startsWith(`${item.href}/`);
 
             return (
               <a
@@ -39,7 +41,7 @@ export function MobileNavigation({ items, currentPath = "/" }: Props) {
                   "block rounded-button px-3 py-2 text-sm font-medium hover:bg-background-section hover:text-primary-dark",
                   active ? "text-primary-dark" : "text-text-secondary",
                 ].join(" ")}
-                href={item.href}
+                href={withBase(item.href)}
                 key={item.href}
                 aria-current={active ? "page" : undefined}
               >

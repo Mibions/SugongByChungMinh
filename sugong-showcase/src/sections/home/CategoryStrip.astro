@@ -1,5 +1,6 @@
 ---
 import Container from "../../components/ui/Container.astro";
+import { withBase } from "../../lib/url";
 
 type Category = {
   name: string;
@@ -23,13 +24,13 @@ const positions = ["18% center", "center", "center", "center"];
       {categories.map((category, index) => (
         <a
           class="group overflow-hidden rounded-card bg-background-card shadow-feather ring-1 ring-primary-soft/20 transition hover:-translate-y-1 hover:ring-primary-soft/35"
-          href={category.href}
+          href={withBase(category.href)}
         >
           <div class="aspect-[1.45/1] overflow-hidden bg-background-section">
             <img
               class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.025]"
               style={`object-position: ${positions[index]};`}
-              src={category.image}
+              src={withBase(category.image)}
               alt={category.alt}
               width="900"
               height="620"
