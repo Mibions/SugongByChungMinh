@@ -8,6 +8,7 @@ import ProductCustomCta from "../../sections/product-detail/ProductCustomCta.ast
 import ProductDescription from "../../sections/product-detail/ProductDescription.astro";
 import ProductInfo from "../../sections/product-detail/ProductInfo.astro";
 import RelatedProducts from "../../sections/product-detail/RelatedProducts.astro";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export async function getStaticPaths() {
   const productService = await createProductService();
@@ -30,15 +31,21 @@ const { product, relatedProducts } = Astro.props;
 <BaseLayout title={product.name} description={product.shortDescription}>
   <section class="py-section-mobile lg:py-section-desktop">
     <Container>
-      <nav class="mb-6 text-sm text-text-secondary" aria-label="Breadcrumb">
-        <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
-        <span class="px-2 text-primary-soft">›</span>
-        <a class="hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
-        <span class="px-2 text-primary-soft">›</span>
-        <span class="text-primary-dark">{product.name}</span>
-      </nav>
+      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <a class="inline-flex w-fit items-center gap-2 text-sm font-medium text-primary-dark hover:text-text-primary" href={withBase("/products")}>
+          <ArrowLeft size={16} aria-hidden="true" />
+          Quay lại sản phẩm
+        </a>
+        <nav class="flex items-center gap-2 text-xs text-text-secondary" aria-label="Breadcrumb">
+          <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
+          <ChevronRight size={14} aria-hidden="true" />
+          <a class="hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
+          <ChevronRight size={14} aria-hidden="true" />
+          <span class="text-primary-dark">{product.name}</span>
+        </nav>
+      </div>
 
-      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.85fr)] lg:items-start">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(380px,0.95fr)] lg:items-start">
         <ProductGallery
           images={product.images}
           videoUrl={product.videoUrl}

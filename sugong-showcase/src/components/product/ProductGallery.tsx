@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { PlayCircle } from "lucide-react";
 import type { ProductImage } from "../../domain/product/product.types";
 import { cn } from "../../lib/cn";
 import { withBase } from "../../lib/url";
@@ -19,13 +20,13 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
   const activeImage = sortedImages[activeIndex] ?? sortedImages[0];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[96px_1fr]">
-      <div className="order-2 flex gap-3 overflow-x-auto lg:order-1 lg:grid lg:content-start lg:overflow-visible">
+    <div className="grid gap-4 lg:grid-cols-[92px_1fr]">
+      <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
         {sortedImages.map((image, index) => (
           <button
             className={cn(
-              "aspect-square w-20 shrink-0 overflow-hidden rounded-button border bg-background-card transition lg:w-full",
-              index === activeIndex ? "border-primary shadow-soft" : "border-border",
+              "aspect-square w-20 shrink-0 overflow-hidden rounded-card border bg-background-card transition lg:w-full",
+              index === activeIndex ? "border-primary-soft shadow-soft ring-2 ring-primary-soft/45" : "border-border hover:border-primary-soft",
             )}
             type="button"
             aria-label={`Xem ảnh ${index + 1} của ${productName}`}
@@ -48,19 +49,25 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
         ))}
         <button
           className={cn(
-            "aspect-square w-20 shrink-0 rounded-button border bg-text-primary px-2 text-xs font-medium text-background-card transition lg:w-full",
-            showVideo ? "border-primary shadow-soft" : "border-border",
+            "relative aspect-square w-20 shrink-0 overflow-hidden rounded-card border bg-text-primary px-2 text-xs font-medium text-background-card transition lg:w-full",
+            showVideo ? "border-primary-soft shadow-soft ring-2 ring-primary-soft/45" : "border-border hover:border-primary-soft",
           )}
           type="button"
           aria-label={`Xem video của ${productName}`}
           aria-pressed={showVideo}
           onClick={() => setShowVideo(true)}
         >
-          Video
+          <span className="absolute inset-0 bg-primary-dark/70" />
+          <span className="relative z-10 grid h-full place-items-center">
+            <PlayCircle size={24} aria-hidden="true" />
+            <span className="mt-1 rounded-full bg-background-card/90 px-2 py-0.5 text-[10px] text-primary-dark">
+              Video
+            </span>
+          </span>
         </button>
       </div>
 
-      <div className="order-1 overflow-hidden rounded-card bg-background-card shadow-feather ring-1 ring-primary-soft/20 lg:order-2">
+      <div className="order-1 overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-feather lg:order-2">
         {showVideo ? (
           videoUrl ? (
             <iframe
@@ -74,6 +81,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
           ) : (
             <div className="grid aspect-[4/3] min-h-80 place-items-center bg-background-section p-8 text-center">
               <div className="max-w-xs">
+                <PlayCircle className="mx-auto mb-4 text-primary-dark" size={38} aria-hidden="true" />
                 <p className="font-heading text-3xl text-primary-dark">Video đang cập nhật</p>
                 <p className="mt-3 text-sm leading-6 text-text-secondary">
                   SUGONG sẽ bổ sung video cận chất liệu và chi tiết sản phẩm tại đây.

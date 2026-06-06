@@ -1,25 +1,28 @@
 ---
 import Container from "../../components/ui/Container.astro";
 import { withBase } from "../../lib/url";
+import { ChevronRight, Sparkles } from "lucide-react";
 ---
 
-<section class="relative overflow-hidden border-b border-border bg-background-card/45 py-10 sm:py-14">
-  <Container>
-    <div class="max-w-3xl space-y-5">
-      <nav class="text-sm text-text-secondary" aria-label="Breadcrumb">
+<section class="relative overflow-hidden border-b border-border bg-background-card py-8 sm:py-10 lg:py-12">
+  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgb(243_216_229/70%),transparent_30%),radial-gradient(circle_at_85%_10%,rgb(217_200_236/75%),transparent_34%)]"></div>
+  <Container class="relative">
+    <div class="flex min-h-40 max-w-3xl flex-col justify-center space-y-4 sm:min-h-44 lg:min-h-52">
+      <nav class="flex items-center gap-2 text-xs font-medium text-text-secondary" aria-label="Breadcrumb">
         <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
-        <span class="px-2 text-primary-soft">›</span>
+        <ChevronRight size={14} aria-hidden="true" />
         <span class="text-primary-dark">Sản phẩm</span>
       </nav>
       <div class="space-y-3">
-        <h1 class="font-heading text-5xl leading-tight text-primary-dark sm:text-6xl">Trang sản phẩm</h1>
-        <p class="text-base leading-7 text-text-secondary">
-          Khám phá bộ sưu tập handmade riêng biệt của SUGONG.
+        <p class="inline-flex w-fit items-center gap-2 rounded-full border border-primary-soft bg-background-card/75 px-4 py-2 text-xs font-semibold uppercase text-primary-dark shadow-soft">
+          <Sparkles size={15} aria-hidden="true" />
+          Bộ sưu tập handmade
+        </p>
+        <h1 class="font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">Sản phẩm SUGONG</h1>
+        <p class="max-w-2xl text-sm leading-7 text-text-secondary sm:text-base">
+          Khám phá những món quà handmade được làm riêng theo câu chuyện của bạn.
         </p>
       </div>
-    </div>
-    <div class="pointer-events-none absolute right-12 top-14 hidden text-7xl font-light text-primary-soft lg:block">
-      ⟡
     </div>
   </Container>
 </section>

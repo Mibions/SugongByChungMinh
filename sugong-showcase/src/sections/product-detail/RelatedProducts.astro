@@ -17,11 +17,11 @@ const { products } = Astro.props;
       <div class="mb-8">
         <SectionHeading
           eyebrow="Gợi ý tiếp theo"
-          title="Sản phẩm liên quan"
+          title="Sản phẩm cùng phong cách"
           description="Những mẫu có cùng tinh thần handmade nhẹ nhàng để bạn xem thêm."
         />
       </div>
-      <div class="grid gap-grid sm:grid-cols-2 lg:grid-cols-3">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
         {products.map((product) => <ProductCard product={product} />)}
       </div>
     </Container>

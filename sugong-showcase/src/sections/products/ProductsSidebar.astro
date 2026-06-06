@@ -1,55 +1,26 @@
 ---
-import type { ProductCategory } from "../../domain/product/product.types";
-import { withBase } from "../../lib/url";
-
-interface Props {
-  activeCategory: ProductCategory | "all";
-}
-
-const { activeCategory } = Astro.props;
-
-const categories: { label: string; value: ProductCategory | "all"; href: string }[] = [
-  { label: "Tất cả", value: "all", href: "/products" },
-  { label: "Túi handmade", value: "bag", href: "/products?category=bag" },
-  { label: "Scrunchie", value: "scrunchie", href: "/products?category=scrunchie" },
-  { label: "Quà tặng", value: "gift", href: "/products?category=gift" },
-  { label: "Custom", value: "custom", href: "/products?category=custom" },
-];
+import { Palette, Scissors, SlidersHorizontal, Tags, WandSparkles } from "lucide-react";
 
 const colors = ["bg-primary", "bg-accent-pink", "bg-accent-cream", "bg-primary-soft", "bg-success"];
 ---
 
-<aside class="hidden space-y-5 lg:block">
-  <div class="rounded-card border border-border bg-background-card p-5 shadow-soft">
-    <div class="mb-6 flex items-center justify-between">
-      <p class="font-heading text-xl text-primary-dark">Bộ lọc</p>
-      <span class="text-xl text-primary-dark" aria-hidden="true">≛</span>
-    </div>
-
-    <div class="space-y-4">
-      <p class="font-medium text-primary-dark">Danh mục</p>
-      <div class="grid gap-3">
-        {categories.map((item) => {
-          const active = activeCategory === item.value;
-
-          return (
-            <a class="flex items-center gap-3 text-sm text-text-secondary hover:text-primary-dark" href={withBase(item.href)}>
-              <span
-                class:list={[
-                  "h-4 w-4 rounded-full border",
-                  active ? "border-primary bg-primary" : "border-border bg-background-card",
-                ]}
-                aria-hidden="true"
-              />
-              <span class:list={[active && "font-medium text-primary-dark"]}>{item.label}</span>
-            </a>
-          );
-        })}
+<aside class="hidden lg:block">
+  <div class="space-y-6 rounded-card border border-primary-soft/60 bg-background-card/90 p-6 shadow-soft">
+    <div class="flex items-center gap-3">
+      <span class="grid h-10 w-10 place-items-center rounded-full bg-background-section text-primary-dark">
+        <SlidersHorizontal size={18} aria-hidden="true" />
+      </span>
+      <div>
+        <p class="font-heading text-xl text-primary-dark">Bộ lọc</p>
+        <p class="text-xs text-text-secondary">Tinh gọn theo phong cách bạn thích</p>
       </div>
     </div>
 
-    <div class="mt-6 border-t border-border pt-6">
-      <p class="font-medium text-primary-dark">Khoảng giá</p>
+    <div class="border-t border-border pt-6">
+      <p class="flex items-center gap-2 font-medium text-primary-dark">
+        <Tags size={17} aria-hidden="true" />
+        Khoảng giá
+      </p>
       <div class="mt-4 h-1.5 rounded-full bg-primary-soft">
         <div class="h-full w-full rounded-full bg-primary"></div>
       </div>
@@ -59,21 +30,31 @@ const colors = ["bg-primary", "bg-accent-pink", "bg-accent-cream", "bg-primary-s
       </div>
     </div>
 
-    <div class="mt-6 border-t border-border pt-6">
-      <p class="font-medium text-primary-dark">Màu sắc</p>
+    <div class="border-t border-border pt-6">
+      <p class="flex items-center gap-2 font-medium text-primary-dark">
+        <Palette size={17} aria-hidden="true" />
+        Màu sắc
+      </p>
       <div class="mt-4 flex items-center gap-3">
         {colors.map((color) => <span class:list={["h-6 w-6 rounded-full", color]} aria-hidden="true" />)}
-        <span class="flex h-6 w-6 items-center justify-center rounded-full border border-border text-sm text-primary-dark" aria-hidden="true">+</span>
       </div>
     </div>
-  </div>
 
-  <div class="rounded-card border border-border bg-background-card p-5 shadow-soft">
-    <p class="font-heading text-xl text-primary-dark">Sản phẩm nổi bật</p>
-    <div class="mt-5 grid gap-4 text-sm text-text-secondary">
-      <p class="flex items-center gap-3"><span class="text-primary" aria-hidden="true">♡</span> Handmade with love</p>
-      <p class="flex items-center gap-3"><span class="text-primary" aria-hidden="true">♙</span> Thiết kế độc quyền</p>
-      <p class="flex items-center gap-3"><span class="text-primary" aria-hidden="true">▣</span> Giao hàng toàn quốc</p>
+    <div class="border-t border-border pt-6">
+      <p class="flex items-center gap-2 font-medium text-primary-dark">
+        <WandSparkles size={17} aria-hidden="true" />
+        Sản phẩm custom
+      </p>
+      <div class="mt-4 grid gap-3 text-sm text-text-secondary">
+        <p class="flex items-center gap-3 rounded-button bg-background-section px-3 py-2">
+          <Scissors size={16} className="text-primary-dark" aria-hidden="true" />
+          Handmade with love
+        </p>
+        <p class="flex items-center gap-3 rounded-button bg-background-section px-3 py-2">
+          <WandSparkles size={16} className="text-primary-dark" aria-hidden="true" />
+          Có thể cá nhân hóa
+        </p>
+      </div>
     </div>
   </div>
 </aside>

@@ -2,11 +2,12 @@
 import Container from "../../components/ui/Container.astro";
 import type { ProductCategory } from "../../domain/product/product.types";
 import { withBase } from "../../lib/url";
+import { Gift, PenLine, ShoppingBag, Sparkles } from "lucide-react";
 
 type CategoryTab = {
   label: string;
   value: ProductCategory | "all";
-  icon: string;
+  icon: typeof Sparkles;
 };
 
 interface Props {
@@ -18,11 +19,11 @@ interface Props {
 const { activeCategory, search = "", sort = "newest" } = Astro.props;
 
 const tabs: CategoryTab[] = [
-  { label: "Tất cả", value: "all", icon: "✦" },
-  { label: "Túi handmade", value: "bag", icon: "▢" },
-  { label: "Scrunchie", value: "scrunchie", icon: "✿" },
-  { label: "Quà tặng", value: "gift", icon: "□" },
-  { label: "Custom", value: "custom", icon: "✎" },
+  { label: "Tất cả", value: "all", icon: Sparkles },
+  { label: "Túi handmade", value: "bag", icon: ShoppingBag },
+  { label: "Scrunchie", value: "scrunchie", icon: Sparkles },
+  { label: "Quà tặng", value: "gift", icon: Gift },
+  { label: "Custom", value: "custom", icon: PenLine },
 ];
 
 function getHref(value: ProductCategory | "all") {
@@ -36,25 +37,26 @@ function getHref(value: ProductCategory | "all") {
 }
 ---
 
-<section class="border-b border-border bg-background-card/65 py-4">
+<section class="border-b border-border bg-background-card/70 py-4">
   <Container>
     <div class="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-      <div class="grid min-w-max grid-cols-5 gap-3">
+      <div class="flex min-w-max gap-3">
         {tabs.map((tab) => {
           const active = tab.value === activeCategory;
+          const Icon = tab.icon;
 
           return (
             <a
               class:list={[
-                "flex min-h-14 items-center justify-center gap-3 rounded-button border px-6 text-sm font-medium transition lg:min-w-48",
+                "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition",
                 active
                   ? "border-primary bg-primary text-background-card shadow-soft"
-                  : "border-border bg-background-card text-text-secondary hover:border-primary-soft hover:text-primary-dark",
+                  : "border-primary-soft/70 bg-background-section/70 text-text-secondary hover:border-primary-soft hover:bg-background-card hover:text-primary-dark",
               ]}
               href={getHref(tab.value)}
               aria-current={active ? "page" : undefined}
             >
-              <span class="text-xl" aria-hidden="true">{tab.icon}</span>
+              <Icon size={16} aria-hidden="true" />
               {tab.label}
             </a>
           );
