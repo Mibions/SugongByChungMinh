@@ -94,6 +94,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
         <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
           {media.map((item, index) => (
           <button
+            data-gallery-thumb
             className={cn(
               "aspect-square w-20 shrink-0 overflow-hidden rounded-card border bg-background-card transition lg:w-full",
               index === activeIndex ? "border-primary-soft shadow-soft ring-2 ring-primary-soft/45" : "border-border hover:border-primary-soft",
@@ -140,6 +141,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
 
         <div className="relative order-1 overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-feather lg:order-2">
           <button
+            data-gallery-main
             className="block w-full cursor-zoom-in"
             type="button"
             aria-label={`Mở ảnh lớn của ${productName}`}
@@ -163,14 +165,14 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
           >
             <ChevronRight size={20} aria-hidden="true" />
           </button>
-          <span className="absolute bottom-3 right-3 rounded-full bg-background-card/90 px-3 py-1 text-xs font-medium text-primary-dark shadow-soft">
+          <span data-gallery-index className="absolute bottom-3 right-3 rounded-full bg-background-card/90 px-3 py-1 text-xs font-medium text-primary-dark shadow-soft">
             {activeIndex + 1} / {media.length}
           </span>
         </div>
       </div>
 
       {lightboxOpen && (
-        <div className="fixed inset-0 z-[90] grid place-items-center bg-text-primary/55 p-4 backdrop-blur-sm">
+        <div data-gallery-lightbox className="fixed inset-0 z-[90] grid place-items-center bg-text-primary/55 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-5xl overflow-hidden rounded-card border border-primary-soft bg-background-card shadow-feather">
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <p className="text-sm font-medium text-primary-dark">

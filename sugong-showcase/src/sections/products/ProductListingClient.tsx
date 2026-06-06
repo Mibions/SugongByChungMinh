@@ -181,7 +181,7 @@ function ProductCard({ product }: { product: Product }) {
   const image = [...product.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
+    <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
       <a className="block" href={withBase(`/products/${product.slug}`)} aria-label={`Xem ${product.name}`}>
         <div className="relative aspect-[4/3] overflow-hidden bg-background-section">
           <img
@@ -516,7 +516,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                 }}
               >
                 <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-                  <p className="flex items-center text-sm font-medium text-primary-dark">
+                  <p data-product-count className="flex items-center text-sm font-medium text-primary-dark">
                     <span className="font-heading text-2xl">{filteredProducts.length}</span>
                     <span className="ml-2 text-text-secondary">sản phẩm</span>
                   </p>
@@ -535,6 +535,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                       <ArrowUpDown className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-soft" size={16} aria-hidden="true" />
                       <select
                         className="min-h-12 w-full appearance-none rounded-full border border-border bg-background-card px-10 pr-8 text-sm text-text-primary outline-none transition focus:border-primary-soft sm:w-48"
+                        aria-label="Sắp xếp sản phẩm"
                         value={sort}
                         onChange={(event) => setFilters({ sort: event.target.value as SortValue })}
                       >

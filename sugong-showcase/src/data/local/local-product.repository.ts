@@ -75,10 +75,8 @@ export class LocalProductRepository implements ProductRepository {
     if (!current) return [];
 
     return this.products
-      .filter(
-        (product) =>
-          product.id !== productId && product.published && product.category === current.category,
-      )
+      .filter((product) => product.id !== productId && product.published)
+      .sort((a, b) => Number(b.category === current.category) - Number(a.category === current.category))
       .slice(0, limit);
   }
 }

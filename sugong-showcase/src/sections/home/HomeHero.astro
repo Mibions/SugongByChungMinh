@@ -1,4 +1,5 @@
 ---
+import { Heart, Home, MessageCircle, Plus, Share2, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 import Button from "../../components/ui/Button.astro";
 import Container from "../../components/ui/Container.astro";
 import { brand } from "../../lib/site-data";
@@ -10,7 +11,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
   : "";
 ---
 
-<section class="relative isolate overflow-hidden bg-background-main py-10 shadow-[inset_0_-1px_0_rgb(228_218_239/35%)] lg:py-14">
+<section class="relative isolate overflow-hidden bg-[linear-gradient(135deg,#fffaf6_0%,#f7f0ff_46%,#fff6fb_100%)] py-10 shadow-[inset_0_-1px_0_rgb(228_218_239/35%)] lg:py-14">
   <div class="pointer-events-none absolute inset-y-0 left-1/2 z-[-1] hidden w-[58%] -translate-x-1/2 bg-background-main/75 blur-2xl lg:block"></div>
   <img
     class="pointer-events-none absolute bottom-0 left-0 z-[-1] hidden h-full w-72 object-cover object-left-bottom opacity-45 md:block"
@@ -32,21 +33,34 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
   />
 
   <Container class="max-w-wide">
-    <div class="grid min-h-[620px] gap-10 lg:grid-cols-[0.95fr_1fr] lg:items-center">
+    <div class="grid min-h-[620px] gap-10 lg:grid-cols-[0.94fr_1fr] lg:items-center">
       <div class="max-w-xl space-y-7">
-        <p class="text-sm font-semibold uppercase text-primary-dark">Handmade with love ♡</p>
+        <p class="inline-flex items-center gap-2 rounded-full border border-primary-soft/30 bg-background-card/80 px-4 py-2 text-sm font-semibold uppercase text-primary-dark shadow-soft">
+          <Sparkles size={16} aria-hidden="true" />
+          Handmade with love
+        </p>
         <h1 class="font-heading text-5xl leading-[1.06] text-primary-dark sm:text-6xl lg:text-7xl">
           Quà handmade theo cách riêng của bạn
         </h1>
         <p class="max-w-md text-lg leading-8 text-text-secondary">{brand.description}</p>
         <div class="flex flex-wrap gap-4">
-          <Button href="/products">Khám phá sản phẩm</Button>
-          <Button href="/custom" variant="secondary">Đặt custom</Button>
+          <Button href="/products">
+            <span class="inline-flex items-center gap-2">
+              <ShoppingBag size={18} aria-hidden="true" />
+              Khám phá sản phẩm
+            </span>
+          </Button>
+          <Button href="/products?category=custom" variant="secondary">
+            <span class="inline-flex items-center gap-2">
+              <WandSparkles size={18} aria-hidden="true" />
+              Đặt custom
+            </span>
+          </Button>
         </div>
       </div>
 
       <div class="flex justify-center lg:justify-center">
-        <div class="relative w-full max-w-[440px] overflow-hidden rounded-card bg-text-primary shadow-feather ring-1 ring-background-card/70">
+        <div class="relative w-full max-w-[460px] overflow-hidden rounded-card bg-text-primary shadow-feather ring-1 ring-background-card/70">
           {
             tiktokEmbedUrl ? (
               <>
@@ -68,7 +82,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
                     const ids = JSON.parse(frame.dataset.videoIds || "[]");
                     if (!Array.isArray(ids) || ids.length === 0) return;
 
-                  const randomId = ids[Math.floor(Math.random() * ids.length)];
+                    const randomId = ids[Math.floor(Math.random() * ids.length)];
                     frame.src = `https://www.tiktok.com/player/v1/${randomId}?autoplay=1&loop=1&muted=1&controls=1&description=0&music_info=0`;
                   })();
                 </script>
@@ -91,19 +105,22 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
                   <span>Dành cho bạn</span>
                 </div>
                 <div class="absolute bottom-16 left-5 max-w-56 text-background-card">
-                  <p class="text-sm font-semibold">Túi hoa nhí tím 💜</p>
+                  <p class="text-sm font-semibold">Túi hoa nhí tím</p>
                   <p class="mt-1 text-xs">Handmade with love</p>
-                  <a class="text-xs underline decoration-background-card/50 underline-offset-2" href={brand.tiktokProfileUrl}>Xem TikTok SUGONG</a>
+                  <a class="inline-flex items-center gap-1 text-xs underline decoration-background-card/50 underline-offset-2" href={brand.tiktokProfileUrl}>
+                    Xem TikTok SUGONG
+                    <Share2 size={12} aria-hidden="true" />
+                  </a>
                 </div>
                 <div class="absolute bottom-20 right-4 grid gap-4 text-center text-background-card">
-                  <span class="text-2xl">♡</span>
-                  <span class="text-2xl">◌</span>
-                  <span class="text-2xl">↗</span>
+                  <Heart size={25} aria-hidden="true" />
+                  <MessageCircle size={25} aria-hidden="true" />
+                  <Share2 size={25} aria-hidden="true" />
                 </div>
                 <div class="absolute inset-x-0 bottom-0 grid grid-cols-5 bg-text-primary/80 px-5 py-3 text-center text-[10px] text-background-card">
-                  <span>Trang chủ</span>
+                  <span class="inline-flex flex-col items-center gap-1"><Home size={14} aria-hidden="true" />Trang chủ</span>
                   <span>Bạn bè</span>
-                  <span class="font-bold">＋</span>
+                  <span class="inline-flex justify-center"><Plus size={18} aria-hidden="true" /></span>
                   <span>Hộp thư</span>
                   <span>Hồ sơ</span>
                 </div>

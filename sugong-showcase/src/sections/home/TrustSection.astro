@@ -1,0 +1,51 @@
+---
+import Container from "../../components/ui/Container.astro";
+import { Gift, HandHeart, MessageCircle, WandSparkles } from "lucide-react";
+
+const items = [
+  {
+    title: "Handmade tỉ mỉ",
+    description: "Từng chi tiết được làm chậm rãi để món quà có cảm giác riêng.",
+    icon: HandHeart,
+  },
+  {
+    title: "Custom theo yêu cầu",
+    description: "Có thể đổi màu, thêu tên hoặc phối chi tiết nhỏ theo câu chuyện của bạn.",
+    icon: WandSparkles,
+  },
+  {
+    title: "Tư vấn trước khi làm",
+    description: "SUGONG xác nhận mẫu, thời gian và chi phí trước khi thực hiện.",
+    icon: MessageCircle,
+  },
+  {
+    title: "Phù hợp làm quà",
+    description: "Nhẹ nhàng, nữ tính và đủ cá nhân để gửi tặng người thương.",
+    icon: Gift,
+  },
+];
+---
+
+<section id="why-sugong" class="bg-background-main py-section-mobile">
+  <Container class="max-w-wide">
+    <div class="mb-8 max-w-2xl">
+      <p class="text-sm font-semibold uppercase text-primary-dark">Vì sao chọn SUGONG?</p>
+      <h2 class="mt-2 font-heading text-3xl text-primary-dark sm:text-4xl">Những món quà nhỏ, được chăm chút kỹ</h2>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item) => {
+        const Icon = item.icon;
+
+        return (
+          <article class="rounded-card border border-primary-soft/45 bg-background-card p-5 shadow-soft">
+            <span class="grid h-11 w-11 place-items-center rounded-full bg-background-section text-primary-dark">
+              <Icon size={20} aria-hidden="true" />
+            </span>
+            <h3 class="mt-4 font-heading text-xl text-primary-dark">{item.title}</h3>
+            <p class="mt-2 text-sm leading-6 text-text-secondary">{item.description}</p>
+          </article>
+        );
+      })}
+    </div>
+  </Container>
+</section>

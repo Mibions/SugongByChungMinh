@@ -17,7 +17,7 @@ const categoryIcons: Partial<Record<Product["category"], typeof Gift>> = {
 const CategoryIcon = categoryIcons[product.category] ?? Scissors;
 ---
 
-<article class="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
+<article data-product-card class="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
   <a class="group block" href={withBase(`/products/${product.slug}`)} aria-label={`Xem ${product.name}`}>
     <div class="relative aspect-[4/3] overflow-hidden bg-background-section">
       <img

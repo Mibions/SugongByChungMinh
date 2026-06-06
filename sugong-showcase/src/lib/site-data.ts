@@ -19,9 +19,9 @@ export const brand = {
 
 export const navigationItems = [
   { href: "/products", label: "Sản phẩm" },
-  { href: "/custom", label: "Custom" },
-  { href: "/about#tiktok", label: "TikTok" },
-  { href: "/about", label: "Về SUGONG" },
+  { href: "/products?category=custom", label: "Custom" },
+  { href: "/#featured-products", label: "TikTok" },
+  { href: "/#why-sugong", label: "Về SUGONG" },
 ];
 
 export const categories = [
@@ -45,7 +45,7 @@ export const categories = [
   },
   {
     name: "Custom",
-    href: "/custom",
+    href: "/products?category=custom",
     image: "/assets/products/custom-pouch.svg",
     alt: "Phụ kiện custom thêu tên",
   },

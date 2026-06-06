@@ -1,6 +1,7 @@
 ---
 import Container from "../../components/ui/Container.astro";
 import { withBase } from "../../lib/url";
+import { Gift, PenLine, ShoppingBag, Sparkles } from "lucide-react";
 
 type Category = {
   name: string;
@@ -14,38 +15,44 @@ interface Props {
 }
 
 const { categories } = Astro.props;
-const icons = ["▢", "✿", "□", "✎"];
+const icons = [ShoppingBag, Sparkles, Gift, PenLine];
 const positions = ["18% center", "center", "center", "center"];
 ---
 
 <section class="-mt-1 bg-background-card py-7 lg:py-9">
   <Container class="max-w-wide">
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-grid">
-      {categories.map((category, index) => (
-        <a
-          class="group overflow-hidden rounded-card bg-background-card shadow-feather ring-1 ring-primary-soft/20 transition hover:-translate-y-1 hover:ring-primary-soft/35"
-          href={withBase(category.href)}
-        >
-          <div class="aspect-[1.45/1] overflow-hidden bg-background-section">
-            <img
-              class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.025]"
-              style={`object-position: ${positions[index]};`}
-              src={withBase(category.image)}
-              alt={category.alt}
-              width="900"
-              height="620"
-              loading="lazy"
-            />
-          </div>
-          <div class="relative p-4 pt-8">
-            <span class="absolute -top-6 left-4 flex h-12 w-12 items-center justify-center rounded-full bg-background-main text-2xl text-primary-dark shadow-feather ring-1 ring-primary-soft/25">
-              {icons[index]}
-            </span>
-            <p class="font-heading text-2xl text-primary-dark">{category.name}</p>
-            <p class="mt-2 text-sm font-medium text-primary-dark">Xem ngay <span aria-hidden="true">→</span></p>
-          </div>
-        </a>
-      ))}
+      {categories.map((category, index) => {
+        const Icon = icons[index] ?? Sparkles;
+
+        return (
+          <a
+            class="group overflow-hidden rounded-card border border-primary-soft/35 bg-background-card shadow-soft transition hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather"
+            href={withBase(category.href)}
+          >
+            <div class="aspect-[1.45/1] overflow-hidden bg-background-section">
+              <img
+                class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.025]"
+                style={`object-position: ${positions[index]};`}
+                src={withBase(category.image)}
+                alt={category.alt}
+                width="900"
+                height="620"
+                loading="lazy"
+              />
+            </div>
+            <div class="relative p-4 pt-8">
+              <span class="absolute -top-6 left-4 flex h-12 w-12 items-center justify-center rounded-full bg-background-main text-primary-dark shadow-feather ring-1 ring-primary-soft/25">
+                <Icon size={21} aria-hidden="true" />
+              </span>
+              <p class="font-heading text-2xl text-primary-dark">{category.name}</p>
+              <p class="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary-dark">
+                Xem ngay <Sparkles size={14} aria-hidden="true" />
+              </p>
+            </div>
+          </a>
+        );
+      })}
     </div>
   </Container>
 </section>
