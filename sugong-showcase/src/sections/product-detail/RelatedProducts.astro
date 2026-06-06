@@ -1,0 +1,29 @@
+---
+import ProductCard from "../../components/product/ProductCard.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import type { Product } from "../../domain/product/product.types";
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+---
+
+{products.length > 0 && (
+  <section class="py-section-mobile lg:py-section-desktop">
+    <Container class="max-w-wide">
+      <div class="mb-8">
+        <SectionHeading
+          eyebrow="Gợi ý tiếp theo"
+          title="Sản phẩm liên quan"
+          description="Những mẫu có cùng tinh thần handmade nhẹ nhàng để bạn xem thêm."
+        />
+      </div>
+      <div class="grid gap-grid sm:grid-cols-2 lg:grid-cols-3">
+        {products.map((product) => <ProductCard product={product} />)}
+      </div>
+    </Container>
+  </section>
+)}

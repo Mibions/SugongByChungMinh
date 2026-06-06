@@ -1,0 +1,56 @@
+---
+import { ProductGallery } from "../../components/product/ProductGallery";
+import Container from "../../components/ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { createProductService } from "../../lib/products";
+import { withBase } from "../../lib/url";
+import ProductCustomCta from "../../sections/product-detail/ProductCustomCta.astro";
+import ProductDescription from "../../sections/product-detail/ProductDescription.astro";
+import ProductInfo from "../../sections/product-detail/ProductInfo.astro";
+import RelatedProducts from "../../sections/product-detail/RelatedProducts.astro";
+
+export async function getStaticPaths() {
+  const productService = await createProductService();
+  const products = await productService.getProducts();
+
+  return Promise.all(
+    products.map(async (product) => ({
+      params: { slug: product.slug },
+      props: {
+        product,
+        relatedProducts: await productService.getRelatedProducts(product.id),
+      },
+    })),
+  );
+}
+
+const { product, relatedProducts } = Astro.props;
+---
+
+<BaseLayout title={product.name} description={product.shortDescription}>
+  <section class="py-section-mobile lg:py-section-desktop">
+    <Container>
+      <nav class="mb-6 text-sm text-text-secondary" aria-label="Breadcrumb">
+        <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
+        <span class="px-2 text-primary-soft">›</span>
+        <a class="hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
+        <span class="px-2 text-primary-soft">›</span>
+        <span class="text-primary-dark">{product.name}</span>
+      </nav>
+
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.85fr)] lg:items-start">
+        <ProductGallery
+          images={product.images}
+          videoUrl={product.videoUrl}
+          productName={product.name}
+          client:load
+        />
+        <ProductInfo product={product} />
+      </div>
+    </Container>
+  </section>
+
+  <ProductDescription product={product} />
+  <RelatedProducts products={relatedProducts} />
+  <ProductCustomCta />
+</BaseLayout>

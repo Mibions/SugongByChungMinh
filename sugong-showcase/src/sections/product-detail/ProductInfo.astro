@@ -1,0 +1,49 @@
+---
+import Button from "../../components/ui/Button.astro";
+import { CustomOptions } from "../../components/product/CustomOptions";
+import type { Product } from "../../domain/product/product.types";
+import { brand } from "../../lib/site-data";
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const categoryLabels: Record<Product["category"], string> = {
+  bag: "Túi handmade",
+  scrunchie: "Scrunchie",
+  gift: "Quà tặng",
+  custom: "Custom",
+  graduation: "Tốt nghiệp",
+};
+---
+
+<aside class="space-y-6 lg:sticky lg:top-24">
+  <div class="space-y-5 rounded-card border border-border bg-background-card p-6 shadow-soft">
+    <div class="space-y-3">
+      <p class="text-sm font-semibold uppercase text-primary-dark">{categoryLabels[product.category]}</p>
+      <h1 class="font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">{product.name}</h1>
+      <p class="text-xl font-semibold text-text-primary">{product.formattedPrice}</p>
+      <p class="text-base leading-7 text-text-secondary">{product.shortDescription}</p>
+    </div>
+
+    <div class="grid gap-3 border-y border-border py-5 text-sm text-text-secondary">
+      <div class="flex items-center justify-between gap-4">
+        <span>Màu chủ đạo</span>
+        <span class="font-medium text-text-primary">Lavender / pastel</span>
+      </div>
+      <div class="flex items-center justify-between gap-4">
+        <span>Kích thước</span>
+        <span class="font-medium text-text-primary">Nhỏ, vừa, lớn</span>
+      </div>
+      <div class="flex items-center justify-between gap-4">
+        <span>Custom</span>
+        <span class="font-medium text-success">{product.customizable ? "Có nhận custom" : "Mẫu có sẵn"}</span>
+      </div>
+    </div>
+
+    <Button class="w-full" href={brand.channels.zalo}>Đặt hàng qua Zalo</Button>
+  </div>
+
+  <CustomOptions customizable={product.customizable} client:load />
+</aside>

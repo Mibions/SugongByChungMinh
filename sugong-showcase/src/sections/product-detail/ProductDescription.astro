@@ -1,0 +1,36 @@
+---
+import type { Product } from "../../domain/product/product.types";
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+---
+
+<section class="bg-background-card py-section-mobile lg:py-section-desktop">
+  <div class="mx-auto grid w-full max-w-page gap-grid px-5 sm:px-6 lg:grid-cols-3 lg:px-8">
+    <article class="rounded-card border border-border bg-background-card p-6 shadow-soft">
+      <p class="font-heading text-2xl text-primary-dark">Mô tả sản phẩm</p>
+      <p class="mt-4 text-sm leading-7 text-text-secondary">
+        {product.description ?? product.shortDescription}
+      </p>
+    </article>
+
+    <article class="rounded-card border border-border bg-background-card p-6 shadow-soft">
+      <p class="font-heading text-2xl text-primary-dark">Tùy chọn custom</p>
+      <p class="mt-4 text-sm leading-7 text-text-secondary">
+        {product.customizable
+          ? "Có thể thêu tên, đổi màu phụ kiện hoặc phối chi tiết nhỏ theo phong cách riêng."
+          : "Sản phẩm hiện ưu tiên bán theo mẫu hoàn thiện để giữ đúng form và chất liệu."}
+      </p>
+    </article>
+
+    <article class="rounded-card border border-border bg-background-card p-6 shadow-soft">
+      <p class="font-heading text-2xl text-primary-dark">Lưu ý</p>
+      <p class="mt-4 text-sm leading-7 text-text-secondary">
+        Mỗi sản phẩm handmade có thể chênh nhẹ về chi tiết. Hãy nhắn SUGONG để xác nhận mẫu, thời gian làm và phí giao hàng.
+      </p>
+    </article>
+  </div>
+</section>
