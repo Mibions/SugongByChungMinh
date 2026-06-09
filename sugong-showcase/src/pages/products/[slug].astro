@@ -50,14 +50,16 @@ const { product, relatedProducts } = Astro.props;
           images={product.images}
           videoUrl={product.videoUrl}
           productName={product.name}
-          client:load
+          client:visible
         />
-        <ProductInfo product={product} />
+        <div class="lg:sticky lg:top-24">
+          <ProductInfo product={product} />
+        </div>
       </div>
     </Container>
   </section>
 
   <ProductDescription product={product} />
-  <RelatedProducts products={relatedProducts} />
   <ProductCustomCta />
+  <RelatedProducts products={relatedProducts} />
 </BaseLayout>

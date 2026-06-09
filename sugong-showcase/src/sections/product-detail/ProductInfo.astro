@@ -3,7 +3,7 @@ import Button from "../../components/ui/Button.astro";
 import { CustomOptions } from "../../components/product/CustomOptions";
 import type { Product } from "../../domain/product/product.types";
 import { brand } from "../../lib/site-data";
-import { MessageCircle, Palette, PenLine, Ruler, Scissors, ShoppingBag, WandSparkles } from "lucide-react";
+import { MessageCircle, Palette, Ruler, Scissors, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
 
 interface Props {
   product: Product;
@@ -14,14 +14,14 @@ const categoryLabels: Record<Product["category"], string> = {
   bag: "Túi handmade",
   scrunchie: "Scrunchie",
   gift: "Quà tặng",
-  custom: "Custom",
+  custom: "Có thể custom",
   graduation: "Tốt nghiệp",
 };
 
 const infoRows = [
   { label: "Màu chủ đạo", value: "Lavender / pastel", icon: Palette },
   { label: "Kích thước", value: "Nhỏ, vừa, lớn", icon: Ruler },
-  { label: "Custom", value: product.customizable ? "Có nhận custom" : "Mẫu có sẵn", icon: WandSparkles },
+  { label: "Custom", value: product.customizable ? "Có thể custom" : "Mẫu có sẵn", icon: WandSparkles },
   { label: "Chất liệu", value: "Handmade thủ công", icon: Scissors },
 ];
 ---
@@ -59,11 +59,11 @@ const infoRows = [
     <div class="grid gap-3 sm:grid-cols-2">
       <Button class="w-full gap-2" href={brand.channels.zalo}>
         <MessageCircle size={17} aria-hidden="true" />
-        Đặt hàng qua Zalo
+        Nhắn Zalo
       </Button>
-      <Button class="w-full gap-2" href={brand.channels.zalo} variant="secondary">
-        <PenLine size={17} aria-hidden="true" />
-        Tư vấn custom
+      <Button class="w-full gap-2" href={brand.tiktokProfileUrl} variant="secondary">
+        <Sparkles size={17} aria-hidden="true" />
+        Xem TikTok
       </Button>
     </div>
     <p class="rounded-card bg-background-section p-4 text-xs leading-6 text-text-secondary">

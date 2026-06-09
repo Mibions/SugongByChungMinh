@@ -4,7 +4,7 @@ import Button from "../components/ui/Button.astro";
 import Container from "../components/ui/Container.astro";
 import { MobileNavigation } from "../features/mobile-navigation/MobileNavigation";
 import { createSeo, type SeoInput } from "../lib/seo";
-import { brand, navigationItems } from "../lib/site-data";
+import { brand, navigationItems, socialLinks } from "../lib/site-data";
 import { withBase, withoutBase } from "../lib/url";
 
 interface Props extends SeoInput {}
@@ -36,19 +36,19 @@ const currentPath = withoutBase(Astro.url.pathname);
             <a
               class:list={[
                 "hover:text-primary-dark",
-                currentPath === item.href || currentPath.startsWith(`${item.href}/`)
+                !item.href.includes("#") && (currentPath === item.href || currentPath.startsWith(`${item.href}/`))
                   ? "text-primary-dark"
                   : "text-text-secondary",
               ]}
               href={withBase(item.href)}
-              aria-current={currentPath === item.href || currentPath.startsWith(`${item.href}/`) ? "page" : undefined}
+              aria-current={!item.href.includes("#") && (currentPath === item.href || currentPath.startsWith(`${item.href}/`)) ? "page" : undefined}
             >
               {item.label}
             </a>
           ))}
         </nav>
         <div class="flex items-center gap-3">
-          <Button href={brand.channels.zalo} size="sm">Đặt hàng</Button>
+          <Button href={brand.channels.zalo} size="sm">Nhắn Zalo</Button>
           <MobileNavigation items={navigationItems} currentPath={currentPath} client:load />
         </div>
       </Container>
@@ -66,9 +66,11 @@ const currentPath = withoutBase(Astro.url.pathname);
           {navigationItems.map((item) => <a class="hover:text-primary-dark" href={withBase(item.href)}>{item.label}</a>)}
         </nav>
         <div class="grid gap-3">
-          <a class="hover:text-primary-dark" href={withBase("/about#tiktok")}>TikTok {brand.channels.tiktok}</a>
-          <a class="hover:text-primary-dark" href={withBase("/about")}>Instagram {brand.channels.instagram}</a>
-          <a class="hover:text-primary-dark" href={brand.channels.zalo}>Zalo</a>
+          {socialLinks.map((item) => (
+            <a class="hover:text-primary-dark" href={withBase(item.href)}>
+              {item.name}
+            </a>
+          ))}
         </div>
       </Container>
     </footer>

@@ -1,0 +1,33 @@
+---
+import { Heart, Sparkles } from "lucide-react";
+import Container from "../../components/ui/Container.astro";
+
+const testimonials = [
+  "Túi xinh, đóng gói kỹ và màu rất dịu.",
+  "Set quà tốt nghiệp nhìn nhỏ xinh mà rất chỉn chu.",
+  "Shop tư vấn dễ thương, gửi mẫu trước khi làm.",
+];
+---
+
+<section class="bg-background-card py-section-mobile lg:py-section-desktop">
+  <Container class="max-w-wide">
+    <div class="mb-8 max-w-2xl">
+      <p class="inline-flex items-center gap-2 text-sm font-semibold uppercase text-primary-dark">
+        <Heart size={16} aria-hidden="true" />
+        Những lời nhắn nhỏ
+      </p>
+      <h2 class="mt-2 font-heading text-3xl text-primary-dark sm:text-4xl">
+        Mềm mại từ sản phẩm đến cách tụi mình tư vấn
+      </h2>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      {testimonials.map((text) => (
+        <article class="rounded-card border border-primary-soft/40 bg-background-main p-5 shadow-soft">
+          <Sparkles className="text-primary-soft" size={22} aria-hidden="true" />
+          <p class="mt-4 text-base leading-7 text-text-primary">{text}</p>
+        </article>
+      ))}
+    </div>
+  </Container>
+</section>

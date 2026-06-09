@@ -14,7 +14,7 @@ export default meta;
 export const Primary = {
   args: {
     variant: "primary",
-    default: "Đặt hàng qua Zalo",
+    default: "Nhắn Zalo",
   },
 };
 

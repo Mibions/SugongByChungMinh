@@ -1,6 +1,7 @@
 ---
+import { ChevronDown, FileText, Info, WandSparkles } from "lucide-react";
 import type { Product } from "../../domain/product/product.types";
-import { FileText, Info, WandSparkles } from "lucide-react";
+import Container from "../../components/ui/Container.astro";
 
 interface Props {
   product: Product;
@@ -12,42 +13,47 @@ const panels = [
   {
     title: "Mô tả",
     icon: FileText,
-    content: product.description ?? product.shortDescription,
+    content: product.description,
   },
   {
     title: "Custom",
     icon: WandSparkles,
     content: product.customizable
-      ? "Có thể thêu tên, đổi màu phụ kiện hoặc phối chi tiết nhỏ theo phong cách riêng."
-      : "Sản phẩm hiện ưu tiên bán theo mẫu hoàn thiện để giữ đúng form và chất liệu.",
+      ? "Bạn có thể nhắn SUGONG để đổi màu, thêu tên hoặc điều chỉnh chi tiết nhỏ theo câu chuyện riêng."
+      : "Mẫu hiện được làm theo thiết kế có sẵn. SUGONG vẫn có thể tư vấn biến tấu nhẹ nếu bạn cần.",
   },
   {
     title: "Lưu ý",
     icon: Info,
-    content:
-      "Mỗi sản phẩm handmade có thể chênh nhẹ về chi tiết. Hãy nhắn SUGONG để xác nhận mẫu, thời gian làm và phí giao hàng.",
+    content: "Mỗi sản phẩm handmade có thể chênh nhẹ về chi tiết. SUGONG sẽ xác nhận mẫu, thời gian làm và phí giao hàng trước khi thực hiện.",
   },
 ];
 ---
 
 <section class="bg-background-card py-section-mobile lg:py-section-desktop">
-  <div class="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
-    <div class="grid gap-4 lg:grid-cols-3">
-      {panels.map((panel) => {
+  <Container class="max-w-wide">
+    <div class="grid gap-4 md:grid-cols-3">
+      {panels.map((panel, index) => {
         const Icon = panel.icon;
 
         return (
-          <article class="rounded-card border border-primary-soft/55 bg-background-card p-6 shadow-soft">
-            <div class="flex items-center gap-3">
-              <span class="grid h-10 w-10 place-items-center rounded-full bg-background-section text-primary-dark">
-                <Icon size={18} aria-hidden="true" />
+          <details
+            class="group rounded-card border border-primary-soft/40 bg-background-main p-5 shadow-soft md:open"
+            open={index === 0}
+          >
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-primary-dark">
+              <span class="inline-flex items-center gap-3 font-heading text-2xl">
+                <span class="grid h-10 w-10 place-items-center rounded-full bg-background-card text-primary-dark shadow-soft">
+                  <Icon size={18} aria-hidden="true" />
+                </span>
+                {panel.title}
               </span>
-              <p class="font-heading text-2xl text-primary-dark">{panel.title}</p>
-            </div>
+              <ChevronDown className="shrink-0 text-primary-soft transition group-open:rotate-180" size={18} aria-hidden="true" />
+            </summary>
             <p class="mt-4 text-sm leading-7 text-text-secondary">{panel.content}</p>
-          </article>
+          </details>
         );
       })}
     </div>
-  </div>
+  </Container>
 </section>

@@ -1,5 +1,5 @@
 ---
-import { Heart, Home, MessageCircle, Plus, Share2, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
+import { Heart, Home, MessageCircle, Plus, Share2, ShoppingBag, Sparkles } from "lucide-react";
 import Button from "../../components/ui/Button.astro";
 import Container from "../../components/ui/Container.astro";
 import { brand } from "../../lib/site-data";
@@ -50,10 +50,10 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
               Khám phá sản phẩm
             </span>
           </Button>
-          <Button href="/products?category=custom" variant="secondary">
+          <Button href={brand.channels.zalo} variant="secondary">
             <span class="inline-flex items-center gap-2">
-              <WandSparkles size={18} aria-hidden="true" />
-              Đặt custom
+              <MessageCircle size={18} aria-hidden="true" />
+              Liên hệ qua Zalo
             </span>
           </Button>
         </div>

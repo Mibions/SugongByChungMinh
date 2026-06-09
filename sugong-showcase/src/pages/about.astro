@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BrandStory from "../sections/about/BrandStory.astro";
+import FinalContactCta from "../sections/about/FinalContactCta.astro";
+import SocialLinks from "../sections/about/SocialLinks.astro";
+import Testimonials from "../sections/about/Testimonials.astro";
+import TikTokHighlights from "../sections/about/TikTokHighlights.astro";
+import { brand } from "../lib/site-data";
+---
+
+<BaseLayout title="Về SUGONG" description={brand.about}>
+  <BrandStory />
+  <TikTokHighlights />
+  <Testimonials />
+  <SocialLinks />
+  <FinalContactCta />
+</BaseLayout>

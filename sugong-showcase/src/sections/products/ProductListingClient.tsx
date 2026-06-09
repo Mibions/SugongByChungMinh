@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   SlidersHorizontal,
   Sparkles,
+  Tags,
   WandSparkles,
   X,
 } from "lucide-react";
@@ -181,7 +182,7 @@ function ProductCard({ product }: { product: Product }) {
   const image = [...product.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
 
   return (
-    <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft hover:shadow-feather">
+    <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/35 bg-background-card/95 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft/80 hover:shadow-feather">
       <a className="block" href={withBase(`/products/${product.slug}`)} aria-label={`Xem ${product.name}`}>
         <div className="relative aspect-[4/3] overflow-hidden bg-background-section">
           <img
@@ -244,7 +245,10 @@ function FilterControls({
   return (
     <div className="space-y-6">
       <section className="border-t border-border pt-6">
-        <p className="font-medium text-primary-dark">Khoảng giá</p>
+        <p className="flex items-center gap-2 font-medium text-primary-dark">
+          <Tags size={17} aria-hidden="true" />
+          Khoảng giá
+        </p>
         <input
           className="mt-4 h-1.5 w-full accent-primary"
           type="range"
@@ -474,18 +478,9 @@ export function ProductListingClient({ products, zaloHref }: Props) {
 
       <section className="py-section-mobile lg:py-section-desktop">
         <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
-          <button
-            className="mb-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-primary-soft bg-background-card px-5 text-sm font-medium text-primary-dark shadow-soft lg:hidden"
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-          >
-            <SlidersHorizontal size={16} aria-hidden="true" />
-            Mở bộ lọc
-          </button>
-
           <div className="grid gap-7 lg:grid-cols-[280px_1fr] xl:grid-cols-[300px_1fr]">
             <aside className="hidden lg:block">
-              <div className="space-y-6 rounded-card border border-primary-soft/60 bg-background-card/90 p-6 shadow-soft">
+              <div className="space-y-6 rounded-card border border-primary-soft/45 bg-background-card/90 p-5 shadow-soft backdrop-blur">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-background-section text-primary-dark">
                     <SlidersHorizontal size={18} aria-hidden="true" />
@@ -520,7 +515,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                     <span className="font-heading text-2xl">{filteredProducts.length}</span>
                     <span className="ml-2 text-text-secondary">sản phẩm</span>
                   </p>
-                  <div className="grid gap-3 sm:grid-cols-[minmax(220px,1fr)_auto_auto] sm:items-center">
+                  <div className="grid gap-3 sm:grid-cols-[minmax(220px,1fr)_auto_auto_auto] sm:items-center">
                     <div className="relative">
                       <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-soft" size={17} aria-hidden="true" />
                       <input
@@ -548,6 +543,14 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                       <SlidersHorizontal size={16} aria-hidden="true" />
                       Áp dụng
                     </button>
+                    <button
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary-soft bg-background-card px-5 text-sm font-medium text-primary-dark shadow-soft transition hover:bg-background-section lg:hidden"
+                      type="button"
+                      onClick={() => setDrawerOpen(true)}
+                    >
+                      <SlidersHorizontal size={16} aria-hidden="true" />
+                      Lọc
+                    </button>
                   </div>
                 </div>
               </form>
@@ -565,7 +568,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                   </div>
                   <p className="mt-5 font-heading text-3xl text-primary-dark">Chưa có sản phẩm phù hợp</p>
                   <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-text-secondary">
-                    Bạn có thể thử đổi bộ lọc hoặc nhắn SUGONG để custom theo ý tưởng riêng.
+                    Bạn có thể thử đổi bộ lọc hoặc nhắn SUGONG qua Zalo để được tư vấn thêm.
                   </p>
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
                     <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-soft bg-background-card px-5 text-sm font-medium text-primary-dark" type="button" onClick={clearFilters}>
@@ -573,7 +576,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                       Xem tất cả sản phẩm
                     </button>
                     <a className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-background-card" href={zaloHref}>
-                      Tư vấn custom
+                      Nhắn Zalo để tư vấn
                     </a>
                   </div>
                 </div>

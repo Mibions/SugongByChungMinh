@@ -1,0 +1,47 @@
+---
+import { HandHeart, Sparkles } from "lucide-react";
+import Container from "../../components/ui/Container.astro";
+import { brand } from "../../lib/site-data";
+import { withBase } from "../../lib/url";
+---
+
+<section class="bg-background-main py-section-mobile lg:py-section-desktop">
+  <Container class="max-w-wide">
+    <div class="grid gap-8 lg:grid-cols-[0.95fr_1fr] lg:items-center">
+      <div class="max-w-2xl space-y-5">
+        <p class="inline-flex items-center gap-2 rounded-full border border-primary-soft/40 bg-background-card px-4 py-2 text-xs font-semibold uppercase text-primary-dark shadow-soft">
+          <HandHeart size={16} aria-hidden="true" />
+          Handmade boutique
+        </p>
+        <h1 class="font-heading text-4xl leading-tight text-primary-dark sm:text-5xl lg:text-6xl">
+          Câu chuyện của SUGONG
+        </h1>
+        <p class="text-lg leading-8 text-text-primary">
+          SUGONG là nơi tụi mình gửi gắm sự mềm mại vào những món quà handmade nhỏ xinh, từ túi, phụ kiện đến những set quà mang dấu ấn riêng.
+        </p>
+        <p class="max-w-xl text-sm leading-7 text-text-secondary">
+          Mỗi sản phẩm được chọn chất liệu, phối màu và hoàn thiện thủ công với mong muốn món quà khi đến tay bạn sẽ thật nhẹ nhàng, chỉn chu và có cảm xúc.
+        </p>
+      </div>
+
+      <div class="relative">
+        <div class="overflow-hidden rounded-card border border-primary-soft/45 bg-background-card p-3 shadow-feather">
+          <img
+            class="aspect-[4/3] w-full rounded-[14px] object-cover"
+            src={withBase("/assets/brand/footer-bag.png")}
+            alt="Góc sản phẩm handmade pastel của SUGONG"
+            width="2048"
+            height="640"
+            loading="eager"
+          />
+        </div>
+        <div class="absolute -bottom-5 left-5 hidden rounded-card border border-primary-soft/45 bg-background-card px-5 py-4 text-sm text-primary-dark shadow-feather sm:block">
+          <span class="inline-flex items-center gap-2 font-semibold">
+            <Sparkles size={16} aria-hidden="true" />
+            {brand.tagline}
+          </span>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

@@ -33,7 +33,9 @@ export function MobileNavigation({ items, currentPath = "/" }: Props) {
       {open && (
         <nav className="absolute right-0 top-12 w-56 rounded-card border border-border bg-background-card p-3 shadow-soft">
           {items.map((item) => {
-            const active = normalizedPath === item.href || normalizedPath.startsWith(`${item.href}/`);
+            const active =
+              !item.href.includes("#") &&
+              (normalizedPath === item.href || normalizedPath.startsWith(`${item.href}/`));
 
             return (
               <a

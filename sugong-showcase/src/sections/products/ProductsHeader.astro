@@ -1,28 +1,28 @@
 ---
+import { ChevronRight, Sparkles } from "lucide-react";
 import Container from "../../components/ui/Container.astro";
 import { withBase } from "../../lib/url";
-import { ChevronRight, Sparkles } from "lucide-react";
 ---
 
-<section class="relative overflow-hidden border-b border-border bg-background-card py-8 sm:py-10 lg:py-12">
-  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgb(243_216_229/70%),transparent_30%),radial-gradient(circle_at_85%_10%,rgb(217_200_236/75%),transparent_34%)]"></div>
-  <Container class="relative">
-    <div class="flex min-h-40 max-w-3xl flex-col justify-center space-y-4 sm:min-h-44 lg:min-h-52">
-      <nav class="flex items-center gap-2 text-xs font-medium text-text-secondary" aria-label="Breadcrumb">
-        <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
+<section class="relative isolate overflow-hidden bg-[linear-gradient(135deg,#fffaf6_0%,#f5efff_52%,#fff7fb_100%)] py-8 shadow-[inset_0_-1px_0_rgb(228_218_239/42%)] sm:py-10 lg:py-12">
+  <div class="pointer-events-none absolute inset-y-0 right-0 z-[-1] hidden w-[42%] bg-[radial-gradient(circle_at_70%_40%,rgba(214,195,236,0.36),transparent_58%)] lg:block"></div>
+  <Container class="max-w-wide">
+    <div class="max-w-3xl">
+      <nav class="mb-5 flex items-center gap-2 text-xs font-medium text-text-secondary" aria-label="Breadcrumb">
+        <a class="transition hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
         <ChevronRight size={14} aria-hidden="true" />
         <span class="text-primary-dark">Sản phẩm</span>
       </nav>
-      <div class="space-y-3">
-        <p class="inline-flex w-fit items-center gap-2 rounded-full border border-primary-soft bg-background-card/75 px-4 py-2 text-xs font-semibold uppercase text-primary-dark shadow-soft">
-          <Sparkles size={15} aria-hidden="true" />
-          Bộ sưu tập handmade
-        </p>
-        <h1 class="font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">Sản phẩm SUGONG</h1>
-        <p class="max-w-2xl text-sm leading-7 text-text-secondary sm:text-base">
-          Khám phá những món quà handmade được làm riêng theo câu chuyện của bạn.
-        </p>
-      </div>
+      <p class="inline-flex items-center gap-2 rounded-full border border-primary-soft/30 bg-background-card/80 px-4 py-2 text-xs font-semibold uppercase text-primary-dark shadow-soft">
+        <Sparkles size={15} aria-hidden="true" />
+        Bộ sưu tập handmade
+      </p>
+      <h1 class="mt-4 font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">
+        Sản phẩm SUGONG
+      </h1>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-text-secondary sm:text-base">
+        Khám phá những món quà handmade được làm riêng theo câu chuyện của bạn.
+      </p>
     </div>
   </Container>
 </section>
