@@ -5,7 +5,11 @@ html {
   background: var(--color-background-main);
   color: var(--color-text-primary);
   font-family: var(--font-body);
+  font-synthesis: none;
   scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {

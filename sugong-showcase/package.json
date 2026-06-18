@@ -9,6 +9,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "cloudinary:sync": "node scripts/cloudinary-sync-assets.cjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:e2e": "playwright test"
@@ -18,7 +19,9 @@
     "@astrojs/sitemap": "^3.4.0",
     "@tailwindcss/vite": "^4.1.8",
     "astro": "^6.0.0",
+    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.17.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

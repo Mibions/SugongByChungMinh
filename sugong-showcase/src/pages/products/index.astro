@@ -14,5 +14,5 @@ const products = await productService.getProducts();
   description="Khám phá những sản phẩm handmade được làm thủ công và có thể thiết kế theo yêu cầu."
 >
   <ProductsHeader />
-  <ProductListingClient products={products} zaloHref={brand.channels.zalo} client:load />
+  <ProductListingClient products={products} zaloHref={brand.channels.zalo} client:idle />
 </BaseLayout>

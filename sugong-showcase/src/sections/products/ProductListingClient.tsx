@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpDown,
   Gift,
+  GraduationCap,
   Heart,
   Palette,
   Search,
@@ -192,6 +193,7 @@ function ProductCard({ product }: { product: Product }) {
             width={image.width}
             height={image.height}
             loading="lazy"
+            decoding="async"
           />
           <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background-card/90 text-primary shadow-feather ring-1 ring-primary-soft/30">
             <Heart size={18} aria-hidden="true" />
@@ -471,6 +473,13 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                   </button>
                 );
               })}
+              <a
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-soft/70 bg-background-card px-5 text-sm font-medium text-primary-dark transition hover:border-primary-soft hover:bg-background-section"
+                href={withBase("/products/graduation-hats")}
+              >
+                <GraduationCap size={16} aria-hidden="true" />
+                Nón tốt nghiệp
+              </a>
             </div>
           </div>
         </div>

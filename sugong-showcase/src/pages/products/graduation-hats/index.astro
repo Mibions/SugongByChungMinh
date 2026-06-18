@@ -1,0 +1,42 @@
+---
+import { ChevronRight, GraduationCap } from "lucide-react";
+import Container from "../../../components/ui/Container.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { createGraduationHatService } from "../../../lib/graduation-hats";
+import GraduationHatGallery from "../../../sections/graduation-hats/GraduationHatGallery.astro";
+import { withBase } from "../../../lib/url";
+
+const graduationHatService = createGraduationHatService();
+const hats = await graduationHatService.getGraduationHats();
+---
+
+<BaseLayout
+  title="Nón tốt nghiệp handmade"
+  description="Những mẫu nón được trang trí thủ công theo nhiều tone màu khác nhau, phù hợp cho lễ tốt nghiệp, kỷ yếu và quà tặng."
+>
+  <section class="bg-background-card py-8 shadow-[inset_0_-1px_0_rgb(228_218_239/42%)] sm:py-10 lg:py-12">
+    <Container class="max-w-wide">
+      <nav class="mb-5 flex items-center gap-2 text-xs font-medium text-text-secondary" aria-label="Breadcrumb">
+        <a class="transition hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
+        <ChevronRight size={14} aria-hidden="true" />
+        <a class="transition hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
+        <ChevronRight size={14} aria-hidden="true" />
+        <span class="text-primary-dark">Nón tốt nghiệp</span>
+      </nav>
+      <div class="max-w-3xl">
+        <p class="inline-flex items-center gap-2 rounded-full border border-primary-soft/40 bg-background-main px-4 py-2 text-xs font-semibold uppercase text-primary-dark shadow-soft">
+          <GraduationCap size={16} aria-hidden="true" />
+          Portfolio handmade
+        </p>
+        <h1 class="mt-4 font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">
+          Nón tốt nghiệp handmade
+        </h1>
+        <p class="mt-3 text-sm leading-7 text-text-secondary sm:text-base">
+          Những mẫu nón được trang trí thủ công theo nhiều tone màu khác nhau, phù hợp cho lễ tốt nghiệp, kỷ yếu và quà tặng.
+        </p>
+      </div>
+    </Container>
+  </section>
+
+  <GraduationHatGallery hats={hats} />
+</BaseLayout>

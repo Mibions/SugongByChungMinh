@@ -22,9 +22,12 @@ type GalleryMedia =
 export function ProductGallery({ images, videoUrl, productName }: Props) {
   const media = useMemo<GalleryMedia[]>(() => {
     const sortedImages = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
+    const imageMedia = sortedImages.map((image) => ({ ...image, type: "image" as const }));
+
+    if (!videoUrl) return imageMedia;
 
     return [
-      ...sortedImages.map((image) => ({ ...image, type: "image" as const })),
+      ...imageMedia,
       {
         type: "video" as const,
         url: videoUrl,
@@ -84,6 +87,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
         width={item.width}
         height={item.height}
         loading="eager"
+        decoding="async"
       />
     );
   }
@@ -112,7 +116,8 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
                 alt={item.alt}
                 width={item.width}
                 height={item.height}
-                loading={index === 0 ? "eager" : "lazy"}
+                loading="lazy"
+                decoding="async"
               />
             ) : (
               <span className="relative grid h-full place-items-center bg-text-primary text-background-card">
@@ -124,6 +129,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
                     width={item.poster.width}
                     height={item.poster.height}
                     loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <span className="absolute inset-0 bg-primary-dark/55" />

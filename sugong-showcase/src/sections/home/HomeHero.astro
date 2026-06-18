@@ -7,7 +7,7 @@ import { withBase } from "../../lib/url";
 
 const tiktokVideoIds = brand.heroTikTokVideoIds;
 const tiktokEmbedUrl = tiktokVideoIds.length > 0
-  ? `https://www.tiktok.com/player/v1/${tiktokVideoIds[0]}?autoplay=1&loop=1&muted=1&controls=1&description=0&music_info=0`
+  ? `https://www.tiktok.com/player/v1/${tiktokVideoIds[0]}?autoplay=0&loop=0&muted=1&controls=1&description=0&music_info=0`
   : "";
 ---
 
@@ -71,21 +71,7 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowfullscreen
-                  data-tiktok-random-frame
-                  data-video-ids={JSON.stringify(tiktokVideoIds)}
                 />
-                <script is:inline>
-                  (() => {
-                    const frame = document.querySelector("[data-tiktok-random-frame]");
-                    if (!(frame instanceof HTMLIFrameElement)) return;
-
-                    const ids = JSON.parse(frame.dataset.videoIds || "[]");
-                    if (!Array.isArray(ids) || ids.length === 0) return;
-
-                    const randomId = ids[Math.floor(Math.random() * ids.length)];
-                    frame.src = `https://www.tiktok.com/player/v1/${randomId}?autoplay=1&loop=1&muted=1&controls=1&description=0&music_info=0`;
-                  })();
-                </script>
               </>
             ) : (
               <>
