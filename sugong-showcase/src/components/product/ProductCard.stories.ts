@@ -1,23 +1,30 @@
 import ProductCard from "./ProductCard.astro";
 import type { Product } from "../../domain/product/product.types";
 
+const image = {
+  url: "/assets/products/bag-lavender-01.svg",
+  alt: "Tui tote handmade hoa nhi tim tren nen sang",
+  width: 1200,
+  height: 900,
+  sortOrder: 0,
+};
+
 const product: Product = {
   id: "bag-lavender",
   slug: "bag-lavender",
-  name: "Túi tote hoa nhí tím",
+  name: "Tui tote hoa nhi tim",
   price: 390000,
-  formattedPrice: "390.000đ",
+  formattedPrice: "390.000d",
   category: "bag",
-  shortDescription: "Túi tote handmade nhẹ nhàng với họa tiết hoa tím.",
-  images: [
-    {
-      url: "/assets/products/bag-lavender-01.svg",
-      alt: "Túi tote handmade hoa nhí tím trên nền sáng",
-      width: 1200,
-      height: 900,
-      sortOrder: 0,
-    },
-  ],
+  shortDescription: "Tui tote handmade nhe nhang voi hoa tiet hoa tim.",
+  coverImage: image,
+  gallery: [image],
+  images: [image],
+  tones: ["lavender", "pink"],
+  tags: ["bag", "lavender", "handmade"],
+  isFeatured: true,
+  status: "published",
+  displayOrder: 1,
   customizable: true,
   featured: true,
   published: true,

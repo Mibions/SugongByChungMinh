@@ -1,6 +1,7 @@
 ---
 import Button from "../../components/ui/Button.astro";
-import { CustomOptions } from "../../components/product/CustomOptions";
+import { isProductCustomizable } from "../../domain/product/product.helpers";
+import { productCategoryMeta } from "../../domain/product/product-taxonomy";
 import type { Product } from "../../domain/product/product.types";
 import { brand } from "../../lib/site-data";
 import { MessageCircle, Palette, Ruler, Scissors, ShoppingBag, Sparkles, WandSparkles } from "lucide-react";
@@ -10,51 +11,55 @@ interface Props {
 }
 
 const { product } = Astro.props;
-const categoryLabels: Record<Product["category"], string> = {
-  bag: "Túi handmade",
-  scrunchie: "Scrunchie",
-  gift: "Quà tặng",
-  custom: "Có thể custom",
-  graduation: "Tốt nghiệp",
-};
 
-const infoRows = [
-  { label: "Màu chủ đạo", value: "Lavender / pastel", icon: Palette },
-  { label: "Kích thước", value: "Nhỏ, vừa, lớn", icon: Ruler },
-  { label: "Custom", value: product.customizable ? "Có thể custom" : "Mẫu có sẵn", icon: WandSparkles },
-  { label: "Chất liệu", value: "Handmade thủ công", icon: Scissors },
-];
+const detailItems = product.detailItems?.length
+  ? product.detailItems
+  : [
+      { label: "Danh mục", value: productCategoryMeta[product.category].label },
+      { label: "Custom", value: isProductCustomizable(product) ? "Có thể custom" : "Mẫu có sẵn" },
+    ];
+
+function getRowIcon(label: string) {
+  const normalized = label.toLocaleLowerCase("vi");
+  if (normalized.includes("màu") || normalized.includes("tone")) return Palette;
+  if (normalized.includes("kích thước") || normalized.includes("size")) return Ruler;
+  if (normalized.includes("custom") || normalized.includes("cá nhân")) return WandSparkles;
+  if (normalized.includes("chất liệu") || normalized.includes("vải") || normalized.includes("canvas")) return Scissors;
+  return Sparkles;
+}
 ---
 
-<aside class="space-y-6 lg:sticky lg:top-24">
-  <div class="space-y-6 rounded-card border border-primary-soft/55 bg-background-card p-6 shadow-feather">
+<aside class="space-y-5">
+  <div class="space-y-5 rounded-[20px] border border-primary-soft/55 bg-background-card p-5 shadow-feather sm:p-6">
     <div class="space-y-3">
       <p class="inline-flex items-center gap-2 rounded-full bg-background-section px-4 py-2 text-xs font-semibold uppercase text-primary-dark">
         <ShoppingBag size={15} aria-hidden="true" />
-        {categoryLabels[product.category]}
+        {productCategoryMeta[product.category].label}
       </p>
-      <h1 class="font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">{product.name}</h1>
-      <p class="text-2xl font-semibold text-primary-dark">{product.formattedPrice}</p>
-      <p class="text-base leading-7 text-text-secondary">{product.shortDescription}</p>
+      <h1 class="font-heading text-3xl leading-tight text-primary-dark sm:text-4xl">{product.name}</h1>
+      <p class="text-xl font-semibold text-primary-dark sm:text-2xl">{product.formattedPrice}</p>
+      <p class="text-sm leading-7 text-text-secondary sm:text-base">{product.shortDescription}</p>
     </div>
 
-    <div class="grid gap-3 border-y border-border py-5">
-      {infoRows.map((row) => {
-        const Icon = row.icon;
+    {detailItems.length > 0 && (
+      <div class="grid gap-3 border-y border-border py-4">
+        {detailItems.map((row) => {
+          const Icon = getRowIcon(row.label);
 
-        return (
-          <div class="flex items-center gap-3 rounded-card bg-background-section/70 p-3">
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-background-card text-primary-dark shadow-soft">
-              <Icon size={17} aria-hidden="true" />
-            </span>
-            <div>
-              <p class="text-xs font-medium text-text-secondary">{row.label}</p>
-              <p class="text-sm font-semibold text-text-primary">{row.value}</p>
+          return (
+            <div class="flex items-center gap-3 rounded-[18px] bg-background-section/70 p-3">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-background-card text-primary-dark shadow-soft">
+                <Icon size={17} aria-hidden="true" />
+              </span>
+              <div>
+                <p class="text-xs font-medium text-text-secondary">{row.label}</p>
+                <p class="text-sm font-semibold text-text-primary">{row.value}</p>
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    )}
 
     <div class="grid gap-3 sm:grid-cols-2">
       <Button class="w-full gap-2" href={brand.channels.zalo}>
@@ -66,10 +71,11 @@ const infoRows = [
         Xem TikTok
       </Button>
     </div>
-    <p class="rounded-card bg-background-section p-4 text-xs leading-6 text-text-secondary">
-      SUGONG sẽ xác nhận mẫu, thời gian làm và phí giao hàng trước khi thực hiện.
-    </p>
-  </div>
 
-  <CustomOptions customizable={product.customizable} client:load />
+    {product.detailNote && (
+      <p class="rounded-[18px] bg-background-section p-4 text-xs leading-6 text-text-secondary">
+        {product.detailNote}
+      </p>
+    )}
+  </div>
 </aside>

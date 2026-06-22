@@ -1,5 +1,6 @@
 ---
 import Container from "../../components/ui/Container.astro";
+import { getCloudinaryImageProps } from "../../lib/cloudinary-image";
 import { withBase } from "../../lib/url";
 import { Gift, PenLine, ShoppingBag, Sparkles } from "lucide-react";
 
@@ -24,6 +25,10 @@ const positions = ["18% center", "center", "center", "center"];
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-grid">
       {categories.map((category, index) => {
         const Icon = icons[index] ?? Sparkles;
+        const imageProps = getCloudinaryImageProps(
+          { url: category.image, width: 900, height: 620 },
+          "category-card",
+        );
 
         return (
           <a
@@ -34,11 +39,14 @@ const positions = ["18% center", "center", "center", "center"];
               <img
                 class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.025]"
                 style={`object-position: ${positions[index]};`}
-                src={withBase(category.image)}
+                src={imageProps.src}
+                srcset={imageProps.srcset}
+                sizes={imageProps.sizes}
                 alt={category.alt}
-                width="900"
-                height="620"
+                width={imageProps.width}
+                height={imageProps.height}
                 loading="lazy"
+                decoding="async"
               />
             </div>
             <div class="relative p-4 pt-8">

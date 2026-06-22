@@ -2,24 +2,22 @@
 import { ProductGallery } from "../../components/product/ProductGallery";
 import Container from "../../components/ui/Container.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { createProductService } from "../../lib/products";
+import { getAllProducts, getRelatedProducts } from "../../lib/catalog";
 import { withBase } from "../../lib/url";
 import ProductCustomCta from "../../sections/product-detail/ProductCustomCta.astro";
-import ProductDescription from "../../sections/product-detail/ProductDescription.astro";
 import ProductInfo from "../../sections/product-detail/ProductInfo.astro";
 import RelatedProducts from "../../sections/product-detail/RelatedProducts.astro";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export async function getStaticPaths() {
-  const productService = await createProductService();
-  const products = await productService.getProducts();
+  const products = await getAllProducts();
 
   return Promise.all(
     products.map(async (product) => ({
       params: { slug: product.slug },
       props: {
         product,
-        relatedProducts: await productService.getRelatedProducts(product.id),
+        relatedProducts: await getRelatedProducts(product.id, 3),
       },
     })),
   );
@@ -29,14 +27,14 @@ const { product, relatedProducts } = Astro.props;
 ---
 
 <BaseLayout title={product.name} description={product.shortDescription}>
-  <section class="py-section-mobile lg:py-section-desktop">
-    <Container>
+  <section class="bg-background-card/45 pt-[40px] pb-section-mobile lg:pt-[40px] lg:pb-section-desktop">
+    <Container class="max-w-[1160px]">
       <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <a class="inline-flex w-fit items-center gap-2 text-sm font-medium text-primary-dark hover:text-text-primary" href={withBase("/products")}>
           <ArrowLeft size={16} aria-hidden="true" />
           Quay lại sản phẩm
         </a>
-        <nav class="flex items-center gap-2 text-xs text-text-secondary" aria-label="Breadcrumb">
+        <nav class="flex flex-wrap items-center gap-2 text-xs text-text-secondary" aria-label="Breadcrumb">
           <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
           <ChevronRight size={14} aria-hidden="true" />
           <a class="hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
@@ -45,21 +43,25 @@ const { product, relatedProducts } = Astro.props;
         </nav>
       </div>
 
-      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(380px,0.95fr)] lg:items-start">
-        <ProductGallery
-          images={product.images}
-          videoUrl={product.videoUrl}
-          productName={product.name}
-          client:visible
-        />
-        <div class="lg:sticky lg:top-24">
+      <div class="grid gap-7 xl:grid-cols-[minmax(0,560px)_minmax(320px,380px)] xl:items-start xl:justify-center xl:gap-9">
+        <div class="min-w-0 rounded-[22px] border border-primary-soft/35 bg-background-card p-3 shadow-feather sm:p-4">
+          <div class="rounded-[18px] bg-background-main/60 p-2.5 sm:p-3">
+            <ProductGallery
+              images={product.images}
+              videoUrl={product.videoUrl}
+              productName={product.name}
+              client:visible
+            />
+          </div>
+        </div>
+
+        <div class="min-w-0 xl:pt-2">
           <ProductInfo product={product} />
         </div>
       </div>
     </Container>
   </section>
 
-  <ProductDescription product={product} />
   <ProductCustomCta />
   <RelatedProducts products={relatedProducts} />
 </BaseLayout>

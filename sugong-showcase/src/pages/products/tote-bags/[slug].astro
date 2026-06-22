@@ -1,0 +1,29 @@
+---
+import { getProductsByCategory } from "../../../lib/catalog";
+import { withBase } from "../../../lib/url";
+
+export async function getStaticPaths() {
+  const toteBags = await getProductsByCategory("bag");
+
+  return toteBags.map((product) => ({
+    params: { slug: product.slug },
+    props: { target: withBase(`/products/${product.slug}`) },
+  }));
+}
+
+const { target } = Astro.props;
+---
+
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>Đang chuyển hướng...</title>
+  </head>
+  <body>
+    <p>
+      Đang chuyển đến <a href={target}>{target}</a>.
+    </p>
+  </body>
+</html>

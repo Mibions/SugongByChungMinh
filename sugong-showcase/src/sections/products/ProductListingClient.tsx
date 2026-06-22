@@ -15,13 +15,28 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
-import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types";
+import {
+  type ProductCategoryFilter,
+  type ProductSort,
+  getProductPrimaryImage,
+  isProductCustomizable,
+  matchesProductCategory,
+  matchesProductSearch,
+  matchesProductTone,
+  sortProducts,
+} from "../../domain/product/product.helpers";
+import {
+  productCategoryMeta,
+  productToneFilters,
+  type ProductTone,
+} from "../../domain/product/product-taxonomy";
+import type { Product } from "../../domain/product/product.types";
+import { getCloudinaryImageProps } from "../../lib/cloudinary-image";
 import { cn } from "../../lib/cn";
 import { withBase } from "../../lib/url";
 
-type CategoryValue = ProductCategory | "all";
-type SortValue = NonNullable<ProductQuery["sort"]>;
-type ColorTone = "lavender" | "pink" | "cream" | "lilac";
+type CategoryValue = ProductCategoryFilter;
+type SortValue = ProductSort;
 
 type Props = {
   products: Product[];
@@ -30,32 +45,25 @@ type Props = {
 
 const pageSize = 6;
 const defaultMaxPrice = 600000;
+type ListingCategoryValue = "bag" | "scrunchie" | "gift" | "custom";
+
+const tabIcons: Record<ListingCategoryValue, typeof Sparkles> = {
+  bag: ShoppingBag,
+  scrunchie: Sparkles,
+  gift: Gift,
+  custom: WandSparkles,
+};
 
 const tabs: { label: string; value: CategoryValue; icon: typeof Sparkles }[] = [
   { label: "Tất cả", value: "all", icon: Sparkles },
-  { label: "Túi handmade", value: "bag", icon: ShoppingBag },
-  { label: "Scrunchie", value: "scrunchie", icon: Sparkles },
-  { label: "Quà tặng", value: "gift", icon: Gift },
-  { label: "Custom", value: "custom", icon: WandSparkles },
+  { label: productCategoryMeta.bag.tabLabel, value: "bag", icon: tabIcons.bag },
+  { label: productCategoryMeta.scrunchie.tabLabel, value: "scrunchie", icon: tabIcons.scrunchie },
+  { label: productCategoryMeta.gift.tabLabel, value: "gift", icon: tabIcons.gift },
+  { label: productCategoryMeta.custom.tabLabel, value: "custom", icon: tabIcons.custom },
 ];
 
-const categoryText: Record<ProductCategory, string> = {
-  bag: "túi handmade bag tote lavender tím",
-  scrunchie: "scrunchie phụ kiện tóc pastel hồng",
-  gift: "quà tặng gift hộp quà kem hồng",
-  custom: "custom cá nhân hóa thêu tên lilac",
-  graduation: "tốt nghiệp graduation quà tặng kem",
-};
-
-const colorFilters: { label: string; value: ColorTone; className: string; keywords: string[] }[] = [
-  { label: "Lavender", value: "lavender", className: "bg-primary", keywords: ["lavender", "tím", "tim", "bag", "tote"] },
-  { label: "Hồng nhạt", value: "pink", className: "bg-accent-pink", keywords: ["hồng", "hong", "pink", "scrunchie", "gift"] },
-  { label: "Kem", value: "cream", className: "bg-accent-cream", keywords: ["kem", "cream", "gift", "graduation"] },
-  { label: "Lilac", value: "lilac", className: "bg-primary-soft", keywords: ["lilac", "custom", "pouch", "keychain"] },
-];
-
-function isColorTone(value: string | null): value is ColorTone {
-  return colorFilters.some((filter) => filter.value === value);
+function isColorTone(value: string | null): value is ProductTone {
+  return productToneFilters.some((filter) => filter.value === value);
 }
 
 function getInitialState(): {
@@ -64,7 +72,7 @@ function getInitialState(): {
   sort: SortValue;
   page: number;
   maxPrice: number;
-  colorTone: ColorTone | null;
+  colorTone: ProductTone | null;
   customOnly: boolean;
 } {
   if (typeof window === "undefined") {
@@ -96,65 +104,10 @@ function getInitialState(): {
   };
 }
 
-function productMatchesCategory(product: Product, category: CategoryValue) {
-  if (category === "all") return true;
-  if (category === "custom") return product.category === "custom" || product.customizable;
-  return product.category === category;
-}
-
-function productMatchesSearch(product: Product, search: string) {
-  const term = search.trim().toLocaleLowerCase("vi");
-  if (!term) return true;
-
-  return [
-    product.name,
-    product.shortDescription,
-    product.description,
-    product.formattedPrice,
-    categoryText[product.category],
-    product.customizable ? "custom cá nhân hóa handmade" : "handmade",
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLocaleLowerCase("vi")
-    .includes(term);
-}
-
 function productMatchesPrice(product: Product, maxPrice: number) {
   if (maxPrice >= defaultMaxPrice) return true;
   if (product.price === null) return false;
   return product.price <= maxPrice;
-}
-
-function productMatchesColor(product: Product, colorTone: ColorTone | null) {
-  if (!colorTone) return true;
-  const filter = colorFilters.find((item) => item.value === colorTone);
-  if (!filter) return true;
-
-  const haystack = [
-    product.name,
-    product.shortDescription,
-    product.description,
-    categoryText[product.category],
-    ...product.images.map((image) => `${image.url} ${image.alt}`),
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLocaleLowerCase("vi");
-
-  return filter.keywords.some((keyword) => haystack.includes(keyword));
-}
-
-function sortProducts(products: Product[], sort: SortValue) {
-  if (sort === "price-asc") {
-    return [...products].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
-  }
-
-  if (sort === "price-desc") {
-    return [...products].sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
-  }
-
-  return products;
 }
 
 function updateUrl(
@@ -163,7 +116,7 @@ function updateUrl(
   sort: SortValue,
   page = 1,
   maxPrice = defaultMaxPrice,
-  colorTone: ColorTone | null = null,
+  colorTone: ProductTone | null = null,
   customOnly = false,
 ) {
   const params = new URLSearchParams();
@@ -180,7 +133,8 @@ function updateUrl(
 }
 
 function ProductCard({ product }: { product: Product }) {
-  const image = [...product.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
+  const image = getProductPrimaryImage(product);
+  const imageProps = getCloudinaryImageProps(image, "product-card");
 
   return (
     <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/35 bg-background-card/95 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft/80 hover:shadow-feather">
@@ -188,10 +142,12 @@ function ProductCard({ product }: { product: Product }) {
         <div className="relative aspect-[4/3] overflow-hidden bg-background-section">
           <img
             className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-            src={withBase(image.url)}
+            src={imageProps.src}
+            srcSet={imageProps.srcset}
+            sizes={imageProps.sizes}
             alt={image.alt}
-            width={image.width}
-            height={image.height}
+            width={imageProps.width}
+            height={imageProps.height}
             loading="lazy"
             decoding="async"
           />
@@ -207,7 +163,7 @@ function ProductCard({ product }: { product: Product }) {
               <Scissors size={13} aria-hidden="true" />
               Handmade
             </span>
-            {product.customizable && (
+            {isProductCustomizable(product) && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft/45 px-3 py-1 text-xs font-medium text-primary-dark">
                 <WandSparkles size={13} aria-hidden="true" />
                 Custom
@@ -238,10 +194,10 @@ function FilterControls({
   onCustomOnlyChange,
 }: {
   maxPrice: number;
-  colorTone: ColorTone | null;
+  colorTone: ProductTone | null;
   customOnly: boolean;
   onMaxPriceChange: (value: number) => void;
-  onColorToneChange: (value: ColorTone | null) => void;
+  onColorToneChange: (value: ProductTone | null) => void;
   onCustomOnlyChange: (value: boolean) => void;
 }) {
   return (
@@ -274,7 +230,7 @@ function FilterControls({
           Màu sắc
         </p>
         <div className="mt-4 flex items-center gap-3">
-          {colorFilters.map((filter) => (
+          {productToneFilters.map((filter) => (
             <button
               className={cn(
                 "h-8 w-8 rounded-full border border-background-card shadow-soft transition",
@@ -324,10 +280,10 @@ function FilterDrawer({
 }: {
   open: boolean;
   maxPrice: number;
-  colorTone: ColorTone | null;
+  colorTone: ProductTone | null;
   customOnly: boolean;
   onMaxPriceChange: (value: number) => void;
-  onColorToneChange: (value: ColorTone | null) => void;
+  onColorToneChange: (value: ProductTone | null) => void;
   onCustomOnlyChange: (value: boolean) => void;
   onClose: () => void;
   onClear: () => void;
@@ -381,7 +337,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
   const [sort, setSort] = useState<SortValue>(initialState.sort);
   const [page, setPage] = useState(initialState.page);
   const [maxPrice, setMaxPrice] = useState(initialState.maxPrice);
-  const [colorTone, setColorTone] = useState<ColorTone | null>(initialState.colorTone);
+  const [colorTone, setColorTone] = useState<ProductTone | null>(initialState.colorTone);
   const [customOnly, setCustomOnly] = useState(initialState.customOnly);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -389,11 +345,11 @@ export function ProductListingClient({ products, zaloHref }: Props) {
     return sortProducts(
       products.filter(
         (product) =>
-          productMatchesCategory(product, category) &&
-          productMatchesSearch(product, search) &&
+          matchesProductCategory(product, category) &&
+          matchesProductSearch(product, search) &&
           productMatchesPrice(product, maxPrice) &&
-          productMatchesColor(product, colorTone) &&
-          (!customOnly || product.customizable),
+          matchesProductTone(product, colorTone) &&
+          (!customOnly || isProductCustomizable(product)),
       ),
       sort,
     );
@@ -413,7 +369,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
     sort?: SortValue;
     page?: number;
     maxPrice?: number;
-    colorTone?: ColorTone | null;
+    colorTone?: ProductTone | null;
     customOnly?: boolean;
   }) {
     const nextCategory = next.category ?? category;
@@ -485,8 +441,8 @@ export function ProductListingClient({ products, zaloHref }: Props) {
         </div>
       </section>
 
-      <section className="py-section-mobile lg:py-section-desktop">
-        <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
+      <section className="pt-10 pb-section-mobile lg:pt-10 lg:pb-section-desktop">
+        <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-5">
           <div className="grid gap-7 lg:grid-cols-[280px_1fr] xl:grid-cols-[300px_1fr]">
             <aside className="hidden lg:block">
               <div className="space-y-6 rounded-card border border-primary-soft/45 bg-background-card/90 p-5 shadow-soft backdrop-blur">

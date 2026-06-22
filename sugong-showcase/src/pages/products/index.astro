@@ -1,12 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { createProductService } from "../../lib/products";
+import { getAllProducts } from "../../lib/catalog";
 import ProductsHeader from "../../sections/products/ProductsHeader.astro";
 import { ProductListingClient } from "../../sections/products/ProductListingClient";
 import { brand } from "../../lib/site-data";
 
-const productService = await createProductService();
-const products = await productService.getProducts();
+const products = await getAllProducts();
 ---
 
 <BaseLayout

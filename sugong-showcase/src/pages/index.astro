@@ -5,11 +5,10 @@ import CustomCta from "../sections/home/CustomCta.astro";
 import FeaturedProducts from "../sections/home/FeaturedProducts.astro";
 import HomeHero from "../sections/home/HomeHero.astro";
 import TrustSection from "../sections/home/TrustSection.astro";
-import { createProductService } from "../lib/products";
+import { getFeaturedProducts } from "../lib/catalog";
 import { brand, categories } from "../lib/site-data";
 
-const productService = await createProductService();
-const products = await productService.getHomepageProducts();
+const products = await getFeaturedProducts(3);
 ---
 
 <BaseLayout title="Trang chủ" description={brand.description}>

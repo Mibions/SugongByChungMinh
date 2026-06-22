@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, PlayCircle, X } from "lucide-react";
 import type { ProductImage } from "../../domain/product/product.types";
+import { getCloudinaryImageProps } from "../../lib/cloudinary-image";
 import { cn } from "../../lib/cn";
-import { withBase } from "../../lib/url";
 
 type Props = {
   images: ProductImage[];
@@ -18,6 +18,9 @@ type GalleryMedia =
       alt: string;
       poster?: ProductImage;
     };
+
+const initialThumbCount = 8;
+const thumbStepCount = 8;
 
 export function ProductGallery({ images, videoUrl, productName }: Props) {
   const media = useMemo<GalleryMedia[]>(() => {
@@ -36,9 +39,22 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
       },
     ];
   }, [images, productName, videoUrl]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [visibleThumbCount, setVisibleThumbCount] = useState(initialThumbCount);
   const activeMedia = media[activeIndex] ?? media[0];
+  const visibleMedia = media.slice(0, visibleThumbCount);
+
+  useEffect(() => {
+    setVisibleThumbCount(initialThumbCount);
+    setActiveIndex(0);
+  }, [media.length]);
+
+  useEffect(() => {
+    if (activeIndex < visibleThumbCount) return;
+    setVisibleThumbCount(Math.ceil((activeIndex + 1) / thumbStepCount) * thumbStepCount);
+  }, [activeIndex, visibleThumbCount]);
 
   function goToNext() {
     setActiveIndex((current) => (current + 1) % media.length);
@@ -55,7 +71,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
           <iframe
             className={cn(
               "w-full bg-text-primary",
-              mode === "lightbox" ? "aspect-[9/16] max-h-[82vh]" : "aspect-[4/5] max-h-[720px]",
+              mode === "lightbox" ? "aspect-[9/16] max-h-[82vh]" : "aspect-[4/5] max-h-[540px]",
             )}
             src={item.url}
             title={item.alt}
@@ -79,13 +95,17 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
       );
     }
 
+    const imageProps = getCloudinaryImageProps(item, "product-gallery-main");
+
     return (
       <img
-        className={cn("h-full w-full object-cover", mode === "lightbox" ? "max-h-[82vh] object-contain" : "aspect-[4/5]")}
-        src={withBase(item.url)}
+        className={cn("h-full w-full object-cover", mode === "lightbox" ? "max-h-[82vh] object-contain" : "aspect-[4/5] max-h-[540px]")}
+        src={imageProps.src}
+        srcSet={imageProps.srcset}
+        sizes={imageProps.sizes}
         alt={item.alt}
-        width={item.width}
-        height={item.height}
+        width={imageProps.width}
+        height={imageProps.height}
         loading="eager"
         decoding="async"
       />
@@ -94,86 +114,117 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
 
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-[92px_1fr]">
-        <div className="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
-          {media.map((item, index) => (
-          <button
-            data-gallery-thumb
-            className={cn(
-              "aspect-square w-20 shrink-0 overflow-hidden rounded-card border bg-background-card transition lg:w-full",
-              index === activeIndex ? "border-primary-soft shadow-soft ring-2 ring-primary-soft/45" : "border-border hover:border-primary-soft",
-            )}
-            type="button"
-            aria-label={`Xem ${item.type === "video" ? "video" : "ảnh"} ${index + 1} của ${productName}`}
-            aria-pressed={index === activeIndex}
-            onClick={() => setActiveIndex(index)}
-            key={`${item.type}-${item.type === "image" ? item.url : item.url ?? "video"}-${index}`}
-          >
-            {item.type === "image" ? (
-              <img
-                className="h-full w-full object-cover"
-                src={withBase(item.url)}
-                alt={item.alt}
-                width={item.width}
-                height={item.height}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <span className="relative grid h-full place-items-center bg-text-primary text-background-card">
-                {item.poster && (
-                  <img
-                    className="absolute inset-0 h-full w-full object-cover opacity-45"
-                    src={withBase(item.poster.url)}
-                    alt=""
-                    width={item.poster.width}
-                    height={item.poster.height}
-                    loading="lazy"
-                    decoding="async"
-                  />
+      <div className="grid gap-4 lg:grid-cols-[76px_minmax(0,1fr)] lg:gap-5">
+        <div className="order-2 space-y-3 lg:order-1">
+          <div className="flex gap-3 overflow-x-auto pb-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
+            {visibleMedia.map((item, index) => (
+              <button
+                data-gallery-thumb
+                className={cn(
+                  "aspect-square w-16 shrink-0 overflow-hidden rounded-[16px] border bg-background-card transition lg:w-full",
+                  index === activeIndex ? "border-primary-soft shadow-soft ring-2 ring-primary-soft/45" : "border-border hover:border-primary-soft",
                 )}
-                <span className="absolute inset-0 bg-primary-dark/55" />
-                <span className="relative z-10 grid place-items-center">
-                  <PlayCircle size={24} aria-hidden="true" />
-                  <span className="mt-1 rounded-full bg-background-card/90 px-2 py-0.5 text-[10px] text-primary-dark">
-                    Video
+                type="button"
+                aria-label={`Xem ${item.type === "video" ? "video" : "ảnh"} ${index + 1} của ${productName}`}
+                aria-pressed={index === activeIndex}
+                onClick={() => setActiveIndex(index)}
+                key={`${item.type}-${item.type === "image" ? item.url : item.url ?? "video"}-${index}`}
+              >
+                {item.type === "image" ? (
+                  (() => {
+                    const imageProps = getCloudinaryImageProps(item, "product-gallery-thumb");
+
+                    return (
+                      <img
+                        className="h-full w-full object-cover"
+                        src={imageProps.src}
+                        srcSet={imageProps.srcset}
+                        sizes={imageProps.sizes}
+                        alt={item.alt}
+                        width={imageProps.width}
+                        height={imageProps.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    );
+                  })()
+                ) : (
+                  <span className="relative grid h-full place-items-center bg-text-primary text-background-card">
+                    {item.poster && (
+                      (() => {
+                        const posterProps = getCloudinaryImageProps(item.poster, "product-gallery-thumb");
+
+                        return (
+                          <img
+                            className="absolute inset-0 h-full w-full object-cover opacity-45"
+                            src={posterProps.src}
+                            srcSet={posterProps.srcset}
+                            sizes={posterProps.sizes}
+                            alt=""
+                            width={posterProps.width}
+                            height={posterProps.height}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        );
+                      })()
+                    )}
+                    <span className="absolute inset-0 bg-primary-dark/55" />
+                    <span className="relative z-10 grid place-items-center">
+                      <PlayCircle size={20} aria-hidden="true" />
+                    </span>
                   </span>
-                </span>
-              </span>
-            )}
-          </button>
-          ))}
+                )}
+              </button>
+            ))}
+          </div>
+
+          {visibleThumbCount < media.length && (
+            <button
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-primary-soft bg-background-card px-3 text-xs font-medium text-primary-dark shadow-soft transition hover:bg-background-section"
+              type="button"
+              onClick={() => setVisibleThumbCount((current) => current + thumbStepCount)}
+            >
+              Xem thêm {Math.min(thumbStepCount, media.length - visibleThumbCount)} ảnh
+            </button>
+          )}
         </div>
 
-        <div className="relative order-1 overflow-hidden rounded-card border border-primary-soft/45 bg-background-card shadow-feather lg:order-2">
-          <button
-            data-gallery-main
-            className="block w-full cursor-zoom-in"
-            type="button"
-            aria-label={`Mở ảnh lớn của ${productName}`}
-            onClick={() => setLightboxOpen(true)}
-          >
-            {renderMedia(activeMedia, "main")}
-          </button>
-          <button
-            className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
-            type="button"
-            aria-label="Ảnh trước"
-            onClick={goToPrevious}
-          >
-            <ChevronLeft size={20} aria-hidden="true" />
-          </button>
-          <button
-            className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
-            type="button"
-            aria-label="Ảnh tiếp theo"
-            onClick={goToNext}
-          >
-            <ChevronRight size={20} aria-hidden="true" />
-          </button>
-          <span data-gallery-index className="absolute bottom-3 right-3 rounded-full bg-background-card/90 px-3 py-1 text-xs font-medium text-primary-dark shadow-soft">
-            {activeIndex + 1} / {media.length}
-          </span>
+        <div className="order-1 mx-auto w-full max-w-[480px] overflow-hidden rounded-[20px] border border-primary-soft/45 bg-background-card shadow-feather lg:order-2 lg:max-w-[520px]">
+          <div className="relative">
+            <button
+              data-gallery-main
+              className="block w-full cursor-zoom-in"
+              type="button"
+              aria-label={`Mở ảnh lớn của ${productName}`}
+              onClick={() => setLightboxOpen(true)}
+            >
+              {renderMedia(activeMedia, "main")}
+            </button>
+            {media.length > 1 && (
+              <>
+                <button
+                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                  type="button"
+                  aria-label="Ảnh trước"
+                  onClick={goToPrevious}
+                >
+                  <ChevronLeft size={20} aria-hidden="true" />
+                </button>
+                <button
+                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                  type="button"
+                  aria-label="Ảnh tiếp theo"
+                  onClick={goToNext}
+                >
+                  <ChevronRight size={20} aria-hidden="true" />
+                </button>
+                <span data-gallery-index className="absolute bottom-3 right-3 rounded-full bg-background-card/90 px-3 py-1 text-xs font-medium text-primary-dark shadow-soft">
+                  {activeIndex + 1} / {media.length}
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -195,22 +246,26 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
             </div>
             <div className="relative bg-background-section">
               {renderMedia(activeMedia, "lightbox")}
-              <button
-                className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
-                type="button"
-                aria-label="Ảnh trước"
-                onClick={goToPrevious}
-              >
-                <ChevronLeft size={22} aria-hidden="true" />
-              </button>
-              <button
-                className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
-                type="button"
-                aria-label="Ảnh tiếp theo"
-                onClick={goToNext}
-              >
-                <ChevronRight size={22} aria-hidden="true" />
-              </button>
+              {media.length > 1 && (
+                <>
+                  <button
+                    className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                    type="button"
+                    aria-label="Ảnh trước"
+                    onClick={goToPrevious}
+                  >
+                    <ChevronLeft size={22} aria-hidden="true" />
+                  </button>
+                  <button
+                    className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                    type="button"
+                    aria-label="Ảnh tiếp theo"
+                    onClick={goToNext}
+                  >
+                    <ChevronRight size={22} aria-hidden="true" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

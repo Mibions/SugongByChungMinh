@@ -2,12 +2,11 @@
 import { ChevronRight, GraduationCap } from "lucide-react";
 import Container from "../../../components/ui/Container.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { createGraduationHatService } from "../../../lib/graduation-hats";
+import { getGraduationHats } from "../../../lib/catalog";
 import GraduationHatGallery from "../../../sections/graduation-hats/GraduationHatGallery.astro";
 import { withBase } from "../../../lib/url";
 
-const graduationHatService = createGraduationHatService();
-const hats = await graduationHatService.getGraduationHats();
+const hats = await getGraduationHats();
 ---
 
 <BaseLayout

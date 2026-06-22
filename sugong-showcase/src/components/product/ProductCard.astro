@@ -1,6 +1,8 @@
 ---
 import { Gift, Heart, Scissors, Sparkles, WandSparkles } from "lucide-react";
+import { getProductPrimaryImage, isProductCustomizable } from "../../domain/product/product.helpers";
 import type { Product } from "../../domain/product/product.types";
+import { getCloudinaryImageProps } from "../../lib/cloudinary-image";
 import { withBase } from "../../lib/url";
 
 interface Props {
@@ -8,7 +10,8 @@ interface Props {
 }
 
 const { product } = Astro.props;
-const image = product.images.toSorted((a, b) => a.sortOrder - b.sortOrder)[0];
+const image = getProductPrimaryImage(product);
+const imageProps = getCloudinaryImageProps(image, "product-card");
 const categoryIcons: Partial<Record<Product["category"], typeof Gift>> = {
   gift: Gift,
   graduation: Gift,
@@ -22,11 +25,14 @@ const CategoryIcon = categoryIcons[product.category] ?? Scissors;
     <div class="relative aspect-[4/3] overflow-hidden bg-background-section">
       <img
         class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-        src={withBase(image.url)}
+        src={imageProps.src}
+        srcset={imageProps.srcset}
+        sizes={imageProps.sizes}
         alt={image.alt}
-        width={image.width}
-        height={image.height}
+        width={imageProps.width}
+        height={imageProps.height}
         loading="lazy"
+        decoding="async"
       />
       <span
         class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background-card/90 text-primary shadow-feather ring-1 ring-primary-soft/30"
@@ -43,7 +49,7 @@ const CategoryIcon = categoryIcons[product.category] ?? Scissors;
           <CategoryIcon size={13} aria-hidden="true" />
           Handmade
         </span>
-        {product.customizable && (
+        {isProductCustomizable(product) && (
           <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-soft/45 px-3 py-1 text-xs font-medium text-primary-dark">
             <WandSparkles size={13} aria-hidden="true" />
             Custom

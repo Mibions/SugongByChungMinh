@@ -12,11 +12,15 @@ export class ProductService {
     return this.repository.getBySlug(slug);
   }
 
-  getHomepageProducts() {
-    return this.repository.getFeatured(3);
+  getProductsByCategory(category: ProductQuery["category"]) {
+    return this.repository.getAll({ category });
   }
 
-  getRelatedProducts(productId: string) {
-    return this.repository.getRelated(productId, 3);
+  getHomepageProducts(limit = 3) {
+    return this.repository.getFeatured(limit);
+  }
+
+  getRelatedProducts(productId: string, limit = 3) {
+    return this.repository.getRelated(productId, limit);
   }
 }

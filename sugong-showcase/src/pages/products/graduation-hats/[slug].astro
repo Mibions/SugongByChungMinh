@@ -1,16 +1,16 @@
 ---
 import { ArrowLeft, ChevronRight, MessageCircle, PlayCircle, Sparkles } from "lucide-react";
+import { ProductGallery } from "../../../components/product/ProductGallery";
 import Button from "../../../components/ui/Button.astro";
 import Container from "../../../components/ui/Container.astro";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { graduationHatTones } from "../../../domain/graduation-hat/graduation-hat.types";
-import { createGraduationHatService } from "../../../lib/graduation-hats";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getGraduationHats } from "../../../lib/catalog";
 import { brand } from "../../../lib/site-data";
 import { withBase } from "../../../lib/url";
 
 export async function getStaticPaths() {
-  const graduationHatService = createGraduationHatService();
-  const hats = await graduationHatService.getGraduationHats();
+  const hats = await getGraduationHats();
 
   return hats.map((hat) => ({
     params: { slug: hat.slug },
@@ -20,18 +20,21 @@ export async function getStaticPaths() {
 
 const { hat } = Astro.props;
 const toneLabel = graduationHatTones.find((item) => item.value === hat.tone)?.label ?? "Khác";
-const gallery = hat.gallery.length > 0 ? hat.gallery : [hat.coverImage];
+const galleryImages = (hat.gallery.length > 0 ? hat.gallery : [hat.coverImage]).map((image, index) => ({
+  ...image,
+  sortOrder: index,
+}));
 ---
 
 <BaseLayout title={hat.name} description={hat.shortDescription}>
-  <section class="py-section-mobile lg:py-section-desktop">
-    <Container class="max-w-wide">
+  <section class="bg-background-card/45 py-section-mobile lg:py-section-desktop">
+    <Container class="max-w-[1160px]">
       <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <a class="inline-flex w-fit items-center gap-2 text-sm font-medium text-primary-dark hover:text-text-primary" href={withBase("/products/graduation-hats")}>
           <ArrowLeft size={16} aria-hidden="true" />
           Quay lại nón tốt nghiệp
         </a>
-        <nav class="flex items-center gap-2 text-xs text-text-secondary" aria-label="Breadcrumb">
+        <nav class="flex flex-wrap items-center gap-2 text-xs text-text-secondary" aria-label="Breadcrumb">
           <a class="hover:text-primary-dark" href={withBase("/")}>Trang chủ</a>
           <ChevronRight size={14} aria-hidden="true" />
           <a class="hover:text-primary-dark" href={withBase("/products")}>Sản phẩm</a>
@@ -42,65 +45,52 @@ const gallery = hat.gallery.length > 0 ? hat.gallery : [hat.coverImage];
         </nav>
       </div>
 
-      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:items-start">
-        <div class="space-y-4">
-          <div class="overflow-hidden rounded-card border border-primary-soft/45 bg-background-card p-3 shadow-feather">
-            <img
-              class="aspect-[4/5] w-full rounded-[14px] object-cover"
-              src={withBase(hat.coverImage.url)}
-              alt={hat.coverImage.alt}
-              width="900"
-              height="1200"
-              loading="eager"
+      <div class="grid gap-7 xl:grid-cols-[minmax(0,560px)_minmax(320px,380px)] xl:items-start xl:justify-center xl:gap-9">
+        <div class="min-w-0 rounded-[22px] border border-primary-soft/35 bg-background-card p-3 shadow-feather sm:p-4">
+          <div class="rounded-[18px] bg-background-main/60 p-2.5 sm:p-3">
+            <ProductGallery
+              images={galleryImages}
+              productName={hat.name}
+              client:visible
             />
           </div>
-          {gallery.length > 1 && (
-            <div class="flex gap-3 overflow-x-auto pb-1">
-              {gallery.map((image) => (
-                <img
-                  class="h-24 w-24 shrink-0 rounded-card border border-primary-soft/45 bg-background-card object-cover p-1 shadow-soft"
-                  src={withBase(image.url)}
-                  alt={image.alt}
-                  width="160"
-                  height="160"
-                  loading="lazy"
-                />
-              ))}
-            </div>
-          )}
         </div>
 
-        <aside class="rounded-card border border-primary-soft/45 bg-background-card p-6 shadow-feather lg:sticky lg:top-24">
-          <p class="inline-flex items-center gap-2 rounded-full bg-background-section px-4 py-2 text-xs font-semibold uppercase text-primary-dark">
-            <Sparkles size={15} aria-hidden="true" />
-            {toneLabel}
-          </p>
-          <h1 class="mt-4 font-heading text-4xl leading-tight text-primary-dark sm:text-5xl">{hat.name}</h1>
-          <p class="mt-4 text-base leading-7 text-text-secondary">{hat.shortDescription}</p>
-          {hat.description && <p class="mt-4 text-sm leading-7 text-text-secondary">{hat.description}</p>}
+        <aside class="space-y-5 xl:pt-2">
+          <div class="space-y-5 rounded-[20px] border border-primary-soft/55 bg-background-card p-5 shadow-feather sm:p-6">
+            <div class="space-y-3">
+              <p class="inline-flex items-center gap-2 rounded-full bg-background-section px-4 py-2 text-xs font-semibold uppercase text-primary-dark">
+                <Sparkles size={15} aria-hidden="true" />
+                {toneLabel}
+              </p>
+              <h1 class="font-heading text-3xl leading-tight text-primary-dark sm:text-4xl">{hat.name}</h1>
+              <p class="text-sm leading-7 text-text-secondary sm:text-base">{hat.shortDescription}</p>
+              {hat.description && <p class="text-sm leading-7 text-text-secondary">{hat.description}</p>}
+            </div>
 
-          <div class="mt-6 flex flex-wrap gap-2">
-            {hat.tags.map((tag) => (
-              <span class="rounded-full bg-background-section px-3 py-1 text-xs font-medium text-primary-dark">
-                {tag}
-              </span>
-            ))}
-          </div>
+            <div class="flex flex-wrap gap-2 border-y border-border py-4">
+              {hat.tags.map((tag) => (
+                <span class="rounded-full bg-background-section px-3 py-1 text-xs font-medium text-primary-dark">
+                  {tag}
+                </span>
+              ))}
+            </div>
 
-          <div class="mt-7 rounded-card bg-background-section p-5">
-            <h2 class="font-heading text-2xl text-primary-dark">Thích mẫu này?</h2>
-            <p class="mt-2 text-sm leading-6 text-text-secondary">
-              Nhắn SUGONG để trao đổi mẫu tương tự, tone màu và thời gian hoàn thiện.
-            </p>
-            <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <Button class="gap-2" href={brand.channels.zalo}>
-                <MessageCircle size={17} aria-hidden="true" />
-                Nhắn Zalo
-              </Button>
-              <Button class="gap-2" href={hat.tiktokUrl ?? brand.tiktokProfileUrl} variant="secondary">
-                <PlayCircle size={17} aria-hidden="true" />
-                Xem TikTok
-              </Button>
+            <div class="rounded-[18px] bg-background-section p-5">
+              <h2 class="font-heading text-2xl text-primary-dark">Thích mẫu này?</h2>
+              <p class="mt-2 text-sm leading-6 text-text-secondary">
+                Nhắn SUGONG để trao đổi mẫu tương tự, tone màu và thời gian hoàn thiện.
+              </p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <Button class="gap-2" href={brand.channels.zalo}>
+                  <MessageCircle size={17} aria-hidden="true" />
+                  Nhắn Zalo
+                </Button>
+                <Button class="gap-2" href={hat.tiktokUrl ?? brand.tiktokProfileUrl} variant="secondary">
+                  <PlayCircle size={17} aria-hidden="true" />
+                  Xem TikTok
+                </Button>
+              </div>
             </div>
           </div>
         </aside>

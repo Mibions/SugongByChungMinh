@@ -1,0 +1,19 @@
+---
+import { withBase } from "../../../lib/url";
+
+const target = withBase("/products?category=bag");
+---
+
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>Đang chuyển hướng...</title>
+  </head>
+  <body>
+    <p>
+      Đang chuyển đến <a href={target}>{target}</a>.
+    </p>
+  </body>
+</html>

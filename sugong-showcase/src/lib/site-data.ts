@@ -1,3 +1,5 @@
+import { productCategoryMeta } from "../domain/product/product-taxonomy";
+
 export const brand = {
   name: "SUGONG",
   tagline: "Quà handmade theo cách riêng của bạn",
@@ -60,25 +62,25 @@ export const socialLinks = [
 
 export const categories = [
   {
-    name: "Túi handmade",
+    name: productCategoryMeta.bag.label,
     href: "/products?category=bag",
     image: "/assets/brand/footer-bag.png",
     alt: "Túi handmade hoa nhí tông tím pastel",
   },
   {
-    name: "Scrunchie",
+    name: productCategoryMeta.scrunchie.label,
     href: "/products?category=scrunchie",
     image: "/assets/categories/scrunchie.svg",
     alt: "Scrunchie pastel mềm mại",
   },
   {
-    name: "Quà tặng",
+    name: productCategoryMeta.gift.label,
     href: "/products?category=gift",
     image: "/assets/categories/giftbox.svg",
     alt: "Hộp quà handmade phối màu nhẹ",
   },
   {
-    name: "Custom",
+    name: productCategoryMeta.custom.tabLabel,
     href: "/products?category=custom",
     image: "/assets/products/custom-pouch.svg",
     alt: "Phụ kiện custom thêu tên",

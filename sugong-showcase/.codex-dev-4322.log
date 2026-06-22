@@ -1,0 +1,29 @@
+
+> sugong-showcase@0.1.0 dev
+> astro dev --host 127.0.0.1 --port 4322
+
+[vite] connected.
+[2m20:51:20[22m [34m[types][39m Generated [2m19ms[22m
+[2m20:51:20[22m [34m[vite][39m Re-optimizing dependencies because vite config has changed
+[42m[1m astro [22m[49m [32mv6.4.4[39m [2mready in[22m 8086 [2mms[22m
+[2m┃[22m Local    [36mhttp://127.0.0.1:4322/[39m
+[2m20:51:20[22m [32mwatching for file changes...[39m
+[2m20:54:08[22m [34m[200][39m / [2m370ms[22m
+[2m20:54:25[22m [34m[200][39m /products [2m144ms[22m
+[2m20:54:26[22m [34m[200][39m /products/bag-lavender [2m89ms[22m
+[2m20:54:26[22m [34m[200][39m /products/graduation-hats [2m57ms[22m
+[2m20:54:27[22m [34m[200][39m /products/graduation-hats/non-tot-nghiep-tone-pastel-phoi-mau [2m56ms[22m
+[2m20:54:27[22m [34m[200][39m /products/tote-bags [2m9ms[22m
+[2m20:54:27[22m [34m[200][39m /products/tote-bags/tui-tote-2-mat-tone-lavender [2m10ms[22m
+[vite] program reload
+[vite] An error happened during full reload
+Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+Error: Failed to load url astro:server-app.js (resolved id: astro:server-app.js). Does the file exist?
+    at loadAndTransform (file:///C:/Users/tn160/OneDrive/M%C3%A1y%20t%C3%ADnh/SugongByChungMinh/sugong-showcase/node_modules/.pnpm/vite@7.3.5_@types+node@22.1_56d3d544e89c00271f1ad123cf58554f/node_modules/vite/dist/node/chunks/config.js:22739:33)
+[vite] program reload
+[2m21:20:00[22m Configuration file removed. Restarting...
+[vite] connected.
+[2m21:20:08[22m [34m[vite][39m server restarted.
+[2m21:28:35[22m [34m[200][39m /products/tui-tote-2-mat-tone-cam-vang [2m205ms[22m
+[2m21:28:35[22m [34m[200][39m /products/tui-tote-2-mat-tone-cam-vang [2m204ms[22m
+[2m21:30:57[22m [34m[200][39m /products/tui-tote-2-mat-tone-cam-vang [2m83ms[22m

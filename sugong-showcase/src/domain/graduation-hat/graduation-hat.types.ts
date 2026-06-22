@@ -3,13 +3,15 @@ export type GraduationHatTone = "blue" | "pink" | "white" | "purple" | "mixed" |
 export type ProductImage = {
   url: string;
   alt: string;
+  width: number;
+  height: number;
+  publicId?: string;
 };
 
 export type GraduationHat = {
   id: string;
   slug: string;
   name: string;
-  category: "graduation-hats";
   tone: GraduationHatTone;
   shortDescription: string;
   description?: string;
