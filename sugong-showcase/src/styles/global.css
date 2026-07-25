@@ -17,6 +17,10 @@ body {
   margin: 0;
 }
 
+body {
+  overflow-x: clip;
+}
+
 body,
 button,
 input,
@@ -43,4 +47,27 @@ video {
 :focus-visible {
   outline: 2px solid var(--color-primary-dark);
   outline-offset: 3px;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

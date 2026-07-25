@@ -405,7 +405,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
     <>
       <section className="border-b border-border bg-background-card/70 py-4">
         <div className="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
-          <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+          <div className="scrollbar-none -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
             <div className="flex min-w-max gap-3">
               {tabs.map((tab) => {
                 const Icon = tab.icon;

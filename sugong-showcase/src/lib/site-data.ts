@@ -15,7 +15,7 @@ export const brand = {
   tiktokProfileUrl: "https://www.tiktok.com/@sugongbychungminh23",
   instagramProfileUrl: "https://www.instagram.com/sugongbychungminh",
   heroTikTokVideoIds: [
-    "7591363539076533522",
+    "7502684361934818567",
     "7616203887690648850",
     "7566495772435565832",
   ],
@@ -64,7 +64,7 @@ export const categories = [
   {
     name: productCategoryMeta.bag.label,
     href: "/products?category=bag",
-    image: "/assets/brand/footer-bag.png",
+    image: "/assets/brand/footer-bag.webp",
     alt: "Túi handmade hoa nhí tông tím pastel",
   },
   {

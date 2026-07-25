@@ -12,6 +12,7 @@ interface Props extends SeoInput {}
 const seo = createSeo(Astro.props);
 const currentPath = withoutBase(Astro.url.pathname);
 const cloudinaryCloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 ---
 
 <!doctype html>
@@ -20,7 +21,16 @@ const cloudinaryCloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={seo.description} />
+    <meta name="theme-color" content="#f8f5fc" />
     <title>{seo.title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content={brand.name} />
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary" />
     {cloudinaryCloudName && <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -50,7 +60,9 @@ const cloudinaryCloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
           ))}
         </nav>
         <div class="flex items-center gap-3">
-          <Button href={brand.channels.zalo} size="sm">Nhắn Zalo</Button>
+          <div class="hidden min-[370px]:block">
+            <Button href={brand.channels.zalo} size="sm">Nhắn Zalo</Button>
+          </div>
           <MobileNavigation items={navigationItems} currentPath={currentPath} client:idle />
         </div>
       </Container>

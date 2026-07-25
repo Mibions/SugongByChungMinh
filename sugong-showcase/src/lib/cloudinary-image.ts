@@ -68,7 +68,7 @@ const variantConfigs: Record<CloudinaryImageVariant, VariantConfig> = {
   "category-card": {
     widths: [360, 540, 720, 960],
     sizes: "(min-width: 768px) 25vw, 50vw",
-    transforms: "f_auto,q_auto:eco,c_fill,g_auto",
+    transforms: "f_auto,q_auto:eco,c_fill,g_auto,ar_29:20",
   },
 };
 

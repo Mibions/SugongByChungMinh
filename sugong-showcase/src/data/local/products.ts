@@ -69,10 +69,10 @@ export const localProducts: Product[] = [
         height: 1600,
       },
       {
-        fileName: "/assets/brand/footer-bag.png",
+        fileName: "/assets/brand/footer-bag.webp",
         alt: "Túi lavender handmade trên nền hoa tím",
-        width: 2048,
-        height: 640,
+        width: 1600,
+        height: 533,
       },
     ],
     tones: ["lavender", "pink", "cream"],

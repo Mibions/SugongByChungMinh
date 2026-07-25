@@ -1,5 +1,5 @@
 ---
-import { Heart, Home, MessageCircle, Plus, Share2, ShoppingBag, Sparkles } from "lucide-react";
+import { MessageCircle, ShoppingBag, Sparkles } from "lucide-react";
 import Button from "../../components/ui/Button.astro";
 import Container from "../../components/ui/Container.astro";
 import { brand } from "../../lib/site-data";
@@ -7,7 +7,7 @@ import { withBase } from "../../lib/url";
 
 const tiktokVideoIds = brand.heroTikTokVideoIds;
 const tiktokEmbedUrl = tiktokVideoIds.length > 0
-  ? `https://www.tiktok.com/player/v1/${tiktokVideoIds[0]}?autoplay=0&loop=0&muted=1&controls=1&description=0&music_info=0`
+  ? `https://www.tiktok.com/player/v1/${tiktokVideoIds[0]}?autoplay=1&loop=1&muted=1&controls=1&description=0&music_info=0`
   : "";
 ---
 
@@ -16,24 +16,26 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
   <img
     class="pointer-events-none absolute bottom-0 left-0 z-[-1] hidden h-full w-72 object-cover object-left-bottom opacity-45 md:block"
     style="-webkit-mask-image: linear-gradient(to right, black 0%, black 42%, transparent 100%); mask-image: linear-gradient(to right, black 0%, black 42%, transparent 100%);"
-    src={withBase("/assets/brand/header-left.png")}
+    src={withBase("/assets/brand/header-left.webp")}
     alt=""
     width="1024"
     height="1536"
     loading="eager"
+    fetchpriority="high"
   />
   <img
     class="pointer-events-none absolute bottom-0 right-0 z-[-1] hidden h-full w-80 object-cover object-right-bottom opacity-35 lg:block"
     style="-webkit-mask-image: linear-gradient(to left, black 0%, black 46%, transparent 100%); mask-image: linear-gradient(to left, black 0%, black 46%, transparent 100%);"
-    src={withBase("/assets/brand/header-right.png")}
+    src={withBase("/assets/brand/header-right.webp")}
     alt=""
     width="1024"
     height="1536"
-    loading="eager"
+    loading="lazy"
+    decoding="async"
   />
 
   <Container class="max-w-wide">
-    <div class="grid min-h-[620px] gap-10 lg:grid-cols-[0.94fr_1fr] lg:items-center">
+    <div class="grid gap-9 lg:min-h-[600px] lg:grid-cols-[0.94fr_1fr] lg:items-center lg:gap-10">
       <div class="max-w-xl space-y-7">
         <p class="inline-flex items-center gap-2 rounded-full border border-primary-soft/30 bg-background-card/80 px-4 py-2 text-sm font-semibold uppercase text-primary-dark shadow-soft">
           <Sparkles size={16} aria-hidden="true" />
@@ -60,57 +62,34 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
       </div>
 
       <div class="flex justify-center lg:justify-center">
-        <div class="relative w-full max-w-[460px] overflow-hidden rounded-card bg-text-primary shadow-feather ring-1 ring-background-card/70">
+        <div class="relative aspect-[4/5] w-full max-w-[430px] overflow-hidden rounded-card bg-text-primary shadow-feather ring-1 ring-background-card/70">
+          <img
+            class="absolute inset-0 h-full w-full object-cover"
+            style="object-position: 18% center;"
+            src={withBase("/assets/brand/footer-bag.webp")}
+            alt=""
+            width="1600"
+            height="533"
+            loading="eager"
+            fetchpriority="high"
+          />
           {
             tiktokEmbedUrl ? (
-              <>
-                <iframe
-                  class="aspect-[4/5] h-auto w-full bg-text-primary"
-                  src={tiktokEmbedUrl}
-                  title="Video TikTok SUGONG"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen
-                />
-              </>
+              <iframe
+                class="relative z-10 h-full w-full bg-transparent"
+                src={tiktokEmbedUrl}
+                title="Video TikTok SUGONG tự động phát"
+                loading="eager"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen
+              />
             ) : (
-              <>
-                <div class="aspect-[4/5]">
-                  <img
-                    class="h-full w-full object-cover"
-                    style="object-position: 18% center;"
-                    src={withBase("/assets/brand/footer-bag.png")}
-                    alt="Túi tote hoa nhí tím trong khung preview TikTok"
-                    width="2048"
-                    height="640"
-                    loading="eager"
-                  />
-                </div>
-                <div class="absolute inset-x-0 top-0 flex justify-center gap-8 p-5 text-xs font-semibold text-background-card">
-                  <span>Đang Follow</span>
-                  <span>Dành cho bạn</span>
-                </div>
-                <div class="absolute bottom-16 left-5 max-w-56 text-background-card">
-                  <p class="text-sm font-semibold">Túi hoa nhí tím</p>
-                  <p class="mt-1 text-xs">Handmade with love</p>
-                  <a class="inline-flex items-center gap-1 text-xs underline decoration-background-card/50 underline-offset-2" href={brand.tiktokProfileUrl}>
-                    Xem TikTok SUGONG
-                    <Share2 size={12} aria-hidden="true" />
-                  </a>
-                </div>
-                <div class="absolute bottom-20 right-4 grid gap-4 text-center text-background-card">
-                  <Heart size={25} aria-hidden="true" />
-                  <MessageCircle size={25} aria-hidden="true" />
-                  <Share2 size={25} aria-hidden="true" />
-                </div>
-                <div class="absolute inset-x-0 bottom-0 grid grid-cols-5 bg-text-primary/80 px-5 py-3 text-center text-[10px] text-background-card">
-                  <span class="inline-flex flex-col items-center gap-1"><Home size={14} aria-hidden="true" />Trang chủ</span>
-                  <span>Bạn bè</span>
-                  <span class="inline-flex justify-center"><Plus size={18} aria-hidden="true" /></span>
-                  <span>Hộp thư</span>
-                  <span>Hồ sơ</span>
-                </div>
-              </>
+              <a
+                class="absolute inset-0 z-10 grid place-items-center bg-text-primary/55 p-6 text-center font-medium text-background-card"
+                href={brand.tiktokProfileUrl}
+              >
+                Xem video trên TikTok SUGONG
+              </a>
             )
           }
         </div>
