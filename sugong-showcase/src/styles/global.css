@@ -15,9 +15,6 @@ html {
 body {
   min-width: 320px;
   margin: 0;
-}
-
-body {
   overflow-x: clip;
 }
 
@@ -30,7 +27,6 @@ select {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
 }
 
@@ -40,6 +36,11 @@ video {
   max-width: 100%;
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -47,6 +48,77 @@ video {
 :focus-visible {
   outline: 2px solid var(--color-primary-dark);
   outline-offset: 3px;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: var(--radius-button);
+  background: var(--color-primary-dark);
+  color: var(--color-background-card);
+  padding: 0.75rem 1rem;
+  transition: transform var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+[data-site-header] {
+  transition:
+    background-color var(--duration-base) var(--ease-editorial),
+    box-shadow var(--duration-base) var(--ease-editorial);
+}
+
+[data-site-header][data-scrolled] {
+  background-color: rgb(248 245 252 / 96%);
+  box-shadow: 0 10px 30px rgb(82 61 110 / 8%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gallery-media-transition {
+    animation: gallery-media-in 360ms var(--ease-editorial) both;
+  }
+
+  .motion-ready main > section:not(:first-child) {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 560ms var(--ease-editorial),
+      transform 560ms var(--ease-editorial);
+  }
+
+  .motion-ready main > section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gallery-media-in {
+  from {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .scrollbar-none {

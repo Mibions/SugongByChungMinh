@@ -21,7 +21,7 @@ const visibleStep = 8;
   data-step-count={visibleStep}
 >
   <div class="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
-    <div class="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+    <div class="scrollbar-none -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
       <div class="flex min-w-max gap-3">
         {graduationHatTones.map((item) => (
           <button
@@ -66,7 +66,7 @@ const visibleStep = 8;
                   alt={hat.coverImage.alt}
                   width={imageProps.width}
                   height={imageProps.height}
-                  loading={index < initialVisibleCount ? "eager" : "lazy"}
+                  loading={index < 2 ? "eager" : "lazy"}
                   decoding="async"
                   fetchpriority={index < 2 ? "high" : "auto"}
                 />
@@ -76,7 +76,7 @@ const visibleStep = 8;
                   <Sparkles size={13} aria-hidden="true" />
                   {toneLabel}
                 </span>
-                <h2 class="font-heading text-xl leading-snug text-primary-dark">{hat.name}</h2>
+                <h2 class="text-balance font-heading text-xl leading-snug text-primary-dark">{hat.name}</h2>
                 <p class="line-clamp-2 text-xs leading-5 text-text-secondary">{hat.shortDescription}</p>
                 <p class="text-sm font-medium text-primary-dark">Xem mẫu</p>
               </div>

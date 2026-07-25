@@ -16,9 +16,9 @@ export function MobileNavigation({ items, currentPath = "/" }: Props) {
   const normalizedPath = withoutBase(currentPath);
 
   return (
-    <div className="relative md:hidden">
+    <div className="relative lg:hidden">
       <button
-        className="flex h-10 w-10 items-center justify-center rounded-button border border-border bg-background-card text-primary-dark"
+        className="flex h-10 w-10 items-center justify-center rounded-button border border-border bg-background-card text-primary-dark transition duration-200 active:scale-[0.96]"
         type="button"
         aria-expanded={open}
         aria-label="Mở menu"

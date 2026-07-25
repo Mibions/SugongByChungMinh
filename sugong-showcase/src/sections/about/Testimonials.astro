@@ -16,16 +16,20 @@ const testimonials = [
         <Heart size={16} aria-hidden="true" />
         Những lời nhắn nhỏ
       </p>
-      <h2 class="mt-2 font-heading text-3xl text-primary-dark sm:text-4xl">
+        <h2 class="text-balance mt-2 font-heading text-3xl text-primary-dark sm:text-4xl">
         Mềm mại từ sản phẩm đến cách tụi mình tư vấn
       </h2>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-3">
-      {testimonials.map((text) => (
-        <article class="rounded-card border border-primary-soft/40 bg-background-main p-5 shadow-soft">
-          <Sparkles className="text-primary-soft" size={22} aria-hidden="true" />
-          <p class="mt-4 text-base leading-7 text-text-primary">{text}</p>
+    <div class="grid border-y border-border md:grid-cols-3">
+      {testimonials.map((text, index) => (
+        <article class="relative py-6 md:px-7 md:first:pl-0 md:last:pr-0">
+          {index > 0 && <span class="absolute inset-x-0 top-0 h-px bg-border md:inset-y-6 md:left-0 md:h-auto md:w-px" aria-hidden="true" />}
+          <div class="flex items-center gap-3 text-primary-soft">
+            <Sparkles size={20} aria-hidden="true" />
+            <span class="text-xs font-semibold tracking-[0.12em] text-primary">LỜI NHẮN 0{index + 1}</span>
+          </div>
+          <p class="text-pretty mt-4 text-base leading-7 text-text-primary">“{text}”</p>
         </article>
       ))}
     </div>

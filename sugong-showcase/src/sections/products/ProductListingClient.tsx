@@ -3,7 +3,6 @@ import {
   ArrowUpDown,
   Gift,
   GraduationCap,
-  Heart,
   Palette,
   Search,
   SearchX,
@@ -137,7 +136,7 @@ function ProductCard({ product }: { product: Product }) {
   const imageProps = getCloudinaryImageProps(image, "product-card");
 
   return (
-    <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-card border border-primary-soft/35 bg-background-card/95 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-primary-soft/80 hover:shadow-feather">
+    <article data-product-card className="group flex h-full flex-col overflow-hidden rounded-[20px] bg-background-card/95 shadow-soft ring-1 ring-border/70 transition duration-300 ease-out hover:-translate-y-1 hover:shadow-feather">
       <a className="block" href={withBase(`/products/${product.slug}`)} aria-label={`Xem ${product.name}`}>
         <div className="relative aspect-[4/3] overflow-hidden bg-background-section">
           <img
@@ -151,9 +150,6 @@ function ProductCard({ product }: { product: Product }) {
             loading="lazy"
             decoding="async"
           />
-          <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background-card/90 text-primary shadow-feather ring-1 ring-primary-soft/30">
-            <Heart size={18} aria-hidden="true" />
-          </span>
         </div>
       </a>
       <div className="flex flex-1 flex-col space-y-4 p-5">
@@ -170,8 +166,8 @@ function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <h3 className="font-heading text-xl leading-snug text-primary-dark">{product.name}</h3>
-          <p className="text-sm font-semibold text-text-primary">{product.formattedPrice}</p>
+          <h3 className="text-balance font-heading text-xl leading-snug text-primary-dark">{product.name}</h3>
+          <p className="tabular-nums text-sm font-semibold text-text-primary">{product.formattedPrice}</p>
         </div>
         <a
           className="mt-auto inline-flex items-center gap-2 text-sm font-medium text-primary-dark transition hover:text-text-primary"
@@ -480,7 +476,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
                     <span className="font-heading text-2xl">{filteredProducts.length}</span>
                     <span className="ml-2 text-text-secondary">sản phẩm</span>
                   </p>
-                  <div className="grid gap-3 sm:grid-cols-[minmax(220px,1fr)_auto_auto_auto] sm:items-center">
+                  <div className="grid min-w-0 gap-3 md:grid-cols-2 md:items-center xl:grid-cols-[minmax(220px,1fr)_auto_auto_auto]">
                     <div className="relative">
                       <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-soft" size={17} aria-hidden="true" />
                       <input
@@ -521,7 +517,7 @@ export function ProductListingClient({ products, zaloHref }: Props) {
               </form>
 
               {visibleProducts.length > 0 ? (
-                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 xl:gap-7">
                   {visibleProducts.map((product) => (
                     <ProductCard product={product} key={product.id} />
                   ))}

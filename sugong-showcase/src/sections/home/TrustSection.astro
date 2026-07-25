@@ -27,22 +27,28 @@ const items = [
 ---
 
 <section id="why-sugong" class="bg-background-main py-section-mobile">
-  <Container class="max-w-wide">
-    <div class="mb-8 max-w-2xl">
-      <p class="text-sm font-semibold uppercase text-primary-dark">Vì sao chọn SUGONG?</p>
-      <h2 class="mt-2 font-heading text-3xl text-primary-dark sm:text-4xl">Những món quà nhỏ, được chăm chút kỹ</h2>
+  <Container class="grid max-w-wide gap-9 lg:grid-cols-[0.72fr_1fr] lg:gap-16">
+    <div class="max-w-xl lg:pt-4">
+      <p class="text-sm font-semibold tracking-[0.08em] text-primary-dark">Vì sao chọn SUGONG?</p>
+      <h2 class="text-balance mt-3 font-heading text-3xl leading-tight text-primary-dark sm:text-4xl">Những món quà nhỏ, được chăm chút kỹ</h2>
+      <p class="text-pretty mt-4 text-sm leading-7 text-text-secondary">
+        Từng lựa chọn đều hướng về cảm giác riêng tư, nhẹ nhàng và vừa vặn với người nhận.
+      </p>
     </div>
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((item) => {
+    <div class="grid border-t border-border sm:grid-cols-2">
+      {items.map((item, index) => {
         const Icon = item.icon;
 
         return (
-          <article class="rounded-card border border-primary-soft/45 bg-background-card p-5 shadow-soft">
-            <span class="grid h-11 w-11 place-items-center rounded-full bg-background-section text-primary-dark">
-              <Icon size={20} aria-hidden="true" />
+          <article class="grid grid-cols-[auto_1fr] gap-4 border-b border-border py-6 sm:px-5 sm:first:pl-0 sm:nth-[2]:pr-0 sm:nth-[3]:pl-0 sm:last:pr-0">
+            <span class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-background-section text-primary-dark">
+              <Icon size={19} aria-hidden="true" />
             </span>
-            <h3 class="mt-4 font-heading text-xl text-primary-dark">{item.title}</h3>
-            <p class="mt-2 text-sm leading-6 text-text-secondary">{item.description}</p>
+            <div>
+              <p class="mb-2 text-xs font-semibold tracking-[0.12em] text-primary">0{index + 1}</p>
+              <h3 class="font-heading text-xl text-primary-dark">{item.title}</h3>
+              <p class="text-pretty mt-2 text-sm leading-6 text-text-secondary">{item.description}</p>
+            </div>
           </article>
         );
       })}

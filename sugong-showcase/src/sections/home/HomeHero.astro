@@ -41,10 +41,10 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
           <Sparkles size={16} aria-hidden="true" />
           Handmade with love
         </p>
-        <h1 class="font-heading text-5xl leading-[1.06] text-primary-dark sm:text-6xl lg:text-7xl">
+        <h1 class="text-balance font-heading text-5xl leading-[1.06] tracking-[-0.025em] text-primary-dark sm:text-6xl lg:text-7xl">
           Quà handmade theo cách riêng của bạn
         </h1>
-        <p class="max-w-md text-lg leading-8 text-text-secondary">{brand.description}</p>
+        <p class="text-pretty max-w-md text-lg leading-8 text-text-secondary">{brand.description}</p>
         <div class="flex flex-wrap gap-4">
           <Button href="/products">
             <span class="inline-flex items-center gap-2">
@@ -62,9 +62,10 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
       </div>
 
       <div class="flex justify-center lg:justify-center">
-        <div class="relative aspect-[4/5] w-full max-w-[430px] overflow-hidden rounded-card bg-text-primary shadow-feather ring-1 ring-background-card/70">
+        <div data-tiktok-frame class="relative aspect-[4/5] w-full max-w-[430px] overflow-hidden rounded-[22px] bg-text-primary shadow-feather ring-1 ring-background-card/70">
           <img
-            class="absolute inset-0 h-full w-full object-cover"
+            data-tiktok-poster
+            class="absolute inset-0 z-20 h-full w-full object-cover"
             style="object-position: 18% center;"
             src={withBase("/assets/brand/footer-bag.webp")}
             alt=""
@@ -76,7 +77,8 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
           {
             tiktokEmbedUrl ? (
               <iframe
-                class="relative z-10 h-full w-full bg-transparent"
+                data-tiktok-iframe
+                class="relative z-10 h-full w-full bg-transparent opacity-0"
                 src={tiktokEmbedUrl}
                 title="Video TikTok SUGONG tự động phát"
                 loading="eager"
@@ -97,3 +99,28 @@ const tiktokEmbedUrl = tiktokVideoIds.length > 0
     </div>
   </Container>
 </section>
+
+<script>
+  const tiktokFrame = document.querySelector("[data-tiktok-frame]");
+  const tiktokIframe = tiktokFrame?.querySelector("[data-tiktok-iframe]");
+
+  tiktokIframe?.addEventListener("load", () => {
+    tiktokFrame?.classList.add("is-loaded");
+  });
+</script>
+
+<style>
+  [data-tiktok-poster],
+  [data-tiktok-iframe] {
+    transition: opacity 500ms var(--ease-editorial);
+  }
+
+  [data-tiktok-frame].is-loaded [data-tiktok-poster] {
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  [data-tiktok-frame].is-loaded [data-tiktok-iframe] {
+    opacity: 1;
+  }
+</style>

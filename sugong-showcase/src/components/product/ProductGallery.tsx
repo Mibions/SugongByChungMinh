@@ -99,7 +99,10 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
 
     return (
       <img
-        className={cn("h-full w-full object-cover", mode === "lightbox" ? "max-h-[82vh] object-contain" : "aspect-[4/5] max-h-[540px]")}
+        className={cn(
+          "h-full w-full object-contain",
+          mode === "lightbox" ? "max-h-[82vh]" : "aspect-[4/5] max-h-[540px] bg-background-main/45 p-2 sm:p-3",
+        )}
         src={imageProps.src}
         srcSet={imageProps.srcset}
         sizes={imageProps.sizes}
@@ -116,7 +119,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
     <>
       <div className="grid gap-4 lg:grid-cols-[76px_minmax(0,1fr)] lg:gap-5">
         <div className="order-2 space-y-3 lg:order-1">
-          <div className="flex gap-3 overflow-x-auto pb-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
+          <div className="scrollbar-none flex gap-3 overflow-x-auto pb-1 lg:grid lg:content-start lg:overflow-visible lg:pb-0">
             {visibleMedia.map((item, index) => (
               <button
                 data-gallery-thumb
@@ -199,12 +202,14 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
               aria-label={`Mở ảnh lớn của ${productName}`}
               onClick={() => setLightboxOpen(true)}
             >
-              {renderMedia(activeMedia, "main")}
+              <div className="gallery-media-transition" key={`${activeMedia.type}-${activeIndex}`}>
+                {renderMedia(activeMedia, "main")}
+              </div>
             </button>
             {media.length > 1 && (
               <>
                 <button
-                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                  className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft transition hover:bg-background-card active:scale-95"
                   type="button"
                   aria-label="Ảnh trước"
                   onClick={goToPrevious}
@@ -212,7 +217,7 @@ export function ProductGallery({ images, videoUrl, productName }: Props) {
                   <ChevronLeft size={20} aria-hidden="true" />
                 </button>
                 <button
-                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft"
+                  className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-background-card/90 text-primary-dark shadow-soft transition hover:bg-background-card active:scale-95"
                   type="button"
                   aria-label="Ảnh tiếp theo"
                   onClick={goToNext}
