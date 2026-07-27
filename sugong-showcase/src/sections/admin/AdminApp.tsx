@@ -68,17 +68,24 @@ export function AdminApp({ configuredAdminUrl }: Props) {
     if (csrf && init.method && init.method !== "GET") headers.set("x-csrf-token", csrf);
     const response = await fetch(`/api/admin/${path}`, { ...init, headers, credentials: "same-origin" });
     const rawBody = await response.text();
-    let body: T & { message?: string };
+    let body: T & { message?: string; errorCode?: string; requestId?: string };
     try {
-      body = (rawBody ? JSON.parse(rawBody) : {}) as T & { message?: string };
+      body = (rawBody ? JSON.parse(rawBody) : {}) as T & {
+        message?: string;
+        errorCode?: string;
+        requestId?: string;
+      };
     } catch {
       body = {
         message: rawBody.startsWith("A server error")
           ? "Vercel API không khởi động được. Hãy kiểm tra Function Runtime Logs."
           : rawBody.slice(0, 300) || `Request failed (${response.status})`,
-      } as T & { message?: string };
+      } as T & { message?: string; errorCode?: string; requestId?: string };
     }
-    if (!response.ok) throw new Error(body.message ?? `Request failed (${response.status})`);
+    if (!response.ok) {
+      const diagnostic = [body.errorCode, body.requestId].filter(Boolean).join(" · ");
+      throw new Error(`${body.message ?? `Request failed (${response.status})`}${diagnostic ? ` (${diagnostic})` : ""}`);
+    }
     return body;
   };
 
@@ -121,23 +128,22 @@ export function AdminApp({ configuredAdminUrl }: Props) {
       setCheckingSession(false);
       return;
     }
-    api<{ authenticated: boolean; csrfToken?: string }>("session")
-      .then(async (session) => {
-        setAuthenticated(session.authenticated);
-        if (session.csrfToken) setCsrfToken(session.csrfToken);
-        if (!session.authenticated) return;
-
-        try {
-          await loadWorkspace();
-        } catch (error) {
-          setMessage(
-            `Đã đăng nhập nhưng chưa tải đủ dữ liệu: ${
-              error instanceof Error ? error.message : String(error)
-            }. Nhấn “Tải lại dữ liệu” để thử lại.`,
-          );
+    api<{
+      authenticated: boolean;
+      csrfToken?: string;
+      items: AdminProductSummary[];
+    }>("bootstrap")
+      .then((workspace) => {
+        setAuthenticated(workspace.authenticated);
+        if (workspace.csrfToken) setCsrfToken(workspace.csrfToken);
+        setProducts(workspace.items);
+      })
+      .catch((error) => {
+        setAuthenticated(false);
+        if (error instanceof Error && !error.message.includes("Phiên đăng nhập")) {
+          setMessage(error.message);
         }
       })
-      .catch(() => setAuthenticated(false))
       .finally(() => setCheckingSession(false));
   }, [isWrongHost]);
 
@@ -146,14 +152,18 @@ export function AdminApp({ configuredAdminUrl }: Props) {
     setBusy(true);
     setMessage("");
     try {
-      const result = await api<{ ok: boolean; csrfToken: string }>("login", {
+      const result = await api<{
+        ok: boolean;
+        csrfToken: string;
+        items: AdminProductSummary[];
+      }>("login", {
         method: "POST",
         body: JSON.stringify({ token }),
       });
       setCsrfToken(result.csrfToken);
       setAuthenticated(true);
       setToken("");
-      await loadWorkspace();
+      setProducts(result.items);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {

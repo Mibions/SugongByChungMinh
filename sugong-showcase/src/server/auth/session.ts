@@ -3,6 +3,8 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getDatabase } from "../db/client.js";
 import { adminAuditLogs, adminLoginAttempts, adminSessions } from "../db/schema.js";
 import { createRandomToken, safeEqual, sha256, verifyAdminToken } from "./crypto.js";
+export { AdminCatalogService } from "../catalog/admin-catalog.service.js";
+export { CatalogConfigService } from "../catalog/catalog-config.service.js";
 
 const sessionCookieName = "sugong_admin_session";
 const csrfCookieName = "sugong_admin_csrf";
@@ -151,7 +153,6 @@ export async function getAdminSession(req: VercelRequest): Promise<AdminSession 
   });
   if (!session) return null;
 
-  await db.update(adminSessions).set({ lastSeenAt: new Date() }).where(eq(adminSessions.id, session.id));
   return { id: session.id, csrfToken, ipHash: sha256(getRequestIp(req)) };
 }
 
