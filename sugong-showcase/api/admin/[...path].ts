@@ -240,9 +240,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const message = error instanceof Error ? error.message : "Unknown server error";
     const isConflict = /unique|duplicate/i.test(message);
+    const databaseCode =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof error.code === "string"
+        ? error.code
+        : undefined;
+    const errorCode = databaseCode ?? (error instanceof Error ? error.name : "UNKNOWN_ERROR");
+    const requestId = req.headers["x-vercel-id"];
     console.error("[admin-api]", error);
     return json(res, isConflict ? 409 : 500, {
       message: isConflict ? "Slug hoặc mã sản phẩm đã tồn tại." : "Server không thể xử lý yêu cầu.",
+      ...(!isConflict
+        ? {
+            errorCode,
+            requestId: Array.isArray(requestId) ? requestId[0] : requestId,
+          }
+        : {}),
     });
   }
 }
