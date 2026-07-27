@@ -134,6 +134,7 @@ export async function commitProductImport(
     try {
       const existing = (await admin.listProducts()).find((product) => product.slug === row.slug);
       if (existing && mode === "create") throw new Error(`Slug "${row.slug}" đã tồn tại`);
+      const existingDetail = existing ? await admin.getProduct(existing.id) : null;
 
       const uploadedMedia = [];
       for (const [mediaIndex, imageUrl] of row.imageUrls.entries()) {
@@ -155,7 +156,9 @@ export async function commitProductImport(
       };
       if (existing) {
         await admin.updateProduct(existing.id, input);
-        await deleteCloudinaryAssets(existing.media.flatMap((item) => (item.publicId ? [item.publicId] : [])));
+        await deleteCloudinaryAssets(
+          existingDetail?.media.flatMap((item) => (item.publicId ? [item.publicId] : [])) ?? [],
+        );
       } else {
         await admin.createProduct(input);
       }

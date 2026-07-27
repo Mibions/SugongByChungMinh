@@ -1,4 +1,4 @@
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import type { ProductRepository } from "../../domain/product/product.repository.js";
 import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers.js";
 import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types.js";
@@ -76,14 +76,18 @@ function mapBundleToProduct(bundle: ProductBundle): Product {
   };
 }
 
-async function loadBundles(includeUnpublished = false): Promise<ProductBundle[]> {
+async function loadBundles(includeUnpublished = false, productId?: string): Promise<ProductBundle[]> {
   const db = getDatabase();
+  const where = and(
+    includeUnpublished ? undefined : eq(products.status, "published"),
+    productId ? eq(products.id, productId) : undefined,
+  );
   const rows = await db
     .select({ row: products, categorySlug: categories.slug, productTypeSlug: productTypes.slug })
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(productTypes, eq(products.productTypeId, productTypes.id))
-    .where(includeUnpublished ? undefined : eq(products.status, "published"))
+    .where(where)
     .orderBy(asc(products.displayOrder), asc(products.createdAt));
 
   if (rows.length === 0) return [];
@@ -178,4 +182,8 @@ export class PostgresProductRepository implements ProductRepository {
 
 export async function getRawProductBundles() {
   return loadBundles(true);
+}
+
+export async function getRawProductBundle(productId: string) {
+  return (await loadBundles(true, productId))[0] ?? null;
 }

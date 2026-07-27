@@ -79,6 +79,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (resource === "products" && req.method === "GET") {
       const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
+      if (id) {
+        const item = await admin.getProduct(id);
+        return item
+          ? json(res, 200, { item })
+          : json(res, 404, { message: "Không tìm thấy sản phẩm." });
+      }
       return json(res, 200, { items: await admin.listProducts() });
     }
 

@@ -9,7 +9,7 @@ import {
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
-import type { AdminProductRecord } from "../../server/catalog/product-input";
+import type { AdminProductSummary } from "../../server/catalog/product-input";
 import { CatalogManager } from "./CatalogManager";
 import { ImportManager } from "./ImportManager";
 import { ProductManager } from "./ProductManager";
@@ -44,7 +44,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   const [authenticated, setAuthenticated] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
   const [token, setToken] = useState("");
-  const [products, setProducts] = useState<AdminProductRecord[]>([]);
+  const [products, setProducts] = useState<AdminProductSummary[]>([]);
   const [config, setConfig] = useState<CatalogConfig>(emptyConfig);
   const [view, setView] = useState<View>("products");
   const [busy, setBusy] = useState(false);
@@ -83,7 +83,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   };
 
   async function reloadProducts() {
-    const response = await api<{ items: AdminProductRecord[] }>("products");
+    const response = await api<{ items: AdminProductSummary[] }>("products");
     setProducts(response.items);
   }
 
@@ -92,10 +92,28 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   }
 
   async function loadWorkspace() {
-    // Keep the two query-heavy resources sequential. Supabase's transaction
-    // pooler is faster and more reliable without two simultaneous bursts.
-    await reloadConfig();
     await reloadProducts();
+  }
+
+  async function ensureConfig() {
+    if (config.categories.length > 0) return config;
+    const next = await api<CatalogConfig>("catalog-config");
+    setConfig(next);
+    return next;
+  }
+
+  async function openView(nextView: View) {
+    setView(nextView);
+    if (nextView !== "catalog" || config.categories.length > 0) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      await ensureConfig();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(false);
+    }
   }
 
   useEffect(() => {
@@ -244,7 +262,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
                   className={`inline-flex min-h-10 items-center gap-2 rounded-button px-3 text-sm transition ${
                     view === value ? "bg-background-section font-medium text-primary-dark" : "text-text-secondary hover:text-primary-dark"
                   }`}
-                  onClick={() => setView(value)}
+                  onClick={() => openView(value)}
                   key={value}
                 >
                   <Icon size={15} /> {label}
@@ -285,7 +303,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
               className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-button px-3 text-sm ${
                 view === value ? "bg-primary-dark text-background-card" : "bg-background-card text-primary-dark"
               }`}
-              onClick={() => setView(value)}
+              onClick={() => openView(value)}
               key={value}
             >
               <Icon size={14} /> {label}
@@ -309,6 +327,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
             setBusy={setBusy}
             setMessage={setMessage}
             reloadProducts={reloadProducts}
+            loadConfig={ensureConfig}
           />
         )}
         {view === "catalog" && (

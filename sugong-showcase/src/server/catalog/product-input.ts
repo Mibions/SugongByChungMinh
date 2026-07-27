@@ -74,3 +74,17 @@ export type AdminProductRecord = AdminProductInput & {
   createdAt: string;
   updatedAt: string;
 };
+
+export type AdminProductSummary = Pick<
+  AdminProductRecord,
+  | "id"
+  | "legacyId"
+  | "slug"
+  | "name"
+  | "category"
+  | "productType"
+  | "status"
+  | "isFeatured"
+  | "displayOrder"
+  | "updatedAt"
+>;

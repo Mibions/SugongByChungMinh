@@ -11,7 +11,11 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import type { AdminProductInput, AdminProductRecord } from "../../server/catalog/product-input";
+import type {
+  AdminProductInput,
+  AdminProductRecord,
+  AdminProductSummary,
+} from "../../server/catalog/product-input";
 import { slugify } from "../../lib/slug";
 import type { AdminApi, CatalogConfig, ProductDraft, ProductTemplateRecord } from "./admin-types";
 
@@ -19,10 +23,11 @@ type Props = {
   api: AdminApi;
   busy: boolean;
   config: CatalogConfig;
-  products: AdminProductRecord[];
+  products: AdminProductSummary[];
   setBusy: (value: boolean) => void;
   setMessage: (value: string) => void;
   reloadProducts: () => Promise<void>;
+  loadConfig: () => Promise<CatalogConfig>;
 };
 
 const editorSteps = [
@@ -77,6 +82,7 @@ export function ProductManager({
   setBusy,
   setMessage,
   reloadProducts,
+  loadConfig,
 }: Props) {
   const [editing, setEditing] = useState<ProductDraft | null>(null);
   const [search, setSearch] = useState("");
@@ -102,6 +108,20 @@ export function ProductManager({
       setEditing(response.item);
       setMessage(product.status === "published" ? "Đã lưu và yêu cầu cập nhật website." : "Đã lưu bản nháp.");
       await reloadProducts();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function editProduct(product: AdminProductSummary) {
+    setBusy(true);
+    setMessage("");
+    try {
+      await loadConfig();
+      const response = await api<{ item: AdminProductRecord }>(`products/${product.id}`);
+      setEditing(response.item);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -193,7 +213,23 @@ export function ProductManager({
           </div>
           <button
             className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-3 text-sm text-background-card"
-            onClick={() => setShowTemplates((value) => !value)}
+            disabled={busy}
+            onClick={async () => {
+              if (showTemplates) {
+                setShowTemplates(false);
+                return;
+              }
+              setBusy(true);
+              setMessage("");
+              try {
+                await loadConfig();
+                setShowTemplates(true);
+              } catch (error) {
+                setMessage(error instanceof Error ? error.message : String(error));
+              } finally {
+                setBusy(false);
+              }
+            }}
           >
             <Plus size={16} /> Thêm
           </button>
@@ -249,7 +285,8 @@ export function ProductManager({
                   ? "bg-background-section ring-1 ring-primary-soft"
                   : "hover:bg-background-main"
               }`}
-              onClick={() => setEditing(product)}
+              disabled={busy}
+              onClick={() => editProduct(product)}
               key={product.id}
             >
               <span className="block truncate font-medium text-primary-dark">{product.name}</span>

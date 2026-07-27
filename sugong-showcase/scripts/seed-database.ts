@@ -270,8 +270,9 @@ try {
   }
 
   const graduationProductIds: string[] = [];
+  const existingProducts = await admin.listProducts();
   for (const product of catalogProducts) {
-    const existing = (await admin.listProducts()).find((item) => item.legacyId === product.id || item.slug === product.slug);
+    const existing = existingProducts.find((item) => item.legacyId === product.id || item.slug === product.slug);
     const saved = existing
       ? await admin.updateProduct(existing.id, mapProduct(product))
       : await admin.createProduct(mapProduct(product));

@@ -13,15 +13,20 @@ import {
   tags,
   tones,
 } from "../db/schema.js";
-import { adminProductInputSchema, type AdminProductInput, type AdminProductRecord } from "./product-input.js";
-import { getRawProductBundles } from "./postgres-product.repository.js";
+import {
+  adminProductInputSchema,
+  type AdminProductInput,
+  type AdminProductRecord,
+  type AdminProductSummary,
+} from "./product-input.js";
+import { getRawProductBundle, type ProductBundle } from "./postgres-product.repository.js";
 import { slugify } from "../../lib/slug.js";
 
 type Database = ReturnType<typeof getDatabase>;
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 type DatabaseExecutor = Database | Transaction;
 
-function toAdminRecord(bundle: Awaited<ReturnType<typeof getRawProductBundles>>[number]): AdminProductRecord {
+function toAdminRecord(bundle: ProductBundle): AdminProductRecord {
   return {
     id: bundle.row.id,
     legacyId: bundle.row.legacyId ?? undefined,
@@ -79,13 +84,11 @@ async function getProductTypeId(productTypeSlug: string | undefined) {
 }
 
 async function replaceRelations(db: DatabaseExecutor, productId: string, input: AdminProductInput) {
-  await Promise.all([
-    db.delete(productMedia).where(eq(productMedia.productId, productId)),
-    db.delete(productAttributes).where(eq(productAttributes.productId, productId)),
-    db.delete(productTags).where(eq(productTags.productId, productId)),
-    db.delete(productTones).where(eq(productTones.productId, productId)),
-    db.delete(productClassifications).where(eq(productClassifications.productId, productId)),
-  ]);
+  await db.delete(productMedia).where(eq(productMedia.productId, productId));
+  await db.delete(productAttributes).where(eq(productAttributes.productId, productId));
+  await db.delete(productTags).where(eq(productTags.productId, productId));
+  await db.delete(productTones).where(eq(productTones.productId, productId));
+  await db.delete(productClassifications).where(eq(productClassifications.productId, productId));
 
   if (input.media.length > 0) {
     await db.insert(productMedia).values(
@@ -151,12 +154,37 @@ async function replaceRelations(db: DatabaseExecutor, productId: string, input: 
 }
 
 export class AdminCatalogService {
-  async listProducts() {
-    return (await getRawProductBundles()).map(toAdminRecord);
+  async listProducts(): Promise<AdminProductSummary[]> {
+    const db = getDatabase();
+    const rows = await db
+      .select({
+        id: products.id,
+        legacyId: products.legacyId,
+        slug: products.slug,
+        name: products.name,
+        category: categories.slug,
+        productType: productTypes.slug,
+        status: products.status,
+        isFeatured: products.isFeatured,
+        displayOrder: products.displayOrder,
+        updatedAt: products.updatedAt,
+      })
+      .from(products)
+      .innerJoin(categories, eq(products.categoryId, categories.id))
+      .leftJoin(productTypes, eq(products.productTypeId, productTypes.id))
+      .orderBy(products.displayOrder, products.updatedAt);
+
+    return rows.map((row) => ({
+      ...row,
+      legacyId: row.legacyId ?? undefined,
+      productType: row.productType ?? undefined,
+      updatedAt: row.updatedAt.toISOString(),
+    }));
   }
 
   async getProduct(id: string) {
-    return (await this.listProducts()).find((product) => product.id === id) ?? null;
+    const bundle = await getRawProductBundle(id);
+    return bundle ? toAdminRecord(bundle) : null;
   }
 
   async createProduct(rawInput: unknown) {
