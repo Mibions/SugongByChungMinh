@@ -111,7 +111,17 @@ export function AdminApp({ configuredAdminUrl }: Props) {
     const csrf = csrfToken || decodeURIComponent(getCookie("sugong_admin_csrf") ?? "");
     if (csrf && init.method && init.method !== "GET") headers.set("x-csrf-token", csrf);
     const response = await fetch(`/api/admin/${path}`, { ...init, headers, credentials: "same-origin" });
-    const body = (await response.json()) as T & { message?: string };
+    const rawBody = await response.text();
+    let body: T & { message?: string };
+    try {
+      body = (rawBody ? JSON.parse(rawBody) : {}) as T & { message?: string };
+    } catch {
+      body = {
+        message: rawBody.startsWith("A server error")
+          ? "Vercel API không khởi động được. Hãy kiểm tra Function Runtime Logs."
+          : rawBody.slice(0, 300) || `Request failed (${response.status})`,
+      } as T & { message?: string };
+    }
     if (!response.ok) throw new Error(body.message ?? `Request failed (${response.status})`);
     return body;
   }
