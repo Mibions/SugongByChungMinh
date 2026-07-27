@@ -1,4 +1,4 @@
-import type { ProductCategory } from "./product.types";
+import type { ProductCategory } from "./product.types.js";
 
 export const productToneValues = ["orange", "pink", "cream", "lavender", "blue", "green", "lilac", "neutral"] as const;
 export type ProductTone = string;

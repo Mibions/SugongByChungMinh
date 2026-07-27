@@ -1,4 +1,4 @@
-import type { Product, ProductQuery } from "./product.types";
+import type { Product, ProductQuery } from "./product.types.js";
 
 export interface ProductRepository {
   getAll(query?: ProductQuery): Promise<Product[]>;

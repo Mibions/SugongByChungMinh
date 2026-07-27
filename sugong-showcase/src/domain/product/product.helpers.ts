@@ -1,5 +1,5 @@
-import { getProductCategoryMeta, type ProductTone } from "./product-taxonomy";
-import type { Product, ProductCategory, ProductQuery } from "./product.types";
+import { getProductCategoryMeta, type ProductTone } from "./product-taxonomy.js";
+import type { Product, ProductCategory, ProductQuery } from "./product.types.js";
 
 export type ProductCategoryFilter = ProductCategory | "all";
 export type ProductSort = NonNullable<ProductQuery["sort"]>;

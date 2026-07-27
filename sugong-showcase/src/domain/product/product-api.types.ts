@@ -1,4 +1,4 @@
-import type { Product, ProductCategory } from "./product.types";
+import type { Product, ProductCategory } from "./product.types.js";
 
 export type ProductListResponse = {
   items: Product[];

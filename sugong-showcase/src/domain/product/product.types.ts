@@ -1,4 +1,4 @@
-import type { ProductTone } from "./product-taxonomy";
+import type { ProductTone } from "./product-taxonomy.js";
 
 export const productCategories = ["bag", "scrunchie", "gift", "custom", "graduation"] as const;
 export type ProductCategory = string;
