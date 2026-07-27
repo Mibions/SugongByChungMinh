@@ -14,9 +14,10 @@ export function getDatabase() {
   }
 
   sqlClient = postgres(databaseUrl, {
-    // Two connections let independent catalogue reads overlap without creating
-    // an excessive serverless connection burst against Supavisor.
-    max: 2,
+    // Supavisor transaction mode is most reliable with one connection per
+    // serverless invocation. Product reads are now one query and config is
+    // warmed in the background, so a second connection only adds timeout risk.
+    max: 1,
     idle_timeout: 10,
     connect_timeout: 15,
     max_lifetime: 60 * 15,
