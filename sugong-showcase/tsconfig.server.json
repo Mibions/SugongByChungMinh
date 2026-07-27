@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "astro/client"]
+  },
+  "include": [
+    "api/**/*.ts",
+    "scripts/**/*.ts",
+    "src/server/**/*.ts",
+    "src/domain/**/*.ts",
+    "src/data/**/*.ts"
+  ],
+  "exclude": ["**/*.stories.ts", "**/*.spec.ts", "node_modules", "dist"]
+}

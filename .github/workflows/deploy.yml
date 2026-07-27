@@ -6,6 +6,11 @@ on:
       - main
       - master
   workflow_dispatch:
+    inputs:
+      reason:
+        description: Reason for the catalogue rebuild
+        required: false
+        default: Manual rebuild
 
 permissions:
   contents: read
@@ -26,8 +31,11 @@ jobs:
       GITHUB_PAGES: "true"
       ASTRO_SITE: https://mibions.github.io
       ASTRO_BASE: /SugongByChungMinh
-      PUBLIC_DATA_SOURCE: local
-      PUBLIC_API_BASE_URL: https://api.example.com
+      DATA_SOURCE: ${{ secrets.DATABASE_URL != '' && 'database' || 'local' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      PUBLIC_ADMIN_URL: ${{ vars.PUBLIC_ADMIN_URL }}
+      PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.PUBLIC_CLOUDINARY_CLOUD_NAME }}
+      PUBLIC_CLOUDINARY_ASSET_FOLDER: ${{ vars.PUBLIC_CLOUDINARY_ASSET_FOLDER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

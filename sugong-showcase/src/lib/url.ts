@@ -1,6 +1,7 @@
-const baseUrl = import.meta.env.BASE_URL ?? "/";
-const cloudinaryCloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
-const cloudinaryAssetFolder = import.meta.env.PUBLIC_CLOUDINARY_ASSET_FOLDER ?? "sugong-showcase";
+const runtimeEnv = import.meta.env ?? (typeof process !== "undefined" ? process.env : {});
+const baseUrl = runtimeEnv.BASE_URL ?? runtimeEnv.ASTRO_BASE ?? "/";
+const cloudinaryCloudName = runtimeEnv.PUBLIC_CLOUDINARY_CLOUD_NAME;
+const cloudinaryAssetFolder = runtimeEnv.PUBLIC_CLOUDINARY_ASSET_FOLDER ?? "sugong-showcase";
 const cloudinaryImageExtensions = new Set(["avif", "gif", "jpg", "jpeg", "png", "svg", "webp"]);
 
 function getBasePath() {

@@ -66,11 +66,21 @@ async function getCatalogData() {
 }
 
 async function getProductService() {
+  if (process.env.DATA_SOURCE === "database") {
+    const { PostgresProductRepository } = await import("../server/catalog/postgres-product.repository");
+    return new ProductService(new PostgresProductRepository());
+  }
+
   const { products } = await getCatalogData();
   return new ProductService(new LocalProductRepository(products));
 }
 
 async function getGraduationHatService() {
+  if (process.env.DATA_SOURCE === "database") {
+    const { PostgresGraduationHatRepository } = await import("../server/catalog/postgres-product.repository");
+    return new GraduationHatService(new PostgresGraduationHatRepository());
+  }
+
   const { graduationHats } = await getCatalogData();
   return new GraduationHatService(new LocalGraduationHatRepository(graduationHats));
 }
