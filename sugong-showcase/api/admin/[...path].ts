@@ -265,7 +265,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? {
             errorCode,
             requestId: Array.isArray(requestId) ? requestId[0] : requestId,
-            ...(errorCode === "ERR_MODULE_NOT_FOUND" ? { errorDetail: message } : {}),
           }
         : {}),
     });
