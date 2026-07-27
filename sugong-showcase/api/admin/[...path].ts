@@ -11,7 +11,19 @@ function json(res: VercelResponse, status: number, body: unknown) {
 
 function getPath(req: VercelRequest) {
   const path = req.query.path;
-  return (Array.isArray(path) ? path : path ? [path] : []).filter(Boolean);
+  const querySegments = (Array.isArray(path) ? path : path ? [path] : [])
+    .flatMap((segment) => segment.split("/"))
+    .filter(Boolean);
+  if (querySegments.length > 0) return querySegments;
+
+  const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
+  const adminPrefix = "/api/admin/";
+  if (!pathname.startsWith(adminPrefix)) return [];
+  return pathname
+    .slice(adminPrefix.length)
+    .split("/")
+    .filter(Boolean)
+    .map((segment) => decodeURIComponent(segment));
 }
 
 function bodyAsObject(req: VercelRequest) {
