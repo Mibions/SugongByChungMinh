@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { catalogProducts } from "../src/data/local/catalog";
-import { productCategoryMeta, productToneFilters } from "../src/domain/product/product-taxonomy";
+import { productCategoryMeta } from "../src/domain/product/product-taxonomy";
 import type { Product } from "../src/domain/product/product.types";
 import { AdminCatalogService } from "../src/server/catalog/admin-catalog.service";
 import { closeDatabase, getDatabase } from "../src/server/db/client";
@@ -15,7 +15,6 @@ import {
   productTemplates,
   productTypeAttributes,
   productTypes,
-  tones,
 } from "../src/server/db/schema";
 
 const db = getDatabase();
@@ -260,13 +259,6 @@ try {
         target: categories.slug,
         set: { name: category.label, displayOrder: index, isActive: true, updatedAt: new Date() },
       });
-  }
-
-  for (const tone of productToneFilters) {
-    await db
-      .insert(tones)
-      .values({ slug: tone.value, name: tone.label })
-      .onConflictDoUpdate({ target: tones.slug, set: { name: tone.label } });
   }
 
   const graduationProductIds: string[] = [];

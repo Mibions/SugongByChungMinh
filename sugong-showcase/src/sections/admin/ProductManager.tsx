@@ -29,6 +29,9 @@ type Props = {
   setMessage: (value: string) => void;
   reloadProducts: () => Promise<void>;
   loadConfig: () => Promise<CatalogConfig>;
+  loadProduct: (productId: string) => Promise<AdminProductRecord>;
+  cacheProduct: (product: AdminProductRecord) => void;
+  removeCachedProduct: (productId: string) => void;
 };
 
 const editorSteps = [
@@ -84,6 +87,9 @@ export function ProductManager({
   setMessage,
   reloadProducts,
   loadConfig,
+  loadProduct,
+  cacheProduct,
+  removeCachedProduct,
 }: Props) {
   const [editing, setEditing] = useState<ProductDraft | null>(null);
   const [search, setSearch] = useState("");
@@ -107,6 +113,7 @@ export function ProductManager({
         { method: isUpdate ? "PUT" : "POST", body: JSON.stringify(product) },
       );
       setEditing(response.item);
+      cacheProduct(response.item);
       setMessage(product.status === "published" ? "Đã lưu và yêu cầu cập nhật website." : "Đã lưu bản nháp.");
       await reloadProducts();
     } catch (error) {
@@ -120,9 +127,11 @@ export function ProductManager({
     setBusy(true);
     setMessage("");
     try {
-      await loadConfig();
-      const response = await api<{ item: AdminProductRecord }>(`products/${product.id}`);
-      setEditing(response.item);
+      const [, record] = await Promise.all([
+        loadConfig(),
+        loadProduct(product.id),
+      ]);
+      setEditing(record);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -134,6 +143,7 @@ export function ProductManager({
     setBusy(true);
     try {
       await api(`products/${product.id}`, { method: "DELETE" });
+      removeCachedProduct(product.id);
       setEditing(null);
       setMessage("Đã xóa sản phẩm.");
       await reloadProducts();
@@ -294,6 +304,12 @@ export function ProductManager({
               }`}
               disabled={busy}
               onClick={() => editProduct(product)}
+              onPointerEnter={() => {
+                void Promise.all([loadConfig(), loadProduct(product.id)]).catch(() => {});
+              }}
+              onFocus={() => {
+                void Promise.all([loadConfig(), loadProduct(product.id)]).catch(() => {});
+              }}
               key={product.id}
             >
               <span className="flex items-center justify-between gap-3">

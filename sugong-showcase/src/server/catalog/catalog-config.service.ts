@@ -10,7 +10,6 @@ import {
   productTemplates,
   productTypeAttributes,
   productTypes,
-  tags,
 } from "../db/schema.js";
 
 const slugSchema = z
@@ -103,7 +102,6 @@ export class CatalogConfigService {
       typeAttributeRows,
       templateRows,
       collectionRows,
-      tagRows,
     ] = await Promise.all([
       db.select().from(categories).orderBy(asc(categories.displayOrder), asc(categories.name)),
       db.select().from(productTypes).orderBy(asc(productTypes.displayOrder), asc(productTypes.name)),
@@ -122,7 +120,6 @@ export class CatalogConfigService {
         .from(productTemplates)
         .orderBy(asc(productTemplates.priority), asc(productTemplates.name)),
       db.select().from(collections).orderBy(asc(collections.displayOrder), asc(collections.name)),
-      db.select().from(tags).orderBy(asc(tags.name)),
     ]);
 
     return {
@@ -140,7 +137,7 @@ export class CatalogConfigService {
       attributeDefinitions: definitionRows,
       productTemplates: templateRows,
       collections: collectionRows,
-      tags: tagRows,
+      tags: [],
     };
   }
 

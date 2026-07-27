@@ -81,8 +81,9 @@ Admin (Vercel)
 
 - `DATA_SOURCE=database`: public repository đọc PostgreSQL.
 - `DATA_SOURCE=local`: dùng record mẫu làm fallback và dữ liệu đầu vào cho seed.
-- Mọi loại sản phẩm dùng chung contract `Product`; category, product type, classification, tone và attribute mở rộng từ database.
-- Ảnh upload/import được đưa lên Cloudinary, database chỉ lưu URL, public ID và metadata.
+- Mọi loại sản phẩm dùng chung contract `Product`. Một sản phẩm nằm trong đúng một row `products`; media, tag, tone, classification và attribute là các JSON array có schema rõ ràng, nên đọc/ghi sản phẩm chỉ cần một truy vấn.
+- Category, product type và classification definition vẫn là dữ liệu cấu hình dùng chung cho form admin, không tham gia join khi tải sản phẩm.
+- Ảnh upload/import được đưa lên Cloudinary; row sản phẩm chỉ lưu URL, public ID và metadata.
 
 ## Tổ chức source
 
@@ -135,7 +136,7 @@ File import mẫu: `public/admin/product-import-template.csv`. Giới hạn hi�
 
 ## Quy ước maintain
 
-- Không tạo model riêng cho từng loại sản phẩm; dùng `Product` + product type/attribute/classification.
+- Không tạo model hoặc bảng quan hệ riêng cho từng loại sản phẩm; dùng `Product` + các field JSON có validation.
 - Không hardcode dữ liệu catalogue trong JSX/Astro component.
 - Nội dung trình bày tĩnh là typed record trong `src/content`.
 - Thêm thay đổi schema bằng migration mới, không sửa migration đã chạy production.

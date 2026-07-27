@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Boxes,
   CheckCircle2,
@@ -11,7 +11,10 @@ import {
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
-import type { AdminProductSummary } from "../../server/catalog/product-input";
+import type {
+  AdminProductRecord,
+  AdminProductSummary,
+} from "../../server/catalog/product-input";
 import { CatalogManager } from "./CatalogManager";
 import { ImportManager } from "./ImportManager";
 import { ProductManager } from "./ProductManager";
@@ -51,6 +54,10 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   const [view, setView] = useState<View>("products");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const configRef = useRef<CatalogConfig>(emptyConfig);
+  const configRequestRef = useRef<Promise<CatalogConfig> | null>(null);
+  const productRecordsRef = useRef(new Map<string, AdminProductRecord>());
+  const productRecordsRequestRef = useRef<Promise<void> | null>(null);
 
   const isWrongHost = useMemo(() => {
     if (typeof window === "undefined") return false;
@@ -97,7 +104,10 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   }
 
   async function reloadConfig() {
-    setConfig(await api<CatalogConfig>("catalog-config"));
+    configRequestRef.current = null;
+    const next = await api<CatalogConfig>("catalog-config");
+    configRef.current = next;
+    setConfig(next);
   }
 
   async function loadWorkspace() {
@@ -105,10 +115,68 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   }
 
   async function ensureConfig() {
-    if (config.categories.length > 0) return config;
-    const next = await api<CatalogConfig>("catalog-config");
-    setConfig(next);
-    return next;
+    if (configRef.current.categories.length > 0) return configRef.current;
+    if (configRequestRef.current) return configRequestRef.current;
+
+    const request = api<CatalogConfig>("catalog-config")
+      .then((next) => {
+        configRef.current = next;
+        setConfig(next);
+        return next;
+      })
+      .finally(() => {
+        configRequestRef.current = null;
+      });
+    configRequestRef.current = request;
+    return request;
+  }
+
+  function cacheProductRecord(product: AdminProductRecord) {
+    productRecordsRef.current.set(product.id, product);
+  }
+
+  function removeCachedProductRecord(productId: string) {
+    productRecordsRef.current.delete(productId);
+  }
+
+  async function preloadProductRecords() {
+    if (productRecordsRef.current.size > 0) return;
+    if (productRecordsRequestRef.current) return productRecordsRequestRef.current;
+
+    const request = api<{ items: AdminProductRecord[] }>("product-records")
+      .then(({ items }) => {
+        for (const item of items) cacheProductRecord(item);
+      })
+      .finally(() => {
+        productRecordsRequestRef.current = null;
+      });
+    productRecordsRequestRef.current = request;
+    return request;
+  }
+
+  async function loadProductRecord(productId: string) {
+    const cached = productRecordsRef.current.get(productId);
+    if (cached) return cached;
+
+    if (productRecordsRequestRef.current) {
+      try {
+        await productRecordsRequestRef.current;
+      } catch {
+        // Fall through to a focused single-record request.
+      }
+      const warmed = productRecordsRef.current.get(productId);
+      if (warmed) return warmed;
+    }
+
+    const response = await api<{ item: AdminProductRecord }>(`products/${productId}`);
+    cacheProductRecord(response.item);
+    return response.item;
+  }
+
+  function warmEditorData() {
+    void Promise.all([ensureConfig(), preloadProductRecords()]).catch(() => {
+      // Warmup is best-effort. The editor retries and surfaces an error on demand.
+    });
   }
 
   async function openView(nextView: View) {
@@ -139,6 +207,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
         setAuthenticated(workspace.authenticated);
         if (workspace.csrfToken) setCsrfToken(workspace.csrfToken);
         setProducts(workspace.items);
+        window.setTimeout(warmEditorData, 0);
       })
       .catch((error) => {
         setAuthenticated(false);
@@ -166,6 +235,7 @@ export function AdminApp({ configuredAdminUrl }: Props) {
       setAuthenticated(true);
       setToken("");
       setProducts(result.items);
+      window.setTimeout(warmEditorData, 0);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -383,6 +453,9 @@ export function AdminApp({ configuredAdminUrl }: Props) {
             setMessage={setMessage}
             reloadProducts={reloadProducts}
             loadConfig={ensureConfig}
+            loadProduct={loadProductRecord}
+            cacheProduct={cacheProductRecord}
+            removeCachedProduct={removeCachedProductRecord}
           />
         )}
         {view === "catalog" && (

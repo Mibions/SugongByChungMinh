@@ -14,7 +14,6 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const productStatusEnum = pgEnum("product_status", ["draft", "published", "hidden"]);
-export const mediaTypeEnum = pgEnum("media_type", ["image", "video"]);
 export const importStatusEnum = pgEnum("import_status", ["previewed", "processing", "completed", "failed"]);
 
 export const categories = pgTable(
@@ -67,10 +66,8 @@ export const products = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     priceAmount: integer("price_amount"),
-    categoryId: uuid("category_id")
-      .notNull()
-      .references(() => categories.id, { onDelete: "restrict" }),
-    productTypeId: uuid("product_type_id").references(() => productTypes.id, { onDelete: "restrict" }),
+    category: text("category").notNull(),
+    productType: text("product_type"),
     shortDescription: text("short_description").notNull(),
     description: text("description"),
     detailNote: text("detail_note"),
@@ -79,6 +76,27 @@ export const products = pgTable(
     isFeatured: boolean("is_featured").notNull().default(false),
     isCustomizable: boolean("is_customizable").notNull().default(false),
     displayOrder: integer("display_order").notNull().default(0),
+    tags: jsonb("tags").$type<string[]>().notNull().default([]),
+    tones: jsonb("tones").$type<string[]>().notNull().default([]),
+    classifications: jsonb("classifications").$type<string[]>().notNull().default([]),
+    media: jsonb("media").$type<Array<{
+      id?: string;
+      publicId?: string;
+      secureUrl: string;
+      format?: string;
+      width: number;
+      height: number;
+      alt: string;
+      position: number;
+      isCover: boolean;
+    }>>().notNull().default([]),
+    attributes: jsonb("attributes").$type<Array<{
+      id?: string;
+      definitionId?: string;
+      label: string;
+      value: string;
+      position: number;
+    }>>().notNull().default([]),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -87,8 +105,8 @@ export const products = pgTable(
     uniqueIndex("products_slug_unique").on(table.slug),
     uniqueIndex("products_legacy_id_unique").on(table.legacyId),
     index("products_status_order_index").on(table.status, table.displayOrder),
-    index("products_category_index").on(table.categoryId),
-    index("products_product_type_index").on(table.productTypeId),
+    index("products_category_slug_index").on(table.category),
+    index("products_product_type_slug_index").on(table.productType),
   ],
 );
 
@@ -133,23 +151,6 @@ export const classificationValues = pgTable(
   ],
 );
 
-export const productClassifications = pgTable(
-  "product_classifications",
-  {
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    classificationValueId: uuid("classification_value_id")
-      .notNull()
-      .references(() => classificationValues.id, { onDelete: "restrict" }),
-    position: integer("position").notNull().default(0),
-  },
-  (table) => [
-    primaryKey({ columns: [table.productId, table.classificationValueId] }),
-    index("product_classifications_value_index").on(table.classificationValueId),
-  ],
-);
-
 export const attributeDefinitions = pgTable(
   "attribute_definitions",
   {
@@ -186,95 +187,6 @@ export const productTypeAttributes = pgTable(
     primaryKey({ columns: [table.productTypeId, table.attributeDefinitionId] }),
     index("product_type_attributes_order_index").on(table.productTypeId, table.displayOrder),
   ],
-);
-
-export const productMedia = pgTable(
-  "product_media",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    type: mediaTypeEnum("type").notNull().default("image"),
-    publicId: text("public_id"),
-    secureUrl: text("secure_url").notNull(),
-    format: text("format"),
-    width: integer("width").notNull(),
-    height: integer("height").notNull(),
-    alt: text("alt").notNull(),
-    position: integer("position").notNull().default(0),
-    isCover: boolean("is_cover").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [
-    index("product_media_product_position_index").on(table.productId, table.position),
-    uniqueIndex("product_media_public_id_unique").on(table.publicId),
-  ],
-);
-
-export const tones = pgTable(
-  "tones",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    slug: text("slug").notNull(),
-    name: text("name").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [uniqueIndex("tones_slug_unique").on(table.slug)],
-);
-
-export const productTones = pgTable(
-  "product_tones",
-  {
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    toneId: uuid("tone_id")
-      .notNull()
-      .references(() => tones.id, { onDelete: "restrict" }),
-  },
-  (table) => [primaryKey({ columns: [table.productId, table.toneId] })],
-);
-
-export const tags = pgTable(
-  "tags",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    slug: text("slug").notNull(),
-    name: text("name").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [uniqueIndex("tags_slug_unique").on(table.slug)],
-);
-
-export const productTags = pgTable(
-  "product_tags",
-  {
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    tagId: uuid("tag_id")
-      .notNull()
-      .references(() => tags.id, { onDelete: "cascade" }),
-  },
-  (table) => [primaryKey({ columns: [table.productId, table.tagId] })],
-);
-
-export const productAttributes = pgTable(
-  "product_attributes",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    productId: uuid("product_id")
-      .notNull()
-      .references(() => products.id, { onDelete: "cascade" }),
-    attributeDefinitionId: uuid("attribute_definition_id").references(() => attributeDefinitions.id, {
-      onDelete: "set null",
-    }),
-    label: text("label").notNull(),
-    value: text("value").notNull(),
-    position: integer("position").notNull().default(0),
-  },
-  (table) => [index("product_attributes_product_position_index").on(table.productId, table.position)],
 );
 
 export const productTemplates = pgTable(

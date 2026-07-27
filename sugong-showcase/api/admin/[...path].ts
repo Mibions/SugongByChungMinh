@@ -91,6 +91,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    if (resource === "product-records" && req.method === "GET") {
+      return json(res, 200, {
+        items: await new AdminCatalogService().listProductRecords(),
+      });
+    }
+
     if (resource === "products" && req.method === "GET") {
       const admin = new AdminCatalogService();
       if (id) {
