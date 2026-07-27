@@ -1,11 +1,11 @@
 import { asc, eq, inArray } from "drizzle-orm";
-import type { GraduationHatRepository, GraduationHatQuery } from "../../domain/graduation-hat/graduation-hat.repository";
-import type { GraduationHat, GraduationHatTone } from "../../domain/graduation-hat/graduation-hat.types";
-import type { ProductRepository } from "../../domain/product/product.repository";
-import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers";
-import { productCategories, type Product, type ProductCategory, type ProductQuery } from "../../domain/product/product.types";
-import { productToneValues, type ProductTone } from "../../domain/product/product-taxonomy";
-import { getDatabase } from "../db/client";
+import type { GraduationHatRepository, GraduationHatQuery } from "../../domain/graduation-hat/graduation-hat.repository.js";
+import type { GraduationHat, GraduationHatTone } from "../../domain/graduation-hat/graduation-hat.types.js";
+import type { ProductRepository } from "../../domain/product/product.repository.js";
+import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers.js";
+import { productCategories, type Product, type ProductCategory, type ProductQuery } from "../../domain/product/product.types.js";
+import { productToneValues, type ProductTone } from "../../domain/product/product-taxonomy.js";
+import { getDatabase } from "../db/client.js";
 import {
   categories,
   productAttributes,
@@ -15,7 +15,7 @@ import {
   products,
   tags,
   tones,
-} from "../db/schema";
+} from "../db/schema.js";
 
 type ProductRow = typeof products.$inferSelect;
 

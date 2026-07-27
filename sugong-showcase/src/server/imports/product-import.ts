@@ -2,10 +2,10 @@ import { Readable } from "node:stream";
 import ExcelJS from "exceljs";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { AdminCatalogService } from "../catalog/admin-catalog.service";
-import { getDatabase } from "../db/client";
-import { importJobs } from "../db/schema";
-import { deleteCloudinaryAssets, uploadRemoteImage } from "../integrations/cloudinary";
+import { AdminCatalogService } from "../catalog/admin-catalog.service.js";
+import { getDatabase } from "../db/client.js";
+import { importJobs } from "../db/schema.js";
+import { deleteCloudinaryAssets, uploadRemoteImage } from "../integrations/cloudinary.js";
 
 const maxImportBytes = 3 * 1024 * 1024;
 const maxImportRows = 100;

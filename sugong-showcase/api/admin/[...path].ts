@@ -33,7 +33,7 @@ function bodyAsObject(req: VercelRequest) {
 
 async function rebuild(reason: string) {
   try {
-    const { triggerFrontendRebuild } = await import("../../src/server/integrations/github");
+    const { triggerFrontendRebuild } = await import("../../src/server/integrations/github.js");
     return await triggerFrontendRebuild(reason);
   } catch (error) {
     return { triggered: false, reason: error instanceof Error ? error.message : String(error) };
@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "login" && req.method === "POST") {
-      const { isAllowedAdminOrigin, loginAdmin } = await import("../../src/server/auth/session");
+      const { isAllowedAdminOrigin, loginAdmin } = await import("../../src/server/auth/session.js");
       if (!isAllowedAdminOrigin(req)) return json(res, 403, { message: "Origin is not allowed." });
       const body = bodyAsObject(req) as { token?: string };
       if (!body.token || body.token.length > 512) return json(res, 400, { message: "Token không hợp lệ." });
@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "logout" && req.method === "POST") {
-      const { logoutAdmin, requireAdmin } = await import("../../src/server/auth/session");
+      const { logoutAdmin, requireAdmin } = await import("../../src/server/auth/session.js");
       const auth = await requireAdmin(req, { mutation: true });
       if (!auth.ok) return json(res, auth.status, { message: auth.message });
       await logoutAdmin(req, res);
@@ -66,24 +66,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "session" && req.method === "GET") {
-      const { requireAdmin } = await import("../../src/server/auth/session");
+      const { requireAdmin } = await import("../../src/server/auth/session.js");
       const auth = await requireAdmin(req);
       if (!auth.ok) return json(res, auth.status, { authenticated: false, message: auth.message });
       return json(res, 200, { authenticated: true, csrfToken: auth.session.csrfToken });
     }
 
-    const { requireAdmin, writeAuditLog } = await import("../../src/server/auth/session");
+    const { requireAdmin, writeAuditLog } = await import("../../src/server/auth/session.js");
     const auth = await requireAdmin(req, { mutation: req.method !== "GET" });
     if (!auth.ok) return json(res, auth.status, { message: auth.message });
 
     if (resource === "products" && req.method === "GET") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service");
+      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
       return json(res, 200, { items: await admin.listProducts() });
     }
 
     if (resource === "products" && !id && req.method === "POST") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service");
+      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
       const product = await admin.createProduct(bodyAsObject(req));
       await writeAuditLog(req, auth.session.id, "create", "product", product?.id, { slug: product?.slug });
@@ -91,8 +91,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "products" && id && req.method === "PUT") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service");
-      const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary");
+      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
+      const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary.js");
       const admin = new AdminCatalogService();
       const existing = await admin.getProduct(id);
       const product = await admin.updateProduct(id, bodyAsObject(req));
@@ -111,8 +111,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "products" && id && req.method === "DELETE") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service");
-      const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary");
+      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
+      const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary.js");
       const admin = new AdminCatalogService();
       const deleted = await admin.deleteProduct(id);
       if (!deleted) return json(res, 404, { message: "Không tìm thấy sản phẩm." });
@@ -129,7 +129,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "cloudinary-signature" && req.method === "POST") {
-      const { createSignedUpload } = await import("../../src/server/integrations/cloudinary");
+      const { createSignedUpload } = await import("../../src/server/integrations/cloudinary.js");
       const body = bodyAsObject(req) as { productId?: string };
       const signature = createSignedUpload(body.productId);
       await writeAuditLog(req, auth.session.id, "sign_upload", "cloudinary", body.productId);
@@ -137,7 +137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "import-preview" && req.method === "POST") {
-      const { parseProductImport } = await import("../../src/server/imports/product-import");
+      const { parseProductImport } = await import("../../src/server/imports/product-import.js");
       const body = bodyAsObject(req) as { fileName?: string; contentBase64?: string };
       if (!body.fileName || !body.contentBase64) return json(res, 400, { message: "Thiếu file import." });
       const preview = await parseProductImport(body.fileName, body.contentBase64);
@@ -150,7 +150,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "import-commit" && req.method === "POST") {
-      const { commitProductImport } = await import("../../src/server/imports/product-import");
+      const { commitProductImport } = await import("../../src/server/imports/product-import.js");
       const body = bodyAsObject(req) as {
         fileName?: string;
         rows?: unknown[];

@@ -1,8 +1,8 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getDatabase } from "../db/client";
-import { adminAuditLogs, adminLoginAttempts, adminSessions } from "../db/schema";
-import { createRandomToken, safeEqual, sha256, verifyAdminToken } from "./crypto";
+import { getDatabase } from "../db/client.js";
+import { adminAuditLogs, adminLoginAttempts, adminSessions } from "../db/schema.js";
+import { createRandomToken, safeEqual, sha256, verifyAdminToken } from "./crypto.js";
 
 const sessionCookieName = "sugong_admin_session";
 const csrfCookieName = "sugong_admin_csrf";

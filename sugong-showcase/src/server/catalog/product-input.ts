@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { productCategories, productStatuses } from "../../domain/product/product.types";
-import { productToneValues } from "../../domain/product/product-taxonomy";
+import { productCategories, productStatuses } from "../../domain/product/product.types.js";
+import { productToneValues } from "../../domain/product/product-taxonomy.js";
 
 export const adminProductMediaSchema = z.object({
   id: z.string().uuid().optional(),
