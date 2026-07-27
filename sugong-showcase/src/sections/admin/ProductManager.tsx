@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import type { AdminProductInput, AdminProductRecord } from "../../server/catalog/product-input";
+import { slugify } from "../../lib/slug";
 import type { AdminApi, CatalogConfig, ProductDraft, ProductTemplateRecord } from "./admin-types";
 
 type Props = {
@@ -33,17 +34,6 @@ const editorSteps = [
   ["publish", "Hiển thị"],
 ] as const;
 type EditorStep = (typeof editorSteps)[number][0];
-
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function emptyProduct(config: CatalogConfig, template?: ProductTemplateRecord): AdminProductInput {
   const category = config.categories.find((item) => item.id === template?.categoryId && item.isActive)

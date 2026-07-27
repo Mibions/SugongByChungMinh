@@ -1,53 +1,11 @@
-import { formatProductPrice } from "../../domain/product/product.helpers";
-import { productSchema } from "../../domain/product/product.schema";
-import type { Product, ProductCategory } from "../../domain/product/product.types";
-import type { ProductTone } from "../../domain/product/product-taxonomy";
-import { createProductGallery, defaultProductStatus, pickCoverImage, type SeedImageSource } from "./seed-utils";
+import type { Product } from "../../domain/product/product.types";
+import { createSeedProduct } from "./seed-utils";
 
 const productBasePath = "/assets/products";
 
-function createProduct(input: {
-  id: string;
-  slug: string;
-  name: string;
-  price: number | null;
-  category: ProductCategory;
-  shortDescription: string;
-  description: string;
-  images: [SeedImageSource, ...SeedImageSource[]];
-  tones: ProductTone[];
-  tags: string[];
-  customizable: boolean;
-  isFeatured?: boolean;
-  displayOrder: number;
-}) {
-  const gallery = createProductGallery(productBasePath, input.images);
-
-  return productSchema.parse({
-    id: input.id,
-    slug: input.slug,
-    name: input.name,
-    price: input.price,
-    formattedPrice: formatProductPrice(input.price),
-    category: input.category,
-    shortDescription: input.shortDescription,
-    description: input.description,
-    coverImage: pickCoverImage(gallery),
-    gallery,
-    images: gallery,
-    tones: input.tones,
-    tags: input.tags,
-    isFeatured: input.isFeatured ?? false,
-    status: defaultProductStatus,
-    displayOrder: input.displayOrder,
-    customizable: input.customizable,
-    featured: input.isFeatured ?? false,
-    published: true,
-  });
-}
-
 export const localProducts: Product[] = [
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "bag-lavender",
     slug: "bag-lavender",
     name: "Túi tote hoa nhí tím",
@@ -81,7 +39,8 @@ export const localProducts: Product[] = [
     isFeatured: true,
     displayOrder: 1,
   }),
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "scrunchie-pastel",
     slug: "scrunchie-pastel",
     name: "Scrunchie lụa pastel",
@@ -103,7 +62,8 @@ export const localProducts: Product[] = [
     isFeatured: true,
     displayOrder: 2,
   }),
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "giftbox-bear",
     slug: "giftbox-bear",
     name: "Hộp quà gấu bông hoa nhí",
@@ -125,7 +85,8 @@ export const localProducts: Product[] = [
     isFeatured: true,
     displayOrder: 3,
   }),
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "graduation-gift",
     slug: "graduation-gift",
     name: "Set tốt nghiệp handmade",
@@ -146,7 +107,8 @@ export const localProducts: Product[] = [
     customizable: true,
     displayOrder: 4,
   }),
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "custom-pouch",
     slug: "custom-pouch",
     name: "Túi thêu tên custom",
@@ -167,7 +129,8 @@ export const localProducts: Product[] = [
     customizable: true,
     displayOrder: 5,
   }),
-  createProduct({
+  createSeedProduct({
+    basePath: productBasePath,
     id: "custom-keychain",
     slug: "custom-keychain",
     name: "Móc khóa custom tên",

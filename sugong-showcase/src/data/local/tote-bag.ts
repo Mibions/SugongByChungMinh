@@ -1,14 +1,16 @@
-import type { ToteBag, ToteBagDetailItem, ToteBagTone } from "../../domain/tote-bag/tote-bag.types";
-import { createSeedGallery, defaultProductStatus, pickCoverImage, type SeedImageSource } from "./seed-utils";
+import type { Product, ProductDetailItem } from "../../domain/product/product.types";
+import type { ProductTone } from "../../domain/product/product-taxonomy";
+import { createSeedProduct, type SeedImageSource } from "./seed-utils";
 
 const toteBagBasePath = "/assets/products/tote-bags";
+type ToteBagTone = "orange" | "pink" | "purple" | "green" | "blue" | "neutral";
 
 function createToteBagDetailItems(input: {
   tone: string;
   silhouette: string;
   customization: string;
   material: string;
-}): ToteBagDetailItem[] {
+}): ProductDetailItem[] {
   return [
     { label: "Tone màu", value: input.tone },
     { label: "Kiểu dáng", value: input.silhouette },
@@ -36,31 +38,28 @@ function createToteBag(input: {
   tags: string[];
   displayOrder: number;
   isFeatured?: boolean;
-  tiktokUrl?: string;
-}): ToteBag {
-  const gallery = createSeedGallery(toteBagBasePath, input.images);
-
-  return {
-    id: input.id,
-    slug: input.slug,
-    name: input.name,
-    tone: input.tone,
-    price: input.price,
-    shortDescription: input.shortDescription,
-    description: input.description,
-    coverImage: pickCoverImage(gallery),
-    gallery,
-    detailItems: createToteBagDetailItems(input.details),
-    detailNote: input.detailNote,
-    tags: input.tags,
-    tiktokUrl: input.tiktokUrl,
-    isFeatured: input.isFeatured ?? false,
-    status: defaultProductStatus,
-    displayOrder: input.displayOrder,
+  videoUrl?: string;
+}): Product {
+  const toneMap: Record<ToteBagTone, ProductTone> = {
+    orange: "orange",
+    pink: "pink",
+    purple: "lavender",
+    green: "green",
+    blue: "blue",
+    neutral: "neutral",
   };
+
+  return createSeedProduct({
+    ...input,
+    basePath: toteBagBasePath,
+    category: "bag",
+    tones: [toneMap[input.tone]],
+    customizable: input.tags.includes("custom"),
+    detailItems: createToteBagDetailItems(input.details),
+  });
 }
 
-export const toteBags: ToteBag[] = [
+export const toteBags: Product[] = [
   createToteBag({
     id: "tote_bag_orange_blossom",
     slug: "tui-tote-2-mat-tone-cam-vang",

@@ -5,26 +5,32 @@ import { withBase } from "../../lib/url";
 import { Gift, PenLine, ShoppingBag, Sparkles } from "lucide-react";
 
 type Category = {
+  icon: "bag" | "sparkles" | "gift" | "custom";
   name: string;
   href: string;
   image: string;
   alt: string;
+  objectPosition: string;
 };
 
 interface Props {
-  categories: Category[];
+  categories: readonly Category[];
 }
 
 const { categories } = Astro.props;
-const icons = [ShoppingBag, Sparkles, Gift, PenLine];
-const positions = ["18% center", "center", "center", "center"];
+const icons = {
+  bag: ShoppingBag,
+  sparkles: Sparkles,
+  gift: Gift,
+  custom: PenLine,
+};
 ---
 
 <section class="-mt-1 bg-background-card py-7 lg:py-9">
   <Container class="max-w-wide">
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-grid">
-      {categories.map((category, index) => {
-        const Icon = icons[index] ?? Sparkles;
+      {categories.map((category) => {
+        const Icon = icons[category.icon];
         const imageProps = getCloudinaryImageProps(
           { url: category.image, width: 900, height: 620 },
           "category-card",
@@ -38,7 +44,7 @@ const positions = ["18% center", "center", "center", "center"];
             <div class="aspect-[1.45/1] overflow-hidden bg-background-section">
               <img
                 class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.025]"
-                style={`object-position: ${positions[index]};`}
+                style={`object-position: ${category.objectPosition};`}
                 src={imageProps.src}
                 srcset={imageProps.srcset}
                 sizes={imageProps.sizes}

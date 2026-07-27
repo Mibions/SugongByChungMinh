@@ -1,4 +1,4 @@
-import type { GraduationHatListResponse } from "../../data/api/generated/api-types";
+import type { GraduationHatListResponse } from "../../domain/product/product-api.types";
 import { createJsonResponse } from "../../lib/api-response";
 import { getGraduationHats } from "../../lib/catalog";
 

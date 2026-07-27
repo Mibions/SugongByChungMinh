@@ -79,3 +79,24 @@ export const productToneFilters: ProductToneMeta[] = [
   { label: "Lilac", value: "lilac", className: "bg-primary-soft" },
   { label: "Trung tính", value: "neutral", className: "bg-[#d9d2cb]" },
 ];
+
+export const graduationToneFilters = [
+  { value: "all", label: "Tất cả" },
+  { value: "blue", label: "Tone xanh" },
+  { value: "pink", label: "Tone hồng" },
+  { value: "white", label: "Tone trắng" },
+  { value: "purple", label: "Tone tím" },
+  { value: "mixed", label: "Tone phối màu" },
+  { value: "other", label: "Khác" },
+] as const;
+
+export type GraduationTone = (typeof graduationToneFilters)[number]["value"];
+
+export function getGraduationTone(tones: ProductTone[]): Exclude<GraduationTone, "all"> {
+  if (tones.length > 2) return "mixed";
+  if (tones.includes("pink")) return tones.includes("blue") ? "mixed" : "pink";
+  if (tones.includes("cream") || tones.includes("neutral")) return "white";
+  if (tones.includes("blue")) return "blue";
+  if (tones.includes("lavender") || tones.includes("lilac")) return "purple";
+  return "other";
+}

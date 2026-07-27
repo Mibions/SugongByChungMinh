@@ -1,4 +1,4 @@
-import type { ProductListResponse } from "../../../data/api/generated/api-types";
+import type { ProductListResponse } from "../../../domain/product/product-api.types";
 import { createJsonResponse } from "../../../lib/api-response";
 import { getFeaturedProducts } from "../../../lib/catalog";
 

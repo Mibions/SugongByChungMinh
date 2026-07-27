@@ -13,9 +13,10 @@ The following legacy fields are never persisted:
 - `featured`: derived from `isFeatured`
 - `published`: derived from `status === "published"`
 
-Graduation hats are products in the `graduation` category and the
-`graduation-hats` collection. The legacy `GraduationHat` API is maintained by a
-compatibility mapper.
+Graduation hats are regular products in the `graduation` category and the
+`graduation-hats` collection. Legacy graduation URLs remain available, but they
+return the shared `Product` contract and no longer require a separate domain,
+repository or service.
 
 ## Recommended public DTO
 
@@ -60,13 +61,18 @@ type CatalogProductDto = {
 };
 ```
 
-## Migration phases
+## Migration status
 
-1. Database repository returns the existing frontend contract.
-2. Admin operates only on the canonical database input.
-3. Public API introduces `/v2` DTOs while legacy static JSON remains available.
-4. Frontend components migrate from `coverImage/gallery/images` to `media`.
-5. Legacy booleans and the separate graduation-hat domain are removed.
+Completed:
 
-This phased approach prevents a database migration from becoming a simultaneous
-frontend rewrite.
+- Database and local fallback return the same frontend `Product` contract.
+- Admin operates on the canonical database input.
+- Tote bag and graduation hat records use the shared seed factory.
+- The separate graduation-hat and tote-bag domains were removed.
+
+Future, intentionally deferred to avoid breaking current clients:
+
+1. Introduce a versioned public DTO.
+2. Migrate frontend components from `coverImage/gallery/images` to one `media`
+   array.
+3. Remove the derived compatibility fields `featured` and `published`.

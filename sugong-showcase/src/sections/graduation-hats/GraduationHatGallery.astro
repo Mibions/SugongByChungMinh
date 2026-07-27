@@ -1,12 +1,12 @@
 ---
 import { Palette, Sparkles } from "lucide-react";
-import type { GraduationHat } from "../../domain/graduation-hat/graduation-hat.types";
-import { graduationHatTones } from "../../domain/graduation-hat/graduation-hat.types";
+import { getGraduationTone, graduationToneFilters } from "../../domain/product/product-taxonomy";
+import type { Product } from "../../domain/product/product.types";
 import { getCloudinaryImageProps } from "../../lib/cloudinary-image";
 import { withBase } from "../../lib/url";
 
 interface Props {
-  hats: GraduationHat[];
+  hats: Product[];
 }
 
 const { hats } = Astro.props;
@@ -23,7 +23,7 @@ const visibleStep = 8;
   <div class="mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8">
     <div class="scrollbar-none -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
       <div class="flex min-w-max gap-3">
-        {graduationHatTones.map((item) => (
+        {graduationToneFilters.map((item) => (
           <button
             class:list={[
               "inline-flex min-h-10 items-center justify-center gap-2 rounded-full border px-4 text-sm font-medium transition",
@@ -44,7 +44,8 @@ const visibleStep = 8;
 
     <div class="mt-7 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:gap-5">
       {hats.map((hat, index) => {
-        const toneLabel = graduationHatTones.find((item) => item.value === hat.tone)?.label ?? "Khác";
+        const tone = getGraduationTone(hat.tones);
+        const toneLabel = graduationToneFilters.find((item) => item.value === tone)?.label ?? "Khác";
         const imageProps = getCloudinaryImageProps(hat.coverImage, "hat-card");
 
         return (
@@ -54,7 +55,7 @@ const visibleStep = 8;
               index >= initialVisibleCount && "hidden",
             ]}
             data-hat-card
-            data-tone={hat.tone}
+            data-tone={tone}
           >
             <a class="block" href={withBase(`/products/graduation-hats/${hat.slug}`)} aria-label={`Xem mẫu ${hat.name}`}>
               <div class="aspect-[4/5] overflow-hidden bg-background-section">

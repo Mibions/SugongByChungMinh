@@ -25,7 +25,7 @@ import {
   sortProducts,
 } from "../../domain/product/product.helpers";
 import {
-  productCategoryMeta,
+  productListingTabs,
   productToneFilters,
   type ProductTone,
 } from "../../domain/product/product-taxonomy";
@@ -55,10 +55,11 @@ const tabIcons: Record<ListingCategoryValue, typeof Sparkles> = {
 
 const tabs: { label: string; value: CategoryValue; icon: typeof Sparkles }[] = [
   { label: "Tất cả", value: "all", icon: Sparkles },
-  { label: productCategoryMeta.bag.tabLabel, value: "bag", icon: tabIcons.bag },
-  { label: productCategoryMeta.scrunchie.tabLabel, value: "scrunchie", icon: tabIcons.scrunchie },
-  { label: productCategoryMeta.gift.tabLabel, value: "gift", icon: tabIcons.gift },
-  { label: productCategoryMeta.custom.tabLabel, value: "custom", icon: tabIcons.custom },
+  ...productListingTabs.map((item) => ({
+    label: item.tabLabel,
+    value: item.value,
+    icon: tabIcons[item.value as ListingCategoryValue] ?? Sparkles,
+  })),
 ];
 
 function isColorTone(value: string | null): value is ProductTone {

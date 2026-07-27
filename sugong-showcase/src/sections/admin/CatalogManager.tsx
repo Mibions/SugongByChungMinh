@@ -12,6 +12,7 @@ import {
   Tags,
 } from "lucide-react";
 import type { AdminApi, CatalogConfig } from "./admin-types";
+import { slugify } from "../../lib/slug";
 
 type Resource =
   | "categories"
@@ -39,17 +40,6 @@ const sections = [
   ["product-templates", "Template", Sparkles],
   ["collections", "Collection", Layers3],
 ] as const;
-
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function initialDraft(resource: Resource, groupId?: string): Draft {
   const base = { _resource: resource, name: "", slug: "", displayOrder: 0, isActive: true };

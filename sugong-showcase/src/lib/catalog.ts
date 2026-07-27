@@ -1,98 +1,43 @@
-import { LocalGraduationHatRepository } from "../data/local/local-graduation-hat.repository";
+import { catalogProducts } from "../data/local/catalog";
 import { LocalProductRepository } from "../data/local/local-product.repository";
-import { graduationHats as graduationHatSeed } from "../data/local/graduation-hats";
-import { localProducts } from "../data/local/products";
-import type { GraduationHatQuery } from "../domain/graduation-hat/graduation-hat.repository";
-import type { GraduationHat, ProductImage as GraduationHatImage } from "../domain/graduation-hat/graduation-hat.types";
+import type { ProductRepository } from "../domain/product/product.repository";
+import { getGraduationTone, type GraduationTone } from "../domain/product/product-taxonomy";
 import type { Product, ProductCategory, ProductQuery } from "../domain/product/product.types";
-import { GraduationHatService } from "../services/graduation-hat.service";
-import { ProductService } from "../services/product.service";
-import { mapToteBagsToProducts } from "./tote-bags";
-import { withBase } from "./url";
 
-type CatalogData = {
-  products: Product[];
-  graduationHats: GraduationHat[];
-};
+let localRepository: LocalProductRepository | undefined;
 
-let catalogPromise: Promise<CatalogData> | undefined;
+function assertUniqueProducts(products: Product[]) {
+  const ids = new Set<string>();
+  const slugs = new Set<string>();
 
-function normalizeGraduationHatImage(image: GraduationHatImage): GraduationHatImage {
-  return {
-    ...image,
-    url: withBase(image.url),
-  };
-}
-
-function normalizeGraduationHat(hat: GraduationHat): GraduationHat {
-  return {
-    ...hat,
-    coverImage: normalizeGraduationHatImage(hat.coverImage),
-    gallery: (hat.gallery.length > 0 ? hat.gallery : [hat.coverImage]).map(normalizeGraduationHatImage),
-  };
-}
-
-function assertUniqueKeys<T>(items: T[], getKey: (item: T) => string, label: string) {
-  const seen = new Set<string>();
-
-  for (const item of items) {
-    const key = getKey(item);
-    if (seen.has(key)) {
-      throw new Error(`Duplicate ${label} detected in catalog: ${key}`);
-    }
-    seen.add(key);
+  for (const product of products) {
+    if (ids.has(product.id)) throw new Error(`Duplicate product id detected in catalog: ${product.id}`);
+    if (slugs.has(product.slug)) throw new Error(`Duplicate product slug detected in catalog: ${product.slug}`);
+    ids.add(product.id);
+    slugs.add(product.slug);
   }
 }
 
-async function buildCatalogData(): Promise<CatalogData> {
-  const toteProducts = mapToteBagsToProducts();
-  const products = [...localProducts, ...toteProducts];
-  const graduationHats = graduationHatSeed.map(normalizeGraduationHat);
-
-  assertUniqueKeys(products, (product) => product.id, "product id");
-  assertUniqueKeys(products, (product) => product.slug, "product slug");
-  assertUniqueKeys(graduationHats, (hat) => hat.id, "graduation hat id");
-  assertUniqueKeys(graduationHats, (hat) => hat.slug, "graduation hat slug");
-
-  return {
-    products,
-    graduationHats,
-  };
-}
-
-async function getCatalogData() {
-  catalogPromise ??= buildCatalogData();
-  return catalogPromise;
-}
-
-async function getProductService() {
+async function getRepository(): Promise<ProductRepository> {
   if (process.env.DATA_SOURCE === "database") {
     const { PostgresProductRepository } = await import("../server/catalog/postgres-product.repository");
-    return new ProductService(new PostgresProductRepository());
+    return new PostgresProductRepository();
   }
 
-  const { products } = await getCatalogData();
-  return new ProductService(new LocalProductRepository(products));
-}
-
-async function getGraduationHatService() {
-  if (process.env.DATA_SOURCE === "database") {
-    const { PostgresGraduationHatRepository } = await import("../server/catalog/postgres-product.repository");
-    return new GraduationHatService(new PostgresGraduationHatRepository());
+  if (!localRepository) {
+    assertUniqueProducts(catalogProducts);
+    localRepository = new LocalProductRepository(catalogProducts);
   }
 
-  const { graduationHats } = await getCatalogData();
-  return new GraduationHatService(new LocalGraduationHatRepository(graduationHats));
+  return localRepository;
 }
 
 export async function getAllProducts(query?: ProductQuery) {
-  const service = await getProductService();
-  return service.getProducts(query);
+  return (await getRepository()).getAll(query);
 }
 
 export async function getProductBySlug(slug: string) {
-  const service = await getProductService();
-  return service.getProductDetail(slug);
+  return (await getRepository()).getBySlug(slug);
 }
 
 export async function getProductsByCategory(category: ProductCategory) {
@@ -100,22 +45,23 @@ export async function getProductsByCategory(category: ProductCategory) {
 }
 
 export async function getFeaturedProducts(limit = 3) {
-  const service = await getProductService();
-  return service.getHomepageProducts(limit);
+  return (await getRepository()).getFeatured(limit);
 }
 
 export async function getRelatedProducts(productOrId: Product | string, limit = 3) {
-  const service = await getProductService();
   const productId = typeof productOrId === "string" ? productOrId : productOrId.id;
-  return service.getRelatedProducts(productId, limit);
+  return (await getRepository()).getRelated(productId, limit);
 }
 
-export async function getGraduationHats(query?: GraduationHatQuery) {
-  const service = await getGraduationHatService();
-  return service.getGraduationHats(query);
+export async function getGraduationHats(query: { tone?: GraduationTone; featured?: boolean } = {}) {
+  let products = await getAllProducts({ category: "graduation", featured: query.featured });
+  if (query.tone && query.tone !== "all") {
+    products = products.filter((product) => getGraduationTone(product.tones) === query.tone);
+  }
+  return products;
 }
 
 export async function getGraduationHatBySlug(slug: string) {
-  const service = await getGraduationHatService();
-  return service.getGraduationHatDetail(slug);
+  const product = await getProductBySlug(slug);
+  return product?.category === "graduation" ? product : null;
 }

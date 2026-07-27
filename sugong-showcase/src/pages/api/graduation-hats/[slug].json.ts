@@ -1,5 +1,5 @@
 import type { GetStaticPaths } from "astro";
-import type { GraduationHatDetailResponse } from "../../../data/api/generated/api-types";
+import type { GraduationHatDetailResponse } from "../../../domain/product/product-api.types";
 import { createJsonResponse } from "../../../lib/api-response";
 import { getGraduationHatBySlug, getGraduationHats } from "../../../lib/catalog";
 

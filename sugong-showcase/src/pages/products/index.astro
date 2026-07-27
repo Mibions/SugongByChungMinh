@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllProducts } from "../../lib/catalog";
 import ProductsHeader from "../../sections/products/ProductsHeader.astro";
 import { ProductListingClient } from "../../sections/products/ProductListingClient";
-import { brand } from "../../lib/site-data";
+import { brand } from "../../content/site";
 
 const products = await getAllProducts();
 ---

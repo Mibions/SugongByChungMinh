@@ -3,10 +3,10 @@ import { ArrowLeft, ChevronRight, MessageCircle, PlayCircle, Sparkles } from "lu
 import { ProductGallery } from "../../../components/product/ProductGallery";
 import Button from "../../../components/ui/Button.astro";
 import Container from "../../../components/ui/Container.astro";
-import { graduationHatTones } from "../../../domain/graduation-hat/graduation-hat.types";
+import { getGraduationTone, graduationToneFilters } from "../../../domain/product/product-taxonomy";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getGraduationHats } from "../../../lib/catalog";
-import { brand } from "../../../lib/site-data";
+import { brand } from "../../../content/site";
 import { withBase } from "../../../lib/url";
 
 export async function getStaticPaths() {
@@ -19,7 +19,8 @@ export async function getStaticPaths() {
 }
 
 const { hat } = Astro.props;
-const toneLabel = graduationHatTones.find((item) => item.value === hat.tone)?.label ?? "Khác";
+const tone = getGraduationTone(hat.tones);
+const toneLabel = graduationToneFilters.find((item) => item.value === tone)?.label ?? "Khác";
 const galleryImages = (hat.gallery.length > 0 ? hat.gallery : [hat.coverImage]).map((image, index) => ({
   ...image,
   sortOrder: index,
@@ -86,7 +87,7 @@ const galleryImages = (hat.gallery.length > 0 ? hat.gallery : [hat.coverImage]).
                   <MessageCircle size={17} aria-hidden="true" />
                   Nhắn Zalo
                 </Button>
-                <Button class="gap-2" href={hat.tiktokUrl ?? brand.tiktokProfileUrl} variant="secondary">
+                <Button class="gap-2" href={hat.videoUrl ?? brand.tiktokProfileUrl} variant="secondary">
                   <PlayCircle size={17} aria-hidden="true" />
                   Xem TikTok
                 </Button>

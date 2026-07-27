@@ -1,5 +1,5 @@
 import type { GetStaticPaths } from "astro";
-import type { ProductDetailResponse } from "../../../data/api/generated/api-types";
+import type { ProductDetailResponse } from "../../../domain/product/product-api.types";
 import { createJsonResponse } from "../../../lib/api-response";
 import { getAllProducts, getProductBySlug } from "../../../lib/catalog";
 

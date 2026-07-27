@@ -15,22 +15,11 @@ import {
 } from "../db/schema.js";
 import { adminProductInputSchema, type AdminProductInput, type AdminProductRecord } from "./product-input.js";
 import { getRawProductBundles } from "./postgres-product.repository.js";
+import { slugify } from "../../lib/slug.js";
 
 type Database = ReturnType<typeof getDatabase>;
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 type DatabaseExecutor = Database | Transaction;
-
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function toAdminRecord(bundle: Awaited<ReturnType<typeof getRawProductBundles>>[number]): AdminProductRecord {
   return {

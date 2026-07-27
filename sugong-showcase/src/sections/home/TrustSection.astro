@@ -1,29 +1,14 @@
 ---
 import Container from "../../components/ui/Container.astro";
 import { Gift, HandHeart, MessageCircle, WandSparkles } from "lucide-react";
+import { trustItems } from "../../content/site";
 
-const items = [
-  {
-    title: "Handmade tỉ mỉ",
-    description: "Từng chi tiết được làm chậm rãi để món quà có cảm giác riêng.",
-    icon: HandHeart,
-  },
-  {
-    title: "Custom theo yêu cầu",
-    description: "Có thể đổi màu, thêu tên hoặc phối chi tiết nhỏ theo câu chuyện của bạn.",
-    icon: WandSparkles,
-  },
-  {
-    title: "Tư vấn trước khi làm",
-    description: "SUGONG xác nhận mẫu, thời gian và chi phí trước khi thực hiện.",
-    icon: MessageCircle,
-  },
-  {
-    title: "Phù hợp làm quà",
-    description: "Nhẹ nhàng, nữ tính và đủ cá nhân để gửi tặng người thương.",
-    icon: Gift,
-  },
-];
+const icons = {
+  handmade: HandHeart,
+  custom: WandSparkles,
+  message: MessageCircle,
+  gift: Gift,
+};
 ---
 
 <section id="why-sugong" class="bg-background-main py-section-mobile">
@@ -36,8 +21,8 @@ const items = [
       </p>
     </div>
     <div class="grid border-t border-border sm:grid-cols-2">
-      {items.map((item, index) => {
-        const Icon = item.icon;
+      {trustItems.map((item, index) => {
+        const Icon = icons[item.icon];
 
         return (
           <article class="grid grid-cols-[auto_1fr] gap-4 border-b border-border py-6 sm:px-5 sm:first:pl-0 sm:nth-[2]:pr-0 sm:nth-[3]:pl-0 sm:last:pr-0">

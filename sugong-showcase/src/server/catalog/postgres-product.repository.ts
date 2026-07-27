@@ -1,6 +1,4 @@
 import { asc, eq, inArray } from "drizzle-orm";
-import type { GraduationHatRepository, GraduationHatQuery } from "../../domain/graduation-hat/graduation-hat.repository.js";
-import type { GraduationHat, GraduationHatTone } from "../../domain/graduation-hat/graduation-hat.types.js";
 import type { ProductRepository } from "../../domain/product/product.repository.js";
 import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers.js";
 import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types.js";
@@ -159,47 +157,6 @@ export class PostgresProductRepository implements ProductRepository {
       .filter((product) => product.id !== productId)
       .sort((a, b) => Number(b.category === current.category) - Number(a.category === current.category))
       .slice(0, limit);
-  }
-}
-
-function mapTone(product: Product): GraduationHatTone {
-  if (product.tones.length > 1) return "mixed";
-  const tone = product.tones[0];
-  if (tone === "blue" || tone === "pink") return tone;
-  if (tone === "cream" || tone === "neutral") return "white";
-  if (tone === "lavender" || tone === "lilac") return "purple";
-  return "other";
-}
-
-function mapProductToGraduationHat(product: Product): GraduationHat {
-  return {
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    tone: mapTone(product),
-    shortDescription: product.shortDescription,
-    description: product.description,
-    coverImage: product.coverImage,
-    gallery: product.gallery,
-    tags: product.tags,
-    tiktokUrl: product.videoUrl,
-    isFeatured: product.isFeatured,
-    status: product.status,
-    displayOrder: product.displayOrder,
-  };
-}
-
-export class PostgresGraduationHatRepository implements GraduationHatRepository {
-  private readonly products = new PostgresProductRepository();
-
-  async getAll(query: GraduationHatQuery = {}): Promise<GraduationHat[]> {
-    let hats = (await this.products.getAll({ category: "graduation", featured: query.featured })).map(mapProductToGraduationHat);
-    if (query.tone && query.tone !== "all") hats = hats.filter((hat) => hat.tone === query.tone);
-    return hats;
-  }
-
-  async getBySlug(slug: string): Promise<GraduationHat | null> {
-    return (await this.getAll()).find((hat) => hat.slug === slug) ?? null;
   }
 }
 

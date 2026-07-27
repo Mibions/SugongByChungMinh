@@ -1,12 +1,7 @@
 ---
 import { Heart, Sparkles } from "lucide-react";
 import Container from "../../components/ui/Container.astro";
-
-const testimonials = [
-  "Túi xinh, đóng gói kỹ và màu rất dịu.",
-  "Set quà tốt nghiệp nhìn nhỏ xinh mà rất chỉn chu.",
-  "Shop tư vấn dễ thương, gửi mẫu trước khi làm.",
-];
+import { testimonials } from "../../content/site";
 ---
 
 <section class="bg-background-card py-section-mobile lg:py-section-desktop">
@@ -22,14 +17,14 @@ const testimonials = [
     </div>
 
     <div class="grid border-y border-border md:grid-cols-3">
-      {testimonials.map((text, index) => (
+      {testimonials.map((testimonial, index) => (
         <article class="relative py-6 md:px-7 md:first:pl-0 md:last:pr-0">
           {index > 0 && <span class="absolute inset-x-0 top-0 h-px bg-border md:inset-y-6 md:left-0 md:h-auto md:w-px" aria-hidden="true" />}
           <div class="flex items-center gap-3 text-primary-soft">
             <Sparkles size={20} aria-hidden="true" />
             <span class="text-xs font-semibold tracking-[0.12em] text-primary">LỜI NHẮN 0{index + 1}</span>
           </div>
-          <p class="text-pretty mt-4 text-base leading-7 text-text-primary">“{text}”</p>
+          <p class="text-pretty mt-4 text-base leading-7 text-text-primary">“{testimonial.quote}”</p>
         </article>
       ))}
     </div>

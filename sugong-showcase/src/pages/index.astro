@@ -6,7 +6,7 @@ import FeaturedProducts from "../sections/home/FeaturedProducts.astro";
 import HomeHero from "../sections/home/HomeHero.astro";
 import TrustSection from "../sections/home/TrustSection.astro";
 import { getFeaturedProducts } from "../lib/catalog";
-import { brand, categories } from "../lib/site-data";
+import { brand, categories } from "../content/site";
 
 const products = await getFeaturedProducts(3);
 ---

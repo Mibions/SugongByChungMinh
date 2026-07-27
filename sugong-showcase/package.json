@@ -19,8 +19,6 @@
     "admin:token": "tsx scripts/generate-admin-token.ts",
     "check:server": "tsc -p tsconfig.server.json",
     "cloudinary:sync": "node scripts/cloudinary-sync-assets.cjs",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -44,16 +42,12 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@playwright/test": "^1.52.0",
-    "@storybook-astro/framework": "^1.2.0",
-    "@storybook/addon-a11y": "^10.4.2",
-    "@storybook/builder-vite": "^10.4.2",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@vercel/node": "^5.8.27",
     "@vitejs/plugin-react": "^5.0.0",
     "drizzle-kit": "^0.31.10",
-    "storybook": "^10.4.2",
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"
   }

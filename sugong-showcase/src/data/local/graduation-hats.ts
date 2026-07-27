@@ -1,41 +1,43 @@
-import type { GraduationHat, GraduationHatTone } from "../../domain/graduation-hat/graduation-hat.types";
-import { createSeedGallery, defaultProductStatus, pickCoverImage, type SeedImageSource } from "./seed-utils";
+import type { Product } from "../../domain/product/product.types";
+import type { ProductTone } from "../../domain/product/product-taxonomy";
+import { createSeedProduct, type SeedImageSource } from "./seed-utils";
 
 const graduationHatBasePath = "/assets/products/graduation-hats";
+type GraduationTone = "blue" | "pink" | "white" | "purple" | "mixed" | "other";
 
 function createGraduationHat(input: {
   id: string;
   slug: string;
   name: string;
-  tone: GraduationHatTone;
+  tone: GraduationTone;
   shortDescription: string;
   description?: string;
   images: [SeedImageSource, ...SeedImageSource[]];
   tags: string[];
   displayOrder: number;
   isFeatured?: boolean;
-  tiktokUrl?: string;
-}): GraduationHat {
-  const gallery = createSeedGallery(graduationHatBasePath, input.images);
-
-  return {
-    id: input.id,
-    slug: input.slug,
-    name: input.name,
-    tone: input.tone,
-    shortDescription: input.shortDescription,
-    description: input.description,
-    coverImage: pickCoverImage(gallery),
-    gallery,
-    tags: input.tags,
-    tiktokUrl: input.tiktokUrl,
-    isFeatured: input.isFeatured ?? false,
-    status: defaultProductStatus,
-    displayOrder: input.displayOrder,
+  videoUrl?: string;
+}): Product {
+  const toneMap: Record<GraduationTone, ProductTone[]> = {
+    blue: ["blue"],
+    pink: ["pink"],
+    white: ["cream"],
+    purple: ["lavender"],
+    mixed: ["lavender", "cream", "pink"],
+    other: ["neutral"],
   };
+
+  return createSeedProduct({
+    ...input,
+    basePath: graduationHatBasePath,
+    price: null,
+    category: "graduation",
+    tones: toneMap[input.tone],
+    customizable: true,
+  });
 }
 
-export const graduationHats: GraduationHat[] = [
+export const graduationHats: Product[] = [
   createGraduationHat({
     id: "grad_hat_blue_butterfly",
     slug: "non-tot-nghiep-tone-xanh-buom",
