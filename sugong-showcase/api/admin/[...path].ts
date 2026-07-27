@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ZodError } from "zod";
-import { AdminCatalogService } from "../../src/server/catalog/admin-catalog.service.js";
-import { CatalogConfigService } from "../../src/server/catalog/catalog-config.service.js";
+import { AdminCatalogService } from "../../src/server/catalog/admin-catalog.service";
+import { CatalogConfigService } from "../../src/server/catalog/catalog-config.service";
 
 function json(res: VercelResponse, status: number, body: unknown) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");

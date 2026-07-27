@@ -1,9 +1,9 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
-import type { ProductRepository } from "../../domain/product/product.repository.js";
-import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers.js";
-import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types.js";
-import type { ProductTone } from "../../domain/product/product-taxonomy.js";
-import { getDatabase } from "../db/client.js";
+import type { ProductRepository } from "../../domain/product/product.repository";
+import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers";
+import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types";
+import type { ProductTone } from "../../domain/product/product-taxonomy";
+import { getDatabase } from "../db/client";
 import {
   categories,
   productAttributes,
@@ -15,7 +15,7 @@ import {
   productTypes,
   tags,
   tones,
-} from "../db/schema.js";
+} from "../db/schema";
 
 type ProductRow = typeof products.$inferSelect;
 let publishedProductsPromise: Promise<Product[]> | undefined;

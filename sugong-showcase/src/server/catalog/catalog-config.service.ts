@@ -1,6 +1,6 @@
 import { asc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { getDatabase } from "../db/client.js";
+import { getDatabase } from "../db/client";
 import {
   attributeDefinitions,
   categories,
@@ -11,7 +11,7 @@ import {
   productTypeAttributes,
   productTypes,
   tags,
-} from "../db/schema.js";
+} from "../db/schema";
 
 const slugSchema = z
   .string()

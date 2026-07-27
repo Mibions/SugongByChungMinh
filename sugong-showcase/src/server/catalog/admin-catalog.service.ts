@@ -1,5 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
-import { getDatabase } from "../db/client.js";
+import { getDatabase } from "../db/client";
 import {
   categories,
   classificationValues,
@@ -12,15 +12,15 @@ import {
   productTypes,
   tags,
   tones,
-} from "../db/schema.js";
+} from "../db/schema";
 import {
   adminProductInputSchema,
   type AdminProductInput,
   type AdminProductRecord,
   type AdminProductSummary,
-} from "./product-input.js";
-import { getRawProductBundle, type ProductBundle } from "./postgres-product.repository.js";
-import { slugify } from "../../lib/slug.js";
+} from "./product-input";
+import { getRawProductBundle, type ProductBundle } from "./postgres-product.repository";
+import { slugify } from "../../lib/slug";
 
 type Database = ReturnType<typeof getDatabase>;
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
