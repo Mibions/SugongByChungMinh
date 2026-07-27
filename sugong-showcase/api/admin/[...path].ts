@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ZodError } from "zod";
+import { AdminCatalogService } from "../../src/server/catalog/admin-catalog.service.js";
+import { CatalogConfigService } from "../../src/server/catalog/catalog-config.service.js";
 
 function json(res: VercelResponse, status: number, body: unknown) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -77,7 +79,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!auth.ok) return json(res, auth.status, { message: auth.message });
 
     if (resource === "products" && req.method === "GET") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
       if (id) {
         const item = await admin.getProduct(id);
@@ -89,7 +90,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "catalog-config" && req.method === "GET") {
-      const { CatalogConfigService } = await import("../../src/server/catalog/catalog-config.service.js");
       return json(res, 200, await new CatalogConfigService().list());
     }
 
@@ -103,7 +103,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       "collections",
     ]);
     if (catalogResources.has(resource) && ["POST", "PUT", "DELETE"].includes(req.method ?? "")) {
-      const { CatalogConfigService } = await import("../../src/server/catalog/catalog-config.service.js");
       const service = new CatalogConfigService();
       if (req.method === "POST" && !id) {
         const item = await service.save(resource as Parameters<typeof service.save>[0], undefined, bodyAsObject(req));
@@ -125,7 +124,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "products" && !id && req.method === "POST") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
       const product = await admin.createProduct(bodyAsObject(req));
       await writeAuditLog(req, auth.session.id, "create", "product", product?.id, { slug: product?.slug });
@@ -138,7 +136,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "products" && id && req.method === "PUT") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary.js");
       const admin = new AdminCatalogService();
       const existing = await admin.getProduct(id);
@@ -161,7 +158,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (resource === "products" && id && req.method === "DELETE") {
-      const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const { deleteCloudinaryAssets } = await import("../../src/server/integrations/cloudinary.js");
       const admin = new AdminCatalogService();
       const deleted = await admin.deleteProduct(id);
