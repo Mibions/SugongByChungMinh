@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { productStatuses } from "../../domain/product/product.types";
+import { productStatuses } from "../../domain/product/product.types.js";
 
 export const adminProductMediaSchema = z.object({
   id: z.string().uuid().optional(),
