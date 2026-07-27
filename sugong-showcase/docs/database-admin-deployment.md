@@ -74,6 +74,12 @@ Draft-only create, update, and delete operations do not trigger a rebuild.
 Publishing a product, editing an already-published product, hiding one, or
 requesting a manual rebuild does.
 
+Vercel runs `pnpm db:migrate:deploy` before its application build. It applies
+only migration files that are not present in `sugong_schema_migrations`. Preview
+deployments without `DATABASE_URL` skip this step instead of failing. Seeding is
+intentionally not part of deployment because it may overwrite catalogue content
+maintained through the admin.
+
 ## Catalogue configuration
 
 The admin reads catalogue structure from PostgreSQL instead of hardcoded UI

@@ -5,7 +5,13 @@ import { join } from "node:path";
 import postgres from "postgres";
 
 const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error("DATABASE_URL is required");
+if (!databaseUrl) {
+  if (process.argv.includes("--if-configured")) {
+    console.log("DATABASE_URL is not configured; skipping database migrations.");
+    process.exit(0);
+  }
+  throw new Error("DATABASE_URL is required");
+}
 
 const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
