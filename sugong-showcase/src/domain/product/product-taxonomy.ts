@@ -1,7 +1,7 @@
 import type { ProductCategory } from "./product.types";
 
 export const productToneValues = ["orange", "pink", "cream", "lavender", "blue", "green", "lilac", "neutral"] as const;
-export type ProductTone = (typeof productToneValues)[number];
+export type ProductTone = string;
 
 export type ProductCategoryMeta = {
   value: ProductCategory;
@@ -16,7 +16,7 @@ export type ProductToneMeta = {
   className: string;
 };
 
-export const productCategoryMeta: Record<ProductCategory, ProductCategoryMeta> = {
+export const productCategoryMeta: Record<string, ProductCategoryMeta> = {
   bag: {
     value: "bag",
     label: "Túi handmade",
@@ -48,6 +48,19 @@ export const productCategoryMeta: Record<ProductCategory, ProductCategoryMeta> =
     searchText: "tốt nghiệp graduation quà tặng",
   },
 };
+
+export function getProductCategoryMeta(category: ProductCategory): ProductCategoryMeta {
+  return productCategoryMeta[category] ?? {
+    value: category,
+    label: category
+      .split("-")
+      .filter(Boolean)
+      .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join(" "),
+    tabLabel: category,
+    searchText: category.replace(/-/g, " "),
+  };
+}
 
 export const productListingTabs = [
   productCategoryMeta.bag,

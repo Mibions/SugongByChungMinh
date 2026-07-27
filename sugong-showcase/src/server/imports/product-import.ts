@@ -14,7 +14,8 @@ const importRowSchema = z.object({
   slug: z.string().trim().min(2).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   name: z.string().trim().min(2),
   priceAmount: z.number().int().nonnegative().nullable(),
-  category: z.enum(["bag", "scrunchie", "gift", "custom", "graduation"]),
+  category: z.string().trim().min(1).max(120),
+  productType: z.string().trim().min(1).max(120).optional(),
   shortDescription: z.string().trim().min(2),
   description: z.string().trim().optional(),
   detailNote: z.string().trim().optional(),
@@ -24,7 +25,7 @@ const importRowSchema = z.object({
   isCustomizable: z.boolean(),
   displayOrder: z.number().int().nonnegative(),
   tags: z.array(z.string().min(1)),
-  tones: z.array(z.enum(["orange", "pink", "cream", "lavender", "blue", "green", "lilac", "neutral"])).min(1),
+  tones: z.array(z.string().trim().min(1).max(120)).min(1).max(50),
   imageUrls: z.array(z.string().url()).min(1).max(8),
 });
 
@@ -87,6 +88,7 @@ export async function parseProductImport(fileName: string, contentBase64: string
       name: record.name,
       priceAmount: parseNullablePrice(record.priceAmount ?? record.price ?? ""),
       category: record.category,
+      productType: record.productType || undefined,
       shortDescription: record.shortDescription,
       description: record.description || undefined,
       detailNote: record.detailNote || undefined,
@@ -149,6 +151,7 @@ export async function commitProductImport(
         ...row,
         media: uploadedMedia,
         attributes: [],
+        classifications: [],
       };
       if (existing) {
         await admin.updateProduct(existing.id, input);

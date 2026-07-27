@@ -3,16 +3,18 @@ import type { GraduationHatRepository, GraduationHatQuery } from "../../domain/g
 import type { GraduationHat, GraduationHatTone } from "../../domain/graduation-hat/graduation-hat.types.js";
 import type { ProductRepository } from "../../domain/product/product.repository.js";
 import { formatProductPrice, matchesProductCategory, matchesProductSearch, paginateProducts, sortProducts } from "../../domain/product/product.helpers.js";
-import { productCategories, type Product, type ProductCategory, type ProductQuery } from "../../domain/product/product.types.js";
-import { productToneValues, type ProductTone } from "../../domain/product/product-taxonomy.js";
+import type { Product, ProductCategory, ProductQuery } from "../../domain/product/product.types.js";
+import type { ProductTone } from "../../domain/product/product-taxonomy.js";
 import { getDatabase } from "../db/client.js";
 import {
   categories,
   productAttributes,
+  productClassifications,
   productMedia,
   productTags,
   productTones,
   products,
+  productTypes,
   tags,
   tones,
 } from "../db/schema.js";
@@ -22,19 +24,13 @@ type ProductRow = typeof products.$inferSelect;
 export type ProductBundle = {
   row: ProductRow;
   category: ProductCategory;
+  productType?: string;
+  classifications: string[];
   media: Array<typeof productMedia.$inferSelect>;
   tags: string[];
   tones: ProductTone[];
   attributes: Array<typeof productAttributes.$inferSelect>;
 };
-
-function isProductCategory(value: string): value is ProductCategory {
-  return productCategories.includes(value as ProductCategory);
-}
-
-function isProductTone(value: string): value is ProductTone {
-  return productToneValues.includes(value as ProductTone);
-}
 
 function mapBundleToProduct(bundle: ProductBundle): Product {
   const images = bundle.media
@@ -84,16 +80,17 @@ function mapBundleToProduct(bundle: ProductBundle): Product {
 async function loadBundles(includeUnpublished = false): Promise<ProductBundle[]> {
   const db = getDatabase();
   const rows = await db
-    .select({ row: products, categorySlug: categories.slug })
+    .select({ row: products, categorySlug: categories.slug, productTypeSlug: productTypes.slug })
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
+    .leftJoin(productTypes, eq(products.productTypeId, productTypes.id))
     .where(includeUnpublished ? undefined : eq(products.status, "published"))
     .orderBy(asc(products.displayOrder), asc(products.createdAt));
 
   if (rows.length === 0) return [];
   const ids = rows.map(({ row }) => row.id);
 
-  const [mediaRows, tagRows, toneRows, attributeRows] = await Promise.all([
+  const [mediaRows, tagRows, toneRows, attributeRows, classificationRows] = await Promise.all([
     db.select().from(productMedia).where(inArray(productMedia.productId, ids)).orderBy(asc(productMedia.position)),
     db
       .select({ productId: productTags.productId, name: tags.name })
@@ -110,22 +107,29 @@ async function loadBundles(includeUnpublished = false): Promise<ProductBundle[]>
       .from(productAttributes)
       .where(inArray(productAttributes.productId, ids))
       .orderBy(asc(productAttributes.position)),
+    db
+      .select({
+        productId: productClassifications.productId,
+        valueId: productClassifications.classificationValueId,
+      })
+      .from(productClassifications)
+      .where(inArray(productClassifications.productId, ids)),
   ]);
 
-  return rows.flatMap(({ row, categorySlug }) => {
-    if (!isProductCategory(categorySlug)) return [];
-
-    return [{
+  return rows.map(({ row, categorySlug, productTypeSlug }) => ({
       row,
       category: categorySlug,
+      productType: productTypeSlug ?? undefined,
+      classifications: classificationRows
+        .filter((item) => item.productId === row.id)
+        .map((item) => item.valueId),
       media: mediaRows.filter((item) => item.productId === row.id),
       tags: tagRows.filter((item) => item.productId === row.id).map((item) => item.name),
       tones: toneRows
-        .filter((item) => item.productId === row.id && isProductTone(item.slug))
-        .map((item) => item.slug as ProductTone),
+        .filter((item) => item.productId === row.id)
+        .map((item) => item.slug),
       attributes: attributeRows.filter((item) => item.productId === row.id),
-    }];
-  });
+  }));
 }
 
 export class PostgresProductRepository implements ProductRepository {

@@ -70,6 +70,31 @@ data so the existing GitHub Pages deployment does not break during setup.
 The public update is eventually consistent and normally appears after the
 GitHub Pages workflow finishes.
 
+Draft-only create, update, and delete operations do not trigger a rebuild.
+Publishing a product, editing an already-published product, hiding one, or
+requesting a manual rebuild does.
+
+## Catalogue configuration
+
+The admin reads catalogue structure from PostgreSQL instead of hardcoded UI
+arrays. Run both commands after deploying a schema update:
+
+```powershell
+pnpm db:migrate
+pnpm db:seed
+```
+
+The seed is idempotent and provides:
+
+- product types and their attribute sets;
+- hierarchical-ready categories;
+- colour, tone, occasion, and style classifications;
+- reusable product attributes;
+- prioritized product templates shown in the create-product flow.
+
+New catalogue values should be created in **Cấu trúc catalogue**. Deactivate
+values that are already referenced instead of deleting their history.
+
 ## 5. Import format
 
 Use `public/admin/product-import-template.csv` as the template. CSV and XLSX are

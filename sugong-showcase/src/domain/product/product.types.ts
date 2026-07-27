@@ -1,7 +1,7 @@
 import type { ProductTone } from "./product-taxonomy";
 
 export const productCategories = ["bag", "scrunchie", "gift", "custom", "graduation"] as const;
-export type ProductCategory = (typeof productCategories)[number];
+export type ProductCategory = string;
 
 export const productStatuses = ["draft", "published", "hidden"] as const;
 export type ProductStatus = (typeof productStatuses)[number];

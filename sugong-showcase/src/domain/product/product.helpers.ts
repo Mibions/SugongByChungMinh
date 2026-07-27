@@ -1,4 +1,4 @@
-import { productCategoryMeta, type ProductTone } from "./product-taxonomy";
+import { getProductCategoryMeta, type ProductTone } from "./product-taxonomy";
 import type { Product, ProductCategory, ProductQuery } from "./product.types";
 
 export type ProductCategoryFilter = ProductCategory | "all";
@@ -36,7 +36,7 @@ export function buildProductSearchText(product: Product) {
     product.shortDescription,
     product.description,
     product.formattedPrice,
-    productCategoryMeta[product.category].searchText,
+    getProductCategoryMeta(product.category).searchText,
     isProductCustomizable(product) ? "custom cá nhân hóa handmade" : "handmade",
     ...product.tags,
     ...product.tones,

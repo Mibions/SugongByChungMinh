@@ -1,5 +1,6 @@
 import {
   boolean,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -22,12 +23,40 @@ export const categories = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     slug: text("slug").notNull(),
     name: text("name").notNull(),
+    description: text("description"),
+    parentId: uuid("parent_id"),
     displayOrder: integer("display_order").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("categories_slug_unique").on(table.slug)],
+  (table) => [
+    uniqueIndex("categories_slug_unique").on(table.slug),
+    index("categories_parent_order_index").on(table.parentId, table.displayOrder),
+    foreignKey({
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+      name: "categories_parent_id_categories_id_fk",
+    }).onDelete("restrict"),
+  ],
+);
+
+export const productTypes = pgTable(
+  "product_types",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    isActive: boolean("is_active").notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("product_types_slug_unique").on(table.slug),
+    index("product_types_active_order_index").on(table.isActive, table.displayOrder),
+  ],
 );
 
 export const products = pgTable(
@@ -41,6 +70,7 @@ export const products = pgTable(
     categoryId: uuid("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "restrict" }),
+    productTypeId: uuid("product_type_id").references(() => productTypes.id, { onDelete: "restrict" }),
     shortDescription: text("short_description").notNull(),
     description: text("description"),
     detailNote: text("detail_note"),
@@ -58,6 +88,103 @@ export const products = pgTable(
     uniqueIndex("products_legacy_id_unique").on(table.legacyId),
     index("products_status_order_index").on(table.status, table.displayOrder),
     index("products_category_index").on(table.categoryId),
+    index("products_product_type_index").on(table.productTypeId),
+  ],
+);
+
+export const classificationGroups = pgTable(
+  "classification_groups",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    selectionMode: text("selection_mode").$type<"single" | "multiple">().notNull().default("multiple"),
+    isFilterable: boolean("is_filterable").notNull().default(true),
+    isActive: boolean("is_active").notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("classification_groups_slug_unique").on(table.slug),
+    index("classification_groups_active_order_index").on(table.isActive, table.displayOrder),
+  ],
+);
+
+export const classificationValues = pgTable(
+  "classification_values",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => classificationGroups.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    isActive: boolean("is_active").notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("classification_values_group_slug_unique").on(table.groupId, table.slug),
+    index("classification_values_group_order_index").on(table.groupId, table.displayOrder),
+  ],
+);
+
+export const productClassifications = pgTable(
+  "product_classifications",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    classificationValueId: uuid("classification_value_id")
+      .notNull()
+      .references(() => classificationValues.id, { onDelete: "restrict" }),
+    position: integer("position").notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.productId, table.classificationValueId] }),
+    index("product_classifications_value_index").on(table.classificationValueId),
+  ],
+);
+
+export const attributeDefinitions = pgTable(
+  "attribute_definitions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    dataType: text("data_type")
+      .$type<"text" | "number" | "boolean" | "select" | "multi_select">()
+      .notNull()
+      .default("text"),
+    unit: text("unit"),
+    options: jsonb("options").$type<Array<{ label: string; value: string }>>().notNull().default([]),
+    isFilterable: boolean("is_filterable").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("attribute_definitions_slug_unique").on(table.slug)],
+);
+
+export const productTypeAttributes = pgTable(
+  "product_type_attributes",
+  {
+    productTypeId: uuid("product_type_id")
+      .notNull()
+      .references(() => productTypes.id, { onDelete: "cascade" }),
+    attributeDefinitionId: uuid("attribute_definition_id")
+      .notNull()
+      .references(() => attributeDefinitions.id, { onDelete: "restrict" }),
+    isRequired: boolean("is_required").notNull().default(false),
+    displayOrder: integer("display_order").notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.productTypeId, table.attributeDefinitionId] }),
+    index("product_type_attributes_order_index").on(table.productTypeId, table.displayOrder),
   ],
 );
 
@@ -140,11 +267,35 @@ export const productAttributes = pgTable(
     productId: uuid("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
+    attributeDefinitionId: uuid("attribute_definition_id").references(() => attributeDefinitions.id, {
+      onDelete: "set null",
+    }),
     label: text("label").notNull(),
     value: text("value").notNull(),
     position: integer("position").notNull().default(0),
   },
   (table) => [index("product_attributes_product_position_index").on(table.productId, table.position)],
+);
+
+export const productTemplates = pgTable(
+  "product_templates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    productTypeId: uuid("product_type_id").references(() => productTypes.id, { onDelete: "set null" }),
+    categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
+    defaults: jsonb("defaults").$type<Record<string, unknown>>().notNull().default({}),
+    priority: integer("priority").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("product_templates_slug_unique").on(table.slug),
+    index("product_templates_active_priority_index").on(table.isActive, table.priority),
+  ],
 );
 
 export const collections = pgTable(

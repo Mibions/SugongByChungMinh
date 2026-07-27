@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { productToneValues } from "./product-taxonomy";
 
 export const productImageSchema = z.object({
   url: z.string().min(1),
@@ -21,13 +20,13 @@ export const productSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative().nullable(),
   formattedPrice: z.string().min(1),
-  category: z.enum(["bag", "scrunchie", "gift", "custom", "graduation"]),
+  category: z.string().min(1),
   shortDescription: z.string().min(1),
   description: z.string().optional(),
   coverImage: productImageSchema,
   gallery: z.array(productImageSchema).min(1),
   images: z.array(productImageSchema).min(1),
-  tones: z.array(z.enum(productToneValues)).min(1),
+  tones: z.array(z.string().min(1)).min(1),
   tags: z.array(z.string().min(1)),
   isFeatured: z.boolean(),
   status: z.enum(["draft", "published", "hidden"]),

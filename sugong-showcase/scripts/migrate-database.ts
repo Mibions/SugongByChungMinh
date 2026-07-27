@@ -1,14 +1,13 @@
 import "dotenv/config";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import postgres from "postgres";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL is required");
 
-const migrationId = "0000_catalog_admin";
-const migrationPath = fileURLToPath(new URL("../drizzle/0000_catalog_admin.sql", import.meta.url));
-const migrationSql = await readFile(migrationPath, "utf8");
+const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
 
 try {
@@ -18,13 +17,21 @@ try {
       applied_at timestamptz NOT NULL DEFAULT now()
     )
   `;
-  const applied = await sql<{ id: string }[]>`
-    SELECT id FROM sugong_schema_migrations WHERE id = ${migrationId}
-  `;
+  const migrationFiles = (await readdir(migrationDirectory))
+    .filter((fileName) => /^\d+.*\.sql$/.test(fileName))
+    .sort((a, b) => a.localeCompare(b));
 
-  if (applied.length > 0) {
-    console.log(`Migration ${migrationId} is already applied.`);
-  } else {
+  for (const fileName of migrationFiles) {
+    const migrationId = fileName.replace(/\.sql$/, "");
+    const applied = await sql<{ id: string }[]>`
+      SELECT id FROM sugong_schema_migrations WHERE id = ${migrationId}
+    `;
+    if (applied.length > 0) {
+      console.log(`Migration ${migrationId} is already applied.`);
+      continue;
+    }
+
+    const migrationSql = await readFile(join(migrationDirectory, fileName), "utf8");
     await sql.begin(async (transaction) => {
       await transaction.unsafe(migrationSql);
       await transaction`

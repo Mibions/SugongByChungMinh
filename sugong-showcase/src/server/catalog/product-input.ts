@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { productCategories, productStatuses } from "../../domain/product/product.types.js";
-import { productToneValues } from "../../domain/product/product-taxonomy.js";
+import { productStatuses } from "../../domain/product/product.types.js";
 
 export const adminProductMediaSchema = z.object({
   id: z.string().uuid().optional(),
@@ -18,6 +17,7 @@ export const adminProductMediaSchema = z.object({
 });
 
 export const adminProductAttributeSchema = z.object({
+  definitionId: z.string().uuid().optional(),
   label: z.string().trim().min(1),
   value: z.string().trim().min(1),
   position: z.number().int().nonnegative(),
@@ -34,7 +34,8 @@ export const adminProductInputSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug chỉ gồm chữ thường, số và dấu gạch ngang"),
   name: z.string().trim().min(2).max(240),
   priceAmount: z.number().int().nonnegative().nullable(),
-  category: z.enum(productCategories),
+  category: z.string().trim().min(1).max(120),
+  productType: z.string().trim().min(1).max(120).optional(),
   shortDescription: z.string().trim().min(2).max(500),
   description: z.string().trim().max(5000).optional(),
   detailNote: z.string().trim().max(2000).optional(),
@@ -44,9 +45,26 @@ export const adminProductInputSchema = z.object({
   isCustomizable: z.boolean(),
   displayOrder: z.number().int().nonnegative(),
   tags: z.array(z.string().trim().min(1).max(80)).max(30),
-  tones: z.array(z.enum(productToneValues)).max(productToneValues.length),
-  media: z.array(adminProductMediaSchema).min(1).max(20),
+  tones: z.array(z.string().trim().min(1).max(120)).max(50),
+  classifications: z.array(z.string().uuid()).max(100).default([]),
+  media: z.array(adminProductMediaSchema).max(20),
   attributes: z.array(adminProductAttributeSchema).max(30),
+}).superRefine((input, context) => {
+  if (input.status !== "published") return;
+  if (input.media.length === 0) {
+    context.addIssue({
+      code: "custom",
+      path: ["media"],
+      message: "Sản phẩm cần ít nhất một ảnh trước khi xuất bản",
+    });
+  }
+  if (input.tones.length === 0) {
+    context.addIssue({
+      code: "custom",
+      path: ["tones"],
+      message: "Sản phẩm cần ít nhất một màu trước khi xuất bản",
+    });
+  }
 });
 
 export type AdminProductInput = z.infer<typeof adminProductInputSchema>;

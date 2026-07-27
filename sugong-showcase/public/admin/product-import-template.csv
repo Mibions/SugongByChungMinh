@@ -1,2 +1,2 @@
-slug,name,priceAmount,category,shortDescription,description,detailNote,videoUrl,status,isFeatured,isCustomizable,displayOrder,tags,tones,imageUrls
-tui-tote-mau-moi,Túi tote mẫu mới,120000,bag,Mô tả ngắn cho sản phẩm,Mô tả đầy đủ,,,draft,false,true,10,"tote|handmade|custom","pink|cream","https://example.com/image-1.jpg|https://example.com/image-2.jpg"
+slug,name,priceAmount,category,productType,shortDescription,description,detailNote,videoUrl,status,isFeatured,isCustomizable,displayOrder,tags,tones,imageUrls
+tui-tote-mau-moi,Túi tote mẫu mới,120000,bag,tui-handmade,Mô tả ngắn cho sản phẩm,Mô tả đầy đủ,,,draft,false,true,10,"tote|handmade|custom","pink|cream","https://example.com/image-1.jpg|https://example.com/image-2.jpg"

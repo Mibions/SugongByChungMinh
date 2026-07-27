@@ -82,12 +82,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return json(res, 200, { items: await admin.listProducts() });
     }
 
+    if (resource === "catalog-config" && req.method === "GET") {
+      const { CatalogConfigService } = await import("../../src/server/catalog/catalog-config.service.js");
+      return json(res, 200, await new CatalogConfigService().list());
+    }
+
+    const catalogResources = new Set([
+      "categories",
+      "product-types",
+      "classification-groups",
+      "classification-values",
+      "attribute-definitions",
+      "product-templates",
+      "collections",
+    ]);
+    if (catalogResources.has(resource) && ["POST", "PUT", "DELETE"].includes(req.method ?? "")) {
+      const { CatalogConfigService } = await import("../../src/server/catalog/catalog-config.service.js");
+      const service = new CatalogConfigService();
+      if (req.method === "POST" && !id) {
+        const item = await service.save(resource as Parameters<typeof service.save>[0], undefined, bodyAsObject(req));
+        await writeAuditLog(req, auth.session.id, "create", resource, (item as { id?: string })?.id);
+        return json(res, 201, { item });
+      }
+      if (req.method === "PUT" && id) {
+        const item = await service.save(resource as Parameters<typeof service.save>[0], id, bodyAsObject(req));
+        if (!item) return json(res, 404, { message: "Không tìm thấy dữ liệu cấu hình." });
+        await writeAuditLog(req, auth.session.id, "update", resource, id);
+        return json(res, 200, { item });
+      }
+      if (req.method === "DELETE" && id) {
+        const item = await service.archive(resource as Parameters<typeof service.archive>[0], id);
+        if (!item) return json(res, 404, { message: "Không tìm thấy dữ liệu cấu hình." });
+        await writeAuditLog(req, auth.session.id, "archive", resource, id);
+        return json(res, 200, { item });
+      }
+    }
+
     if (resource === "products" && !id && req.method === "POST") {
       const { AdminCatalogService } = await import("../../src/server/catalog/admin-catalog.service.js");
       const admin = new AdminCatalogService();
       const product = await admin.createProduct(bodyAsObject(req));
       await writeAuditLog(req, auth.session.id, "create", "product", product?.id, { slug: product?.slug });
-      return json(res, 201, { item: product, rebuild: await rebuild(`Created product ${product?.slug}`) });
+      return json(res, 201, {
+        item: product,
+        rebuild: product?.status === "published"
+          ? await rebuild(`Created product ${product.slug}`)
+          : { triggered: false, reason: "Draft changes do not rebuild the public site." },
+      });
     }
 
     if (resource === "products" && id && req.method === "PUT") {
@@ -103,10 +144,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ) ?? [];
       const cleanupErrors = await deleteCloudinaryAssets(removedPublicIds);
       await writeAuditLog(req, auth.session.id, "update", "product", id, { slug: product.slug, cleanupErrors });
+      const affectsPublicSite = existing?.status === "published" || product.status === "published";
       return json(res, 200, {
         item: product,
         cleanupErrors,
-        rebuild: await rebuild(`Updated product ${product.slug}`),
+        rebuild: affectsPublicSite
+          ? await rebuild(`Updated product ${product.slug}`)
+          : { triggered: false, reason: "Draft changes do not rebuild the public site." },
       });
     }
 
@@ -124,7 +168,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return json(res, 200, {
         deleted: true,
         cleanupErrors,
-        rebuild: await rebuild(`Deleted product ${deleted.product.slug}`),
+        rebuild: deleted.product.status === "published"
+          ? await rebuild(`Deleted product ${deleted.product.slug}`)
+          : { triggered: false, reason: "Deleting a draft does not rebuild the public site." },
       });
     }
 

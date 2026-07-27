@@ -2,11 +2,14 @@ import { eq, inArray } from "drizzle-orm";
 import { getDatabase } from "../db/client.js";
 import {
   categories,
+  classificationValues,
   productAttributes,
+  productClassifications,
   productMedia,
   productTags,
   productTones,
   products,
+  productTypes,
   tags,
   tones,
 } from "../db/schema.js";
@@ -37,6 +40,7 @@ function toAdminRecord(bundle: Awaited<ReturnType<typeof getRawProductBundles>>[
     name: bundle.row.name,
     priceAmount: bundle.row.priceAmount,
     category: bundle.category,
+    productType: bundle.productType,
     shortDescription: bundle.row.shortDescription,
     description: bundle.row.description ?? undefined,
     detailNote: bundle.row.detailNote ?? undefined,
@@ -47,6 +51,7 @@ function toAdminRecord(bundle: Awaited<ReturnType<typeof getRawProductBundles>>[
     displayOrder: bundle.row.displayOrder,
     tags: bundle.tags,
     tones: bundle.tones,
+    classifications: bundle.classifications,
     media: bundle.media.map((item) => ({
       id: item.id,
       publicId: item.publicId ?? undefined,
@@ -59,6 +64,7 @@ function toAdminRecord(bundle: Awaited<ReturnType<typeof getRawProductBundles>>[
       isCover: item.isCover,
     })),
     attributes: bundle.attributes.map((item) => ({
+      definitionId: item.attributeDefinitionId ?? undefined,
       label: item.label,
       value: item.value,
       position: item.position,
@@ -75,12 +81,21 @@ async function getCategoryId(categorySlug: string) {
   return row.id;
 }
 
+async function getProductTypeId(productTypeSlug: string | undefined) {
+  if (!productTypeSlug) return null;
+  const db = getDatabase();
+  const row = await db.query.productTypes.findFirst({ where: eq(productTypes.slug, productTypeSlug) });
+  if (!row) throw new Error(`Product type "${productTypeSlug}" does not exist`);
+  return row.id;
+}
+
 async function replaceRelations(db: DatabaseExecutor, productId: string, input: AdminProductInput) {
   await Promise.all([
     db.delete(productMedia).where(eq(productMedia.productId, productId)),
     db.delete(productAttributes).where(eq(productAttributes.productId, productId)),
     db.delete(productTags).where(eq(productTags.productId, productId)),
     db.delete(productTones).where(eq(productTones.productId, productId)),
+    db.delete(productClassifications).where(eq(productClassifications.productId, productId)),
   ]);
 
   if (input.media.length > 0) {
@@ -103,6 +118,7 @@ async function replaceRelations(db: DatabaseExecutor, productId: string, input: 
     await db.insert(productAttributes).values(
       input.attributes.map((item, index) => ({
         productId,
+        attributeDefinitionId: item.definitionId,
         label: item.label,
         value: item.value,
         position: item.position ?? index,
@@ -126,6 +142,23 @@ async function replaceRelations(db: DatabaseExecutor, productId: string, input: 
     if (toneRows.length !== input.tones.length) throw new Error("One or more tones have not been seeded");
     await db.insert(productTones).values(toneRows.map((tone) => ({ productId, toneId: tone.id })));
   }
+
+  if (input.classifications.length > 0) {
+    const values = await db
+      .select({ id: classificationValues.id })
+      .from(classificationValues)
+      .where(inArray(classificationValues.id, input.classifications));
+    if (values.length !== new Set(input.classifications).size) {
+      throw new Error("One or more classifications do not exist");
+    }
+    await db.insert(productClassifications).values(
+      [...new Set(input.classifications)].map((classificationValueId, position) => ({
+        productId,
+        classificationValueId,
+        position,
+      })),
+    );
+  }
 }
 
 export class AdminCatalogService {
@@ -141,6 +174,7 @@ export class AdminCatalogService {
     const input = adminProductInputSchema.parse(rawInput);
     const db = getDatabase();
     const categoryId = await getCategoryId(input.category);
+    const productTypeId = await getProductTypeId(input.productType);
     const createdId = await db.transaction(async (tx) => {
       const [created] = await tx
         .insert(products)
@@ -150,6 +184,7 @@ export class AdminCatalogService {
           name: input.name,
           priceAmount: input.priceAmount,
           categoryId,
+          productTypeId,
           shortDescription: input.shortDescription,
           description: input.description || null,
           detailNote: input.detailNote || null,
@@ -174,6 +209,7 @@ export class AdminCatalogService {
     const existing = await this.getProduct(id);
     if (!existing) return null;
     const categoryId = await getCategoryId(input.category);
+    const productTypeId = await getProductTypeId(input.productType);
 
     await db.transaction(async (tx) => {
       await tx
@@ -184,6 +220,7 @@ export class AdminCatalogService {
           name: input.name,
           priceAmount: input.priceAmount,
           categoryId,
+          productTypeId,
           shortDescription: input.shortDescription,
           description: input.description || null,
           detailNote: input.detailNote || null,
