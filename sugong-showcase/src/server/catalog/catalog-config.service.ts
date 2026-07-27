@@ -94,36 +94,39 @@ export type CatalogResource =
 export class CatalogConfigService {
   async list() {
     const db = getDatabase();
-    const [
-      categoryRows,
-      productTypeRows,
-      groupRows,
-      valueRows,
-      definitionRows,
-      typeAttributeRows,
-      templateRows,
-      collectionRows,
-      tagRows,
-    ] = await Promise.all([
-      db.select().from(categories).orderBy(asc(categories.displayOrder), asc(categories.name)),
-      db.select().from(productTypes).orderBy(asc(productTypes.displayOrder), asc(productTypes.name)),
-      db
-        .select()
-        .from(classificationGroups)
-        .orderBy(asc(classificationGroups.displayOrder), asc(classificationGroups.name)),
-      db
-        .select()
-        .from(classificationValues)
-        .orderBy(asc(classificationValues.displayOrder), asc(classificationValues.name)),
-      db.select().from(attributeDefinitions).orderBy(asc(attributeDefinitions.name)),
-      db.select().from(productTypeAttributes).orderBy(asc(productTypeAttributes.displayOrder)),
-      db
-        .select()
-        .from(productTemplates)
-        .orderBy(asc(productTemplates.priority), asc(productTemplates.name)),
-      db.select().from(collections).orderBy(asc(collections.displayOrder), asc(collections.name)),
-      db.select().from(tags).orderBy(asc(tags.name)),
-    ]);
+    const categoryRows = await db
+      .select()
+      .from(categories)
+      .orderBy(asc(categories.displayOrder), asc(categories.name));
+    const productTypeRows = await db
+      .select()
+      .from(productTypes)
+      .orderBy(asc(productTypes.displayOrder), asc(productTypes.name));
+    const groupRows = await db
+      .select()
+      .from(classificationGroups)
+      .orderBy(asc(classificationGroups.displayOrder), asc(classificationGroups.name));
+    const valueRows = await db
+      .select()
+      .from(classificationValues)
+      .orderBy(asc(classificationValues.displayOrder), asc(classificationValues.name));
+    const definitionRows = await db
+      .select()
+      .from(attributeDefinitions)
+      .orderBy(asc(attributeDefinitions.name));
+    const typeAttributeRows = await db
+      .select()
+      .from(productTypeAttributes)
+      .orderBy(asc(productTypeAttributes.displayOrder));
+    const templateRows = await db
+      .select()
+      .from(productTemplates)
+      .orderBy(asc(productTemplates.priority), asc(productTemplates.name));
+    const collectionRows = await db
+      .select()
+      .from(collections)
+      .orderBy(asc(collections.displayOrder), asc(collections.name));
+    const tagRows = await db.select().from(tags).orderBy(asc(tags.name));
 
     return {
       categories: categoryRows,

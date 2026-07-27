@@ -18,6 +18,7 @@ import {
 } from "../db/schema.js";
 
 type ProductRow = typeof products.$inferSelect;
+let publishedProductsPromise: Promise<Product[]> | undefined;
 
 export type ProductBundle = {
   row: ProductRow;
@@ -88,31 +89,33 @@ async function loadBundles(includeUnpublished = false): Promise<ProductBundle[]>
   if (rows.length === 0) return [];
   const ids = rows.map(({ row }) => row.id);
 
-  const [mediaRows, tagRows, toneRows, attributeRows, classificationRows] = await Promise.all([
-    db.select().from(productMedia).where(inArray(productMedia.productId, ids)).orderBy(asc(productMedia.position)),
-    db
-      .select({ productId: productTags.productId, name: tags.name })
-      .from(productTags)
-      .innerJoin(tags, eq(productTags.tagId, tags.id))
-      .where(inArray(productTags.productId, ids)),
-    db
-      .select({ productId: productTones.productId, slug: tones.slug })
-      .from(productTones)
-      .innerJoin(tones, eq(productTones.toneId, tones.id))
-      .where(inArray(productTones.productId, ids)),
-    db
-      .select()
-      .from(productAttributes)
-      .where(inArray(productAttributes.productId, ids))
-      .orderBy(asc(productAttributes.position)),
-    db
-      .select({
-        productId: productClassifications.productId,
-        valueId: productClassifications.classificationValueId,
-      })
-      .from(productClassifications)
-      .where(inArray(productClassifications.productId, ids)),
-  ]);
+  const mediaRows = await db
+    .select()
+    .from(productMedia)
+    .where(inArray(productMedia.productId, ids))
+    .orderBy(asc(productMedia.position));
+  const tagRows = await db
+    .select({ productId: productTags.productId, name: tags.name })
+    .from(productTags)
+    .innerJoin(tags, eq(productTags.tagId, tags.id))
+    .where(inArray(productTags.productId, ids));
+  const toneRows = await db
+    .select({ productId: productTones.productId, slug: tones.slug })
+    .from(productTones)
+    .innerJoin(tones, eq(productTones.toneId, tones.id))
+    .where(inArray(productTones.productId, ids));
+  const attributeRows = await db
+    .select()
+    .from(productAttributes)
+    .where(inArray(productAttributes.productId, ids))
+    .orderBy(asc(productAttributes.position));
+  const classificationRows = await db
+    .select({
+      productId: productClassifications.productId,
+      valueId: productClassifications.classificationValueId,
+    })
+    .from(productClassifications)
+    .where(inArray(productClassifications.productId, ids));
 
   return rows.map(({ row, categorySlug, productTypeSlug }) => ({
       row,
@@ -130,9 +133,22 @@ async function loadBundles(includeUnpublished = false): Promise<ProductBundle[]>
   }));
 }
 
+async function loadPublishedProducts() {
+  if (!publishedProductsPromise) {
+    publishedProductsPromise = loadBundles()
+      .then((bundles) => bundles.map(mapBundleToProduct))
+      .catch((error) => {
+        publishedProductsPromise = undefined;
+        throw error;
+      });
+  }
+
+  return publishedProductsPromise;
+}
+
 export class PostgresProductRepository implements ProductRepository {
   async getAll(query: ProductQuery = {}): Promise<Product[]> {
-    let result = (await loadBundles()).map(mapBundleToProduct);
+    let result = [...(await loadPublishedProducts())];
     if (query.category) result = result.filter((product) => matchesProductCategory(product, query.category));
     if (query.featured !== undefined) result = result.filter((product) => product.isFeatured === query.featured);
     if (query.search) result = result.filter((product) => matchesProductSearch(product, query.search));

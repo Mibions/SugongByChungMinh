@@ -92,7 +92,10 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   }
 
   async function loadWorkspace() {
-    await Promise.all([reloadProducts(), reloadConfig()]);
+    // Keep the two query-heavy resources sequential. Supabase's transaction
+    // pooler is faster and more reliable without two simultaneous bursts.
+    await reloadConfig();
+    await reloadProducts();
   }
 
   useEffect(() => {
@@ -104,7 +107,17 @@ export function AdminApp({ configuredAdminUrl }: Props) {
       .then(async (session) => {
         setAuthenticated(session.authenticated);
         if (session.csrfToken) setCsrfToken(session.csrfToken);
-        if (session.authenticated) await loadWorkspace();
+        if (!session.authenticated) return;
+
+        try {
+          await loadWorkspace();
+        } catch (error) {
+          setMessage(
+            `Đã đăng nhập nhưng chưa tải đủ dữ liệu: ${
+              error instanceof Error ? error.message : String(error)
+            }. Nhấn “Tải lại dữ liệu” để thử lại.`,
+          );
+        }
       })
       .catch(() => setAuthenticated(false))
       .finally(() => setCheckingSession(false));
@@ -240,6 +253,24 @@ export function AdminApp({ configuredAdminUrl }: Props) {
             </nav>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              className="inline-flex min-h-10 items-center gap-2 rounded-button border border-border bg-background-card px-4 text-sm disabled:opacity-50"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setMessage("");
+                try {
+                  await loadWorkspace();
+                } catch (error) {
+                  setMessage(error instanceof Error ? error.message : String(error));
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <RefreshCw className={busy ? "animate-spin" : ""} size={15} />
+              <span className="hidden lg:inline">Tải lại dữ liệu</span>
+            </button>
             <button className="inline-flex min-h-10 items-center gap-2 rounded-button border border-border bg-background-card px-4 text-sm disabled:opacity-50" disabled={busy} onClick={rebuild}>
               <RefreshCw className={busy ? "animate-spin" : ""} size={15} /> <span className="hidden sm:inline">Cập nhật website</span>
             </button>

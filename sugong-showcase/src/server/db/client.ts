@@ -14,9 +14,12 @@ export function getDatabase() {
   }
 
   sqlClient = postgres(databaseUrl, {
-    max: 5,
-    idle_timeout: 20,
-    connect_timeout: 10,
+    // Supabase port 6543 is a transaction pooler. A single connection per
+    // serverless instance avoids bursts that can stall concurrent functions.
+    max: 1,
+    idle_timeout: 10,
+    connect_timeout: 15,
+    max_lifetime: 60 * 15,
     prepare: false,
   });
   database = drizzle(sqlClient, { schema });
