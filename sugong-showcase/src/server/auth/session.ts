@@ -1,10 +1,12 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { AdminCatalogService } from "../catalog/admin-catalog.service.js";
+import { CatalogConfigService } from "../catalog/catalog-config.service.js";
 import { getDatabase } from "../db/client.js";
 import { adminAuditLogs, adminLoginAttempts, adminSessions } from "../db/schema.js";
 import { createRandomToken, safeEqual, sha256, verifyAdminToken } from "./crypto.js";
-export { AdminCatalogService } from "../catalog/admin-catalog.service.js";
-export { CatalogConfigService } from "../catalog/catalog-config.service.js";
+
+export { AdminCatalogService, CatalogConfigService };
 
 const sessionCookieName = "sugong_admin_session";
 const csrfCookieName = "sugong_admin_csrf";
