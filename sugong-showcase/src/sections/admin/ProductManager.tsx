@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Boxes,
   Check,
   ChevronRight,
   ImagePlus,
@@ -130,7 +131,6 @@ export function ProductManager({
   }
 
   async function removeProduct(product: AdminProductRecord) {
-    if (!window.confirm(`Xóa sản phẩm “${product.name}”? Ảnh Cloudinary liên quan cũng sẽ được dọn.`)) return;
     setBusy(true);
     try {
       await api(`products/${product.id}`, { method: "DELETE" });
@@ -204,15 +204,21 @@ export function ProductManager({
   const templates = config.productTemplates.filter((item) => item.isActive);
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[21rem_minmax(0,1fr)]">
-      <aside className="self-start rounded-[20px] bg-background-card p-4 shadow-soft ring-1 ring-border xl:sticky xl:top-24">
+    <div className="grid gap-5 xl:grid-cols-[23rem_minmax(0,1fr)]">
+      <aside className="self-start overflow-hidden rounded-[20px] bg-background-card shadow-soft ring-1 ring-border xl:sticky xl:top-[5.75rem]">
+        <div className="border-b border-border px-4 pb-4 pt-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-[0.12em] text-primary">CATALOGUE</p>
-            <h1 className="mt-1 font-heading text-2xl text-primary-dark">Sản phẩm</h1>
+            <p className="text-xs font-medium text-text-secondary">Catalogue</p>
+            <div className="mt-1 flex items-end gap-2">
+              <h1 className="font-heading text-2xl tracking-[-0.02em] text-primary-dark">Sản phẩm</h1>
+              <span className="mb-0.5 rounded-[8px] bg-background-section px-2 py-0.5 text-xs tabular-nums text-primary-dark">
+                {products.length}
+              </span>
+            </div>
           </div>
           <button
-            className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-3 text-sm text-background-card"
+            className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-3 text-sm font-medium text-background-card transition hover:bg-primary active:translate-y-px"
             disabled={busy}
             onClick={async () => {
               if (showTemplates) {
@@ -277,23 +283,36 @@ export function ProductManager({
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
-        <div className="scrollbar-none mt-3 max-h-[62dvh] space-y-1.5 overflow-y-auto">
+        </div>
+        <div className="scrollbar-none max-h-[calc(100dvh-14.5rem)] space-y-1 overflow-y-auto p-2">
           {filteredProducts.map((product) => (
             <button
-              className={`w-full rounded-[14px] p-3 text-left transition ${
+              className={`group w-full rounded-[13px] px-3 py-3 text-left transition ${
                 "id" in (editing ?? {}) && editing?.id === product.id
-                  ? "bg-background-section ring-1 ring-primary-soft"
-                  : "hover:bg-background-main"
+                  ? "bg-background-section ring-1 ring-primary-soft/80"
+                  : "hover:bg-background-main active:translate-y-px"
               }`}
               disabled={busy}
               onClick={() => editProduct(product)}
               key={product.id}
             >
-              <span className="block truncate font-medium text-primary-dark">{product.name}</span>
-              <span className="mt-1 block truncate text-xs text-text-secondary">
-                {config.productTypes.find((item) => item.slug === product.productType)?.name ?? product.category}
-                {" · "}
-                {product.status}
+              <span className="flex items-center justify-between gap-3">
+                <span className="block min-w-0">
+                  <span className="block truncate text-sm font-medium text-primary-dark">{product.name}</span>
+                  <span className="mt-1 block truncate text-xs text-text-secondary">
+                    {config.productTypes.find((item) => item.slug === product.productType)?.name ?? product.productType ?? product.category}
+                  </span>
+                </span>
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${
+                    product.status === "published"
+                      ? "bg-success"
+                      : product.status === "hidden"
+                        ? "bg-text-secondary/50"
+                        : "bg-amber-400"
+                  }`}
+                  title={product.status}
+                />
               </span>
             </button>
           ))}
@@ -305,17 +324,20 @@ export function ProductManager({
 
       <section className="min-w-0">
         {!editing ? (
-          <div className="grid min-h-[34rem] place-items-center rounded-[24px] border border-dashed border-primary-soft bg-background-card/50 p-8 text-center">
+          <div className="grid min-h-[32rem] place-items-center rounded-[24px] border border-dashed border-primary-soft bg-background-card/60 p-8 text-center">
             <div>
-              <Sparkles className="mx-auto text-primary-soft" size={42} />
-              <h2 className="mt-4 font-heading text-3xl text-primary-dark">Chọn sản phẩm để chỉnh sửa</h2>
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-[18px] bg-background-section text-primary-dark">
+                <Boxes size={24} />
+              </span>
+              <h2 className="mt-5 font-heading text-3xl tracking-[-0.025em] text-primary-dark">Chọn một sản phẩm</h2>
               <p className="mx-auto mt-2 max-w-md leading-7 text-text-secondary">
-                Hoặc chọn một template đã cấu hình để chỉ nhập những thông tin cần thiết.
+                Chọn trong danh sách bên trái để chỉnh sửa, hoặc tạo mới từ một template có sẵn.
               </p>
             </div>
           </div>
         ) : (
           <ProductEditor
+            key={"id" in editing ? editing.id : `new-${editing.productType ?? "blank"}`}
             product={editing}
             config={config}
             busy={busy}
@@ -351,6 +373,7 @@ function ProductEditor({
   onClose: () => void;
 }) {
   const [step, setStep] = useState<EditorStep>("identity");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const update = <K extends keyof AdminProductInput>(key: K, value: AdminProductInput[K]) =>
     onChange({ ...product, [key]: value });
   const selectedType = config.productTypes.find((item) => item.slug === product.productType);
@@ -391,6 +414,21 @@ function ProductEditor({
     update("attributes", next);
   }
 
+  function removeMedia(index: number) {
+    const remaining = product.media
+      .filter((_, itemIndex) => itemIndex !== index)
+      .map((item, position) => ({ ...item, position }));
+    const selectedCoverIndex = remaining.findIndex((item) => item.isCover);
+    const coverIndex = selectedCoverIndex >= 0 ? selectedCoverIndex : 0;
+    update(
+      "media",
+      remaining.map((item, position) => ({
+        ...item,
+        isCover: position === coverIndex,
+      })),
+    );
+  }
+
   const completion = [
     Boolean(product.name && product.slug && product.category && product.productType),
     product.classifications.length > 0,
@@ -405,14 +443,14 @@ function ProductEditor({
       <header className="border-b border-border px-5 pb-0 pt-5 sm:px-7 sm:pt-7">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold tracking-[0.12em] text-primary">
-              {selectedType?.name ?? "SẢN PHẨM MỚI"}
+            <p className="text-xs font-medium text-text-secondary">
+              {selectedType?.name ?? "Sản phẩm mới"}
             </p>
             <h2 className="mt-1 text-balance font-heading text-3xl text-primary-dark">
               {product.name || "Chưa đặt tên"}
             </h2>
           </div>
-          <button className="grid h-10 w-10 place-items-center rounded-button border border-border" onClick={onClose}>
+          <button className="grid h-10 w-10 place-items-center rounded-button border border-border text-text-secondary transition hover:bg-background-section hover:text-primary-dark" onClick={onClose} aria-label="Đóng trình chỉnh sửa">
             <X size={17} />
           </button>
         </div>
@@ -584,6 +622,27 @@ function ProductEditor({
                             <option value={option.value} key={option.value}>{option.label}</option>
                           ))}
                         </select>
+                      ) : definition.dataType === "multi_select" ? (
+                        <div className="grid gap-2 rounded-[14px] bg-background-main p-3 sm:grid-cols-2">
+                          {definition.options.map((option) => {
+                            const selectedValues = value.split(",").map((item) => item.trim()).filter(Boolean);
+                            return (
+                              <label className="flex cursor-pointer items-center gap-2 rounded-[10px] bg-background-card px-3 py-2 text-sm" key={option.value}>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedValues.includes(option.value)}
+                                  onChange={() => setAttribute(
+                                    definition.id,
+                                    selectedValues.includes(option.value)
+                                      ? selectedValues.filter((item) => item !== option.value).join(",")
+                                      : [...selectedValues, option.value].join(","),
+                                  )}
+                                />
+                                {option.label}
+                              </label>
+                            );
+                          })}
+                        </div>
                       ) : definition.dataType === "boolean" ? (
                         <select value={value} onChange={(event) => setAttribute(definition.id, event.target.value)}>
                           <option value="">Chọn giá trị</option>
@@ -641,7 +700,8 @@ function ProductEditor({
                       </label>
                       <button
                         className="text-red-700"
-                        onClick={() => update("media", product.media.filter((_, itemIndex) => itemIndex !== index).map((item, position) => ({ ...item, position, isCover: position === 0 ? true : item.isCover })))}
+                        onClick={() => removeMedia(index)}
+                        aria-label={`Xóa ảnh ${index + 1}`}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -700,12 +760,20 @@ function ProductEditor({
 
       <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background-card/95 px-5 py-4 backdrop-blur sm:px-7">
         {onDelete ? (
-          <button className="inline-flex min-h-11 items-center gap-2 rounded-button px-3 text-sm text-red-700 hover:bg-red-50" onClick={onDelete}>
-            <Trash2 size={16} /> Xóa
-          </button>
+          confirmDelete ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-red-700">Xóa sản phẩm và ảnh liên quan?</span>
+              <button className="min-h-9 rounded-button bg-red-700 px-3 text-sm font-medium text-white" onClick={onDelete}>Xác nhận xóa</button>
+              <button className="min-h-9 rounded-button px-3 text-sm text-text-secondary" onClick={() => setConfirmDelete(false)}>Hủy</button>
+            </div>
+          ) : (
+            <button className="inline-flex min-h-11 items-center gap-2 rounded-button px-3 text-sm text-red-700 transition hover:bg-red-50" onClick={() => setConfirmDelete(true)}>
+              <Trash2 size={16} /> Xóa
+            </button>
+          )
         ) : <span />}
         <button
-          className="inline-flex min-h-11 items-center gap-2 rounded-button bg-primary-dark px-5 font-medium text-background-card disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-button bg-primary-dark px-5 font-medium text-background-card transition hover:bg-primary active:translate-y-px disabled:opacity-50"
           disabled={busy}
           onClick={onSave}
         >

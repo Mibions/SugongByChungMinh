@@ -50,6 +50,33 @@ a {
   outline-offset: 3px;
 }
 
+.admin-shell button:not(:disabled),
+.admin-shell label:has(input[type="file"]) {
+  cursor: pointer;
+}
+
+.admin-shell input,
+.admin-shell textarea,
+.admin-shell select {
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.admin-shell input:not([type="checkbox"], [type="radio"], [type="color"]):focus,
+.admin-shell textarea:focus,
+.admin-shell select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgb(217 200 236 / 35%);
+  outline: none;
+}
+
+.admin-shell input[type="checkbox"],
+.admin-shell input[type="radio"] {
+  accent-color: var(--color-primary-dark);
+}
+
 .text-balance {
   text-wrap: balance;
 }

@@ -20,6 +20,7 @@ async function readFileBase64(file: File) {
 
 export function ImportManager({ api, reloadProducts, setMessage }: Props) {
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [fileName, setFileName] = useState("");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
   const [mode, setMode] = useState<"create" | "upsert">("upsert");
@@ -47,18 +48,22 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
     try {
       let successRows = 0;
       let failedRows = 0;
-      for (const [index, row] of preview.rows.entries()) {
+      const chunkSize = 3;
+      setProgress({ done: 0, total: preview.rows.length });
+      for (let index = 0; index < preview.rows.length; index += chunkSize) {
+        const rows = preview.rows.slice(index, index + chunkSize);
         const result = await api<{ successRows: number; failedRows: number }>("import-commit", {
           method: "POST",
           body: JSON.stringify({
             fileName,
-            rows: [row],
+            rows,
             mode,
-            triggerRebuild: index === preview.rows.length - 1,
+            triggerRebuild: index + chunkSize >= preview.rows.length,
           }),
         });
         successRows += result.successRows;
         failedRows += result.failedRows;
+        setProgress({ done: Math.min(index + rows.length, preview.rows.length), total: preview.rows.length });
       }
       setMessage(`Import hoàn tất: ${successRows} thành công, ${failedRows} lỗi.`);
       setPreview(null);
@@ -67,25 +72,26 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(false);
+      setProgress({ done: 0, total: 0 });
     }
   }
 
   return (
     <div className="mx-auto max-w-5xl">
       <div>
-        <p className="text-xs font-semibold tracking-[0.12em] text-primary">BULK DATA</p>
-        <h1 className="mt-1 font-heading text-3xl text-primary-dark">Import sản phẩm</h1>
+        <p className="text-xs font-medium text-text-secondary">Nhập dữ liệu hàng loạt</p>
+        <h1 className="mt-1 font-heading text-3xl tracking-[-0.025em] text-primary-dark">Import sản phẩm</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
           Import được tách khỏi form sản phẩm để có thể kiểm tra dữ liệu, xử lý lỗi và xác nhận trước khi ghi database.
         </p>
       </div>
 
       <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <section className="rounded-[24px] bg-background-card p-6 shadow-soft ring-1 ring-border">
-          <label className="grid min-h-64 cursor-pointer place-items-center rounded-[20px] border border-dashed border-primary-soft bg-background-section/40 p-8 text-center transition hover:bg-background-section">
+        <section className="rounded-[24px] bg-background-card p-5 shadow-soft ring-1 ring-border sm:p-6">
+          <label className="grid min-h-56 cursor-pointer place-items-center rounded-[18px] border border-dashed border-primary-soft bg-background-section/35 p-8 text-center transition hover:border-primary hover:bg-background-section/70">
             <span>
               {busy ? <LoaderCircle className="mx-auto animate-spin text-primary" size={38} /> : <CloudUpload className="mx-auto text-primary" size={38} />}
-              <span className="mt-4 block font-heading text-2xl text-primary-dark">Chọn file CSV hoặc XLSX</span>
+              <span className="mt-4 block font-heading text-2xl tracking-[-0.02em] text-primary-dark">Chọn file CSV hoặc XLSX</span>
               <span className="mt-2 block text-sm text-text-secondary">Tối đa 3 MB và 100 sản phẩm mỗi lần.</span>
             </span>
             <input className="sr-only" type="file" accept=".csv,.xlsx" onChange={(event) => event.target.files?.[0] && previewFile(event.target.files[0])} />
@@ -130,17 +136,20 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
                 disabled={preview.errors.length > 0 || busy}
                 onClick={commit}
               >
-                {busy && <LoaderCircle className="animate-spin" size={17} />} Xác nhận import
+                {busy && <LoaderCircle className="animate-spin" size={17} />}
+                {busy && progress.total > 0
+                  ? `Đang nhập ${progress.done}/${progress.total}`
+                  : "Xác nhận import"}
               </button>
             </div>
           )}
         </section>
 
-        <aside className="self-start rounded-[20px] bg-background-card p-5 ring-1 ring-border">
+        <aside className="self-start rounded-[20px] bg-background-section/55 p-5 ring-1 ring-primary-soft/60">
           <FileSpreadsheet className="text-primary-dark" size={24} />
-          <h2 className="mt-4 font-heading text-xl text-primary-dark">File mẫu</h2>
+          <h2 className="mt-4 font-heading text-xl text-primary-dark">Chuẩn bị file</h2>
           <p className="mt-2 text-sm leading-6 text-text-secondary">
-            Dùng đúng tên cột và slug đã cấu hình trong catalogue.
+            Dùng đúng tên cột và slug đã cấu hình. Hệ thống xử lý theo từng nhóm nhỏ để tránh timeout.
           </p>
           <a className="mt-4 inline-flex text-sm font-medium text-primary-dark underline underline-offset-4" href="/admin/product-import-template.csv" download>
             Tải CSV mẫu

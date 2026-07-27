@@ -14,9 +14,9 @@ export function getDatabase() {
   }
 
   sqlClient = postgres(databaseUrl, {
-    // Supabase port 6543 is a transaction pooler. A single connection per
-    // serverless instance avoids bursts that can stall concurrent functions.
-    max: 1,
+    // Two connections let independent catalogue reads overlap without creating
+    // an excessive serverless connection burst against Supavisor.
+    max: 2,
     idle_timeout: 10,
     connect_timeout: 15,
     max_lifetime: 60 * 15,

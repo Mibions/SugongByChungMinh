@@ -2,9 +2,11 @@ import { useMemo, useState } from "react";
 import {
   Archive,
   Boxes,
+  ChevronRight,
   FolderTree,
   Layers3,
   ListFilter,
+  LoaderCircle,
   Plus,
   Save,
   Shapes,
@@ -72,6 +74,7 @@ function initialDraft(resource: Resource, groupId?: string): Draft {
 export function CatalogManager({ api, config, reloadConfig, setMessage }: Props) {
   const [section, setSection] = useState<Section>("product-types");
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [saving, setSaving] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState(config.classificationGroups[0]?.id ?? "");
   const selectedGroup = config.classificationGroups.find((group) => group.id === selectedGroupId)
     ?? config.classificationGroups[0];
@@ -143,6 +146,7 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
       delete payload.isActive;
     }
 
+    setSaving(true);
     try {
       await api(`${resource}${id ? `/${id}` : ""}`, {
         method: id ? "PUT" : "POST",
@@ -153,11 +157,14 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
       await reloadConfig();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
     }
   }
 
   async function archive() {
     if (!draft?.id) return;
+    setSaving(true);
     try {
       await api(`${draft._resource}/${draft.id}`, { method: "DELETE" });
       setMessage(`Đã ngừng sử dụng ${draft.name}. Dữ liệu cũ vẫn được giữ.`);
@@ -165,6 +172,8 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
       await reloadConfig();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -172,25 +181,28 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-primary">CATALOGUE STRUCTURE</p>
-          <h1 className="mt-1 font-heading text-3xl text-primary-dark">Cấu trúc catalogue</h1>
+          <p className="text-xs font-medium text-text-secondary">Dữ liệu dùng chung</p>
+          <h1 className="mt-1 font-heading text-3xl tracking-[-0.025em] text-primary-dark">Cấu trúc catalogue</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
             Quản lý dữ liệu dùng chung trước, sau đó form sản phẩm sẽ tự hiển thị đúng lựa chọn.
           </p>
         </div>
         <button
-          className="inline-flex min-h-11 items-center gap-2 rounded-button bg-primary-dark px-4 text-sm font-medium text-background-card"
+          className="inline-flex min-h-11 items-center gap-2 rounded-button bg-primary-dark px-4 text-sm font-medium text-background-card transition hover:bg-primary active:translate-y-px"
           onClick={() => setDraft(initialDraft(section))}
+          disabled={saving}
         >
           <Plus size={16} /> Thêm mới
         </button>
       </div>
 
-      <nav className="scrollbar-none mt-6 flex gap-2 overflow-x-auto border-b border-border pb-3" aria-label="Cấu trúc catalogue">
+      <nav className="scrollbar-none mt-6 flex gap-1 overflow-x-auto rounded-[15px] bg-background-section/65 p-1.5" aria-label="Cấu trúc catalogue">
         {sections.map(([value, label, Icon]) => (
           <button
             className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-button px-3 text-sm transition ${
-              section === value ? "bg-primary-dark text-background-card" : "bg-background-card text-primary-dark hover:bg-background-section"
+              section === value
+                ? "bg-background-card font-medium text-primary-dark shadow-sm ring-1 ring-border"
+                : "text-text-secondary hover:bg-background-card/70 hover:text-primary-dark"
             }`}
             onClick={() => {
               setSection(value);
@@ -203,7 +215,7 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
         ))}
       </nav>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_28rem]">
+      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_27rem]">
         <section className="min-w-0">
           {section === "classification-groups" ? (
             <div className="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
@@ -259,28 +271,38 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
               </div>
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+            <div className="overflow-hidden rounded-[20px] bg-background-card shadow-soft ring-1 ring-border">
+              <div className="grid grid-cols-[minmax(0,1fr)_7rem_2rem] gap-3 border-b border-border bg-background-section/55 px-4 py-3 text-xs font-medium text-text-secondary">
+                <span>Tên và slug</span>
+                <span>Trạng thái</span>
+                <span />
+              </div>
               {sectionItems.map((item) => (
                 <button
-                  className="group min-h-36 rounded-[18px] bg-background-card p-4 text-left shadow-soft ring-1 ring-border transition hover:-translate-y-0.5 hover:ring-primary-soft"
+                  className="group grid w-full grid-cols-[minmax(0,1fr)_7rem_2rem] items-center gap-3 border-b border-border px-4 py-3.5 text-left transition last:border-b-0 hover:bg-background-main"
                   onClick={() => edit(section, item as unknown as Record<string, unknown>)}
                   key={item.id}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="grid h-9 w-9 place-items-center rounded-[12px] bg-background-section text-primary-dark">
-                      <Boxes size={17} />
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-background-section text-primary-dark">
+                      <Boxes size={16} />
                     </span>
-                    {"isActive" in item && !item.isActive && <span className="text-xs text-text-secondary">Đã tắt</span>}
-                  </div>
-                  <span className="mt-4 block font-medium text-primary-dark">{item.name}</span>
-                  <span className="mt-1 block text-xs text-text-secondary">
-                    {item.slug}
-                    {section === "product-templates" ? ` · ưu tiên ${(item as CatalogConfig["productTemplates"][number]).priority}` : ""}
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-primary-dark">{item.name}</span>
+                      <span className="mt-0.5 block truncate text-xs text-text-secondary">
+                        {item.slug}
+                        {section === "product-templates" ? ` · ưu tiên ${(item as CatalogConfig["productTemplates"][number]).priority}` : ""}
+                      </span>
+                    </span>
                   </span>
+                  <span className={`text-xs ${("isActive" in item && !item.isActive) || ("status" in item && item.status !== "published") ? "text-text-secondary" : "text-success"}`}>
+                    {("isActive" in item && !item.isActive) || ("status" in item && item.status !== "published") ? "Ngừng dùng" : "Đang dùng"}
+                  </span>
+                  <ChevronRight className="text-text-secondary transition group-hover:translate-x-0.5 group-hover:text-primary-dark" size={16} />
                 </button>
               ))}
               {sectionItems.length === 0 && (
-                <div className="sm:col-span-2 2xl:col-span-3 rounded-[20px] border border-dashed border-primary-soft p-10 text-center text-sm text-text-secondary">
+                <div className="p-10 text-center text-sm text-text-secondary">
                   Chưa có dữ liệu. Chọn “Thêm mới” để bắt đầu.
                 </div>
               )}
@@ -297,6 +319,7 @@ export function CatalogManager({ api, config, reloadConfig, setMessage }: Props)
               onSave={save}
               onArchive={draft.id ? archive : undefined}
               onClose={() => setDraft(null)}
+              saving={saving}
             />
           ) : (
             <div className="rounded-[20px] border border-dashed border-primary-soft bg-background-card/50 p-7">
@@ -319,6 +342,7 @@ function EditorPanel({
   onSave,
   onArchive,
   onClose,
+  saving,
 }: {
   draft: Draft;
   config: CatalogConfig;
@@ -326,7 +350,9 @@ function EditorPanel({
   onSave: () => void;
   onArchive?: () => void;
   onClose: () => void;
+  saving: boolean;
 }) {
+  const [confirmArchive, setConfirmArchive] = useState(false);
   const update = (key: string, value: unknown) => setDraft({ ...draft, [key]: value });
   const title = sections.find(([value]) => value === draft._resource)?.[1]
     ?? (draft._resource === "classification-values" ? "Giá trị phân loại" : "Dữ liệu");
@@ -338,7 +364,7 @@ function EditorPanel({
           <p className="text-xs font-semibold tracking-[0.1em] text-primary">{title}</p>
           <h2 className="mt-1 font-heading text-2xl text-primary-dark">{draft.name || "Thêm mới"}</h2>
         </div>
-        <button className="text-sm text-text-secondary" onClick={onClose}>Đóng</button>
+        <button className="rounded-button px-2 py-1 text-sm text-text-secondary transition hover:bg-background-section hover:text-primary-dark" onClick={onClose}>Đóng</button>
       </div>
 
       <div className="mt-5 space-y-4">
@@ -482,12 +508,19 @@ function EditorPanel({
 
       <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-4">
         {onArchive ? (
-          <button className="inline-flex items-center gap-2 px-2 py-2 text-sm text-red-700" onClick={onArchive}>
-            <Archive size={15} /> Ngừng dùng
-          </button>
+          confirmArchive ? (
+            <span className="flex items-center gap-1.5">
+              <button className="min-h-9 rounded-button bg-red-700 px-3 text-xs font-medium text-white" onClick={onArchive} disabled={saving}>Xác nhận</button>
+              <button className="min-h-9 rounded-button px-2 text-xs text-text-secondary" onClick={() => setConfirmArchive(false)}>Hủy</button>
+            </span>
+          ) : (
+            <button className="inline-flex items-center gap-2 px-2 py-2 text-sm text-red-700" onClick={() => setConfirmArchive(true)}>
+              <Archive size={15} /> Ngừng dùng
+            </button>
+          )
         ) : <span />}
-        <button className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-4 text-sm font-medium text-background-card" onClick={onSave}>
-          <Save size={15} /> Lưu
+        <button className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-4 text-sm font-medium text-background-card transition hover:bg-primary disabled:opacity-50" onClick={onSave} disabled={saving}>
+          {saving ? <LoaderCircle className="animate-spin" size={15} /> : <Save size={15} />} Lưu
         </button>
       </div>
     </div>

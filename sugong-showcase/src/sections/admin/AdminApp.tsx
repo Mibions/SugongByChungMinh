@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Boxes,
+  CheckCircle2,
+  Database,
   ExternalLink,
   FileSpreadsheet,
   LoaderCircle,
@@ -220,33 +222,65 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   }
 
   if (checkingSession) {
-    return <main className="grid min-h-screen place-items-center"><LoaderCircle className="animate-spin text-primary-dark" /></main>;
+    return (
+      <main className="min-h-dvh bg-background-main p-4 sm:p-6">
+        <div className="mx-auto max-w-[1600px]">
+          <div className="h-16 animate-pulse rounded-[18px] bg-background-card ring-1 ring-border" />
+          <div className="mt-5 grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
+            <div className="h-[38rem] animate-pulse rounded-[20px] bg-background-card ring-1 ring-border" />
+            <div className="h-[38rem] animate-pulse rounded-[24px] bg-background-card/70 ring-1 ring-border" />
+          </div>
+          <p className="mt-5 text-center text-sm text-text-secondary">Đang kết nối catalogue…</p>
+        </div>
+      </main>
+    );
   }
 
   if (!authenticated) {
     return (
-      <main className="grid min-h-screen place-items-center p-6">
-        <form className="w-full max-w-md rounded-[24px] bg-background-card p-7 shadow-feather ring-1 ring-border" onSubmit={login}>
-          <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-background-section text-primary-dark">
-            <ShieldCheck size={23} aria-hidden="true" />
-          </span>
-          <h1 className="mt-5 font-heading text-3xl text-primary-dark">Quản trị SUGONG</h1>
-          <p className="mt-2 text-sm leading-6 text-text-secondary">Token chỉ dùng để tạo phiên đăng nhập và không được lưu trong trình duyệt.</p>
-          <label className="mt-6 block text-sm font-medium text-primary-dark" htmlFor="admin-token">Master token</label>
-          <input
-            id="admin-token"
-            className="mt-2 min-h-12 w-full rounded-button border border-border bg-background-main px-4 outline-none focus:border-primary"
-            type="password"
-            value={token}
-            onChange={(event) => setToken(event.target.value)}
-            autoComplete="current-password"
-            required
-          />
-          {message && <p className="mt-3 text-sm text-red-700">{message}</p>}
-          <button className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-button bg-primary-dark px-5 font-medium text-background-card disabled:opacity-60" disabled={busy}>
-            {busy && <LoaderCircle className="animate-spin" size={17} />} Đăng nhập an toàn
-          </button>
-        </form>
+      <main className="grid min-h-dvh bg-background-main lg:grid-cols-[minmax(22rem,0.85fr)_minmax(30rem,1.15fr)]">
+        <section className="relative hidden overflow-hidden bg-primary-dark p-12 text-background-card lg:flex lg:flex-col lg:justify-between">
+          <div className="absolute -right-28 -top-24 h-80 w-80 rounded-full bg-primary/40 blur-3xl" />
+          <div className="relative">
+            <p className="text-sm font-semibold tracking-[0.16em] text-primary-soft">SUGONG</p>
+            <h1 className="mt-5 max-w-lg text-balance font-heading text-5xl leading-[1.08] tracking-[-0.035em]">
+              Quản lý catalogue rõ ràng, theo từng lớp dữ liệu.
+            </h1>
+            <p className="mt-5 max-w-md text-pretty leading-7 text-background-section/80">
+              Sản phẩm, phân loại, thuộc tính và hình ảnh được tách riêng để bạn cập nhật mà không làm rối cấu trúc website.
+            </p>
+          </div>
+          <div className="relative grid gap-3 text-sm text-background-section/80">
+            <p className="flex items-center gap-3"><CheckCircle2 size={17} /> Phiên đăng nhập được bảo vệ bằng cookie HttpOnly</p>
+            <p className="flex items-center gap-3"><Database size={17} /> Dữ liệu được đọc trực tiếp từ catalogue production</p>
+          </div>
+        </section>
+        <section className="grid place-items-center p-5 sm:p-10">
+          <form className="w-full max-w-md" onSubmit={login}>
+            <span className="grid h-12 w-12 place-items-center rounded-[15px] bg-background-section text-primary-dark ring-1 ring-primary-soft/60">
+              <ShieldCheck size={22} aria-hidden="true" />
+            </span>
+            <p className="mt-7 text-sm font-semibold tracking-[0.12em] text-primary">ADMIN WORKSPACE</p>
+            <h2 className="mt-2 text-balance font-heading text-4xl tracking-[-0.03em] text-primary-dark">Đăng nhập quản trị</h2>
+            <p className="mt-3 text-pretty text-sm leading-6 text-text-secondary">
+              Nhập master token để tạo phiên làm việc. Token không được lưu trong trình duyệt.
+            </p>
+            <label className="mt-8 block text-sm font-medium text-primary-dark" htmlFor="admin-token">Master token</label>
+            <input
+              id="admin-token"
+              className="mt-2 min-h-12 w-full rounded-button border border-border bg-background-card px-4 shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-soft/30"
+              type="password"
+              value={token}
+              onChange={(event) => setToken(event.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            {message && <p className="mt-3 rounded-[12px] bg-red-50 px-3 py-2.5 text-sm text-red-700">{message}</p>}
+            <button className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-button bg-primary-dark px-5 font-medium text-background-card transition hover:bg-primary active:translate-y-px disabled:opacity-60" disabled={busy}>
+              {busy && <LoaderCircle className="animate-spin" size={17} />} Vào workspace
+            </button>
+          </form>
+        </section>
       </main>
     );
   }
@@ -258,19 +292,27 @@ export function AdminApp({ configuredAdminUrl }: Props) {
   ] as const;
 
   return (
-    <main className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-border bg-background-main/95 backdrop-blur">
-        <div className="mx-auto flex min-h-16 max-w-[1500px] items-center justify-between gap-4 px-5">
+    <main className="min-h-dvh bg-[radial-gradient(circle_at_top_left,rgba(217,200,236,0.2),transparent_32rem)]">
+      {busy && <div className="fixed inset-x-0 top-0 z-50 h-0.5 animate-pulse bg-primary" />}
+      <header className="sticky top-0 z-30 border-b border-border/80 bg-background-main/90 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[4.5rem] max-w-[1600px] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-6">
-            <div>
-              <p className="font-heading text-xl text-primary-dark">SUGONG Admin</p>
-              <p className="text-xs text-text-secondary">Catalogue workspace</p>
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-[13px] bg-primary-dark text-background-card">
+                <Boxes size={18} />
+              </span>
+              <div>
+                <p className="font-heading text-lg leading-none text-primary-dark">SUGONG</p>
+                <p className="mt-1 text-[11px] text-text-secondary">Catalogue admin</p>
+              </div>
             </div>
             <nav className="hidden items-center gap-1 md:flex" aria-label="Quản trị">
               {navigation.map(([value, label, Icon]) => (
                 <button
                   className={`inline-flex min-h-10 items-center gap-2 rounded-button px-3 text-sm transition ${
-                    view === value ? "bg-background-section font-medium text-primary-dark" : "text-text-secondary hover:text-primary-dark"
+                    view === value
+                      ? "bg-background-card font-medium text-primary-dark shadow-sm ring-1 ring-border"
+                      : "text-text-secondary hover:bg-background-section/70 hover:text-primary-dark"
                   }`}
                   onClick={() => openView(value)}
                   key={value}
@@ -282,8 +324,10 @@ export function AdminApp({ configuredAdminUrl }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <button
-              className="inline-flex min-h-10 items-center gap-2 rounded-button border border-border bg-background-card px-4 text-sm disabled:opacity-50"
+              className="grid h-10 w-10 place-items-center rounded-button border border-border bg-background-card text-primary-dark transition hover:bg-background-section active:translate-y-px disabled:opacity-50"
               disabled={busy}
+              aria-label="Tải lại dữ liệu"
+              title="Tải lại dữ liệu"
               onClick={async () => {
                 setBusy(true);
                 setMessage("");
@@ -296,13 +340,12 @@ export function AdminApp({ configuredAdminUrl }: Props) {
                 }
               }}
             >
-              <RefreshCw className={busy ? "animate-spin" : ""} size={15} />
-              <span className="hidden lg:inline">Tải lại dữ liệu</span>
+              <RefreshCw className={busy ? "animate-spin" : ""} size={16} />
             </button>
-            <button className="inline-flex min-h-10 items-center gap-2 rounded-button border border-border bg-background-card px-4 text-sm disabled:opacity-50" disabled={busy} onClick={rebuild}>
-              <RefreshCw className={busy ? "animate-spin" : ""} size={15} /> <span className="hidden sm:inline">Cập nhật website</span>
+            <button className="inline-flex min-h-10 items-center gap-2 rounded-button bg-primary-dark px-4 text-sm font-medium text-background-card transition hover:bg-primary active:translate-y-px disabled:opacity-50" disabled={busy} onClick={rebuild}>
+              <RefreshCw className={busy ? "animate-spin" : ""} size={15} /> <span className="hidden sm:inline">Đồng bộ website</span>
             </button>
-            <button className="grid h-10 w-10 place-items-center rounded-button border border-border bg-background-card" onClick={logout} aria-label="Đăng xuất">
+            <button className="grid h-10 w-10 place-items-center rounded-button border border-border bg-background-card text-text-secondary transition hover:bg-red-50 hover:text-red-700" onClick={logout} aria-label="Đăng xuất" title="Đăng xuất">
               <LogOut size={17} />
             </button>
           </div>
@@ -322,10 +365,12 @@ export function AdminApp({ configuredAdminUrl }: Props) {
         </nav>
       </header>
 
-      <div className="mx-auto max-w-[1500px] px-5 py-6">
+      <div className="mx-auto max-w-[1600px] px-4 py-5 sm:px-6 sm:py-7">
         {message && (
-          <button className="mb-5 w-full rounded-[14px] border border-primary-soft bg-background-card px-4 py-3 text-left text-sm text-primary-dark" onClick={() => setMessage("")}>
-            {message}
+          <button className="mb-5 flex w-full items-center gap-3 rounded-[14px] border border-primary-soft bg-background-card px-4 py-3 text-left text-sm text-primary-dark shadow-sm" onClick={() => setMessage("")}>
+            <CheckCircle2 className="shrink-0 text-success" size={17} />
+            <span className="flex-1">{message}</span>
+            <span className="text-xs text-text-secondary">Đóng</span>
           </button>
         )}
         {view === "products" && (

@@ -1,5 +1,6 @@
 {
   "framework": "astro",
+  "regions": ["hnd1"],
   "buildCommand": "pnpm db:migrate:deploy && pnpm build",
   "outputDirectory": "dist",
   "functions": {
