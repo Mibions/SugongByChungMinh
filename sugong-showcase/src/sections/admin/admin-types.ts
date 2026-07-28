@@ -83,7 +83,6 @@ export type CatalogConfig = {
   attributeDefinitions: AttributeDefinitionRecord[];
   productTemplates: ProductTemplateRecord[];
   collections: CollectionRecord[];
-  tags: Array<{ id: string; slug: string; name: string }>;
 };
 
 export type ImportPreview = {

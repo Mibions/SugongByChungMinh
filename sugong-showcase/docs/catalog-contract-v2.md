@@ -2,14 +2,16 @@
 
 ## Canonical database model
 
-The database is the source of truth. It stores normalized product, media,
-category, collection, tone, tag, and attribute records.
+The database is the source of truth. Each catalogue item is stored in one
+`products` row. Media, tones, tags, classifications and attributes are typed
+JSON arrays on that row. Categories, product types, classification definitions,
+templates and collections remain shared configuration records.
 
 The following legacy fields are never persisted:
 
 - `formattedPrice`: derived from `priceAmount`
-- `coverImage`: derived from the media row marked `isCover`
-- `gallery` and `images`: both derived from ordered `product_media`
+- `coverImage`: derived from the item in `products.media` marked `isCover`
+- `gallery` and `images`: both derived from the ordered `products.media` array
 - `featured`: derived from `isFeatured`
 - `published`: derived from `status === "published"`
 
@@ -38,8 +40,7 @@ type CatalogProductDto = {
   isCustomizable: boolean;
   displayOrder: number;
   media: Array<{
-    id: string;
-    type: "image" | "video";
+    id?: string;
     url: string;
     publicId?: string;
     alt: string;

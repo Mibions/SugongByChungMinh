@@ -33,7 +33,6 @@ const emptyConfig: CatalogConfig = {
   attributeDefinitions: [],
   productTemplates: [],
   collections: [],
-  tags: [],
 };
 
 function getCookie(name: string) {

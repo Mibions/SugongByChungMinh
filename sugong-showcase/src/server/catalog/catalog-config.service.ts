@@ -143,7 +143,6 @@ export class CatalogConfigService {
       attributeDefinitions: definitionRows,
       productTemplates: templateRows,
       collections: collectionRows,
-      tags: [],
     };
   }
 
