@@ -197,9 +197,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (resource === "cloudinary-signature" && req.method === "POST") {
       const { createSignedUpload } = await import("../../src/server/integrations/cloudinary.js");
-      const body = bodyAsObject(req) as { productId?: string };
-      const signature = createSignedUpload(body.productId);
-      await writeAuditLog(req, auth.session.id, "sign_upload", "cloudinary", body.productId);
+      const body = bodyAsObject(req) as { productSlug?: string; ordinal?: number };
+      if (!body.productSlug || body.ordinal === undefined) {
+        return json(res, 400, { message: "Thiếu slug hoặc thứ tự ảnh." });
+      }
+      const signature = createSignedUpload(body.productSlug, body.ordinal);
+      await writeAuditLog(req, auth.session.id, "sign_upload", "cloudinary", undefined, {
+        productSlug: body.productSlug,
+        ordinal: body.ordinal,
+        publicId: signature.publicId,
+      });
       return json(res, 200, signature);
     }
 

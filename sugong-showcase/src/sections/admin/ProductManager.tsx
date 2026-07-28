@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Boxes,
   Check,
@@ -43,6 +43,21 @@ const editorSteps = [
   ["publish", "Hiển thị"],
 ] as const;
 type EditorStep = (typeof editorSteps)[number][0];
+
+function getNextImageOrdinal(slug: string, publicIds: Array<string | undefined>) {
+  const uniqueIds = [...new Set(publicIds.filter((item): item is string => Boolean(item)))];
+  let nextOrdinal = uniqueIds.length;
+  for (const publicId of uniqueIds) {
+    const fileName = publicId?.split("/").at(-1);
+    if (fileName === slug) {
+      nextOrdinal = Math.max(nextOrdinal, 1);
+      continue;
+    }
+    const match = fileName?.match(new RegExp(`^${slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}_(\\d+)$`));
+    if (match) nextOrdinal = Math.max(nextOrdinal, Number(match[1]) + 1);
+  }
+  return nextOrdinal;
+}
 
 function emptyProduct(config: CatalogConfig, template?: ProductTemplateRecord): AdminProductInput {
   const category = config.categories.find((item) => item.id === template?.categoryId && item.isActive)
@@ -94,6 +109,7 @@ export function ProductManager({
   const [editing, setEditing] = useState<ProductDraft | null>(null);
   const [search, setSearch] = useState("");
   const [showTemplates, setShowTemplates] = useState(false);
+  const persistedMediaRef = useRef(new Map<string, string[]>());
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("vi");
@@ -114,6 +130,10 @@ export function ProductManager({
       );
       setEditing(response.item);
       cacheProduct(response.item);
+      persistedMediaRef.current.set(
+        response.item.id,
+        response.item.media.map((item) => item.publicId ?? item.secureUrl),
+      );
       setMessage(product.status === "published" ? "Đã lưu và yêu cầu cập nhật website." : "Đã lưu bản nháp.");
       await reloadProducts();
     } catch (error) {
@@ -132,6 +152,10 @@ export function ProductManager({
         loadProduct(product.id),
       ]);
       setEditing(record);
+      persistedMediaRef.current.set(
+        record.id,
+        record.media.map((item) => item.publicId ?? item.secureUrl),
+      );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -156,10 +180,14 @@ export function ProductManager({
 
   async function uploadImages(files: FileList | null) {
     if (!editing || !files?.length) return;
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(editing.slug)) {
+      setMessage("Hãy nhập slug hợp lệ trước khi upload ảnh.");
+      return;
+    }
     setBusy(true);
     setMessage("");
+    const uploaded: AdminProductInput["media"] = [];
     try {
-      const uploaded = [];
       for (const file of Array.from(files)) {
         if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) {
           throw new Error(`${file.name}: chỉ nhận ảnh tối đa 10 MB`);
@@ -170,12 +198,23 @@ export function ProductManager({
           signature: string;
           timestamp: number;
           folder: string;
+          publicId: string;
           overwrite: boolean;
           unique_filename: boolean;
           use_filename: boolean;
         }>("cloudinary-signature", {
           method: "POST",
-          body: JSON.stringify({ productId: "id" in editing ? editing.id : undefined }),
+          body: JSON.stringify({
+            productSlug: editing.slug,
+            ordinal: getNextImageOrdinal(
+              editing.slug,
+              [
+                ...(editing.id ? persistedMediaRef.current.get(editing.id) ?? [] : []),
+                ...editing.media.map((item) => item.publicId ?? item.secureUrl),
+                ...uploaded.map((item) => item.publicId),
+              ],
+            ),
+          }),
         });
         const form = new FormData();
         form.set("file", file);
@@ -183,6 +222,7 @@ export function ProductManager({
         form.set("signature", signed.signature);
         form.set("timestamp", String(signed.timestamp));
         form.set("folder", signed.folder);
+        form.set("public_id", signed.publicId);
         form.set("overwrite", String(signed.overwrite));
         form.set("unique_filename", String(signed.unique_filename));
         form.set("use_filename", String(signed.use_filename));
@@ -205,6 +245,9 @@ export function ProductManager({
       }
       setEditing({ ...editing, media: [...editing.media, ...uploaded] });
     } catch (error) {
+      if (uploaded.length > 0) {
+        setEditing({ ...editing, media: [...editing.media, ...uploaded] });
+      }
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(false);
@@ -685,7 +728,10 @@ function ProductEditor({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 className="font-heading text-2xl text-primary-dark">Gallery sản phẩm</h3>
-                <p className="mt-1 text-sm text-text-secondary">Upload trực tiếp có chữ ký lên Cloudinary.</p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  Cloudinary đặt tên theo slug: {product.slug || "slug-san-pham"}, {product.slug || "slug-san-pham"}_1, …
+                  Nhấn “Lưu sản phẩm” để ghi các URL vào database.
+                </p>
               </div>
               <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-button border border-primary-soft px-4 text-sm font-medium text-primary-dark">
                 <ImagePlus size={16} /> Upload ảnh

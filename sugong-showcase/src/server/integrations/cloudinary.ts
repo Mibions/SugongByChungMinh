@@ -11,21 +11,35 @@ function configureCloudinary() {
   return { cloudName, apiKey, apiSecret };
 }
 
-export function createSignedUpload(productId?: string) {
+const productSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function getProductImageName(productSlug: string, ordinal: number) {
+  const slug = productSlug.trim();
+  if (!productSlugPattern.test(slug) || slug.length > 160) {
+    throw new Error("Slug sản phẩm không hợp lệ.");
+  }
+  if (!Number.isSafeInteger(ordinal) || ordinal < 0 || ordinal > 99) {
+    throw new Error("Thứ tự ảnh không hợp lệ.");
+  }
+  return ordinal === 0 ? slug : `${slug}_${ordinal}`;
+}
+
+export function createSignedUpload(productSlug: string, ordinal: number) {
   const { cloudName, apiKey, apiSecret } = configureCloudinary();
   const timestamp = Math.floor(Date.now() / 1000);
   const rootFolder = process.env.PUBLIC_CLOUDINARY_ASSET_FOLDER ?? "sugong-showcase";
-  const safeProductId = productId && /^[0-9a-f-]{36}$/i.test(productId) ? productId : "drafts";
-  const folder = `${rootFolder}/products/${safeProductId}`;
+  const publicId = getProductImageName(productSlug, ordinal);
+  const folder = `${rootFolder}/products/${productSlug}`;
   const uploadParams = {
     timestamp,
     folder,
+    public_id: publicId,
     overwrite: false,
-    unique_filename: true,
-    use_filename: true,
+    unique_filename: false,
+    use_filename: false,
   };
   const signature = cloudinary.utils.api_sign_request(uploadParams, apiSecret);
-  return { cloudName, apiKey, signature, ...uploadParams };
+  return { cloudName, apiKey, signature, publicId, ...uploadParams };
 }
 
 export async function uploadRemoteImage(url: string, importJobId: string, slug: string) {
