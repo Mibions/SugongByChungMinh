@@ -19,7 +19,8 @@
     "admin:token": "tsx scripts/generate-admin-token.ts",
     "check:server": "tsc -p tsconfig.server.json",
     "cloudinary:sync": "node scripts/cloudinary-sync-assets.cjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:import": "node --import tsx --test tests/product-import.test.ts"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",

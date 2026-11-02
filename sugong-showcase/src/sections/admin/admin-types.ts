@@ -86,6 +86,7 @@ export type CatalogConfig = {
 };
 
 export type ImportPreview = {
+  skippedRows?: Array<{ row: number; message: string }>;
   rows: Array<Record<string, unknown>>;
   errors: Array<{ row: number; message: string }>;
   totalRows: number;
