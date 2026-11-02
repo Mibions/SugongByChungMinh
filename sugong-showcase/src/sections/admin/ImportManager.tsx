@@ -23,10 +23,11 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [fileName, setFileName] = useState("");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const [mode, setMode] = useState<"create" | "upsert">("upsert");
+  const [mode, setMode] = useState<"create" | "upsert">("create");
 
   async function previewFile(file: File) {
     setBusy(true);
+    setPreview(null);
     setMessage("");
     try {
       const result = await api<ImportPreview>("import-preview", {
@@ -48,11 +49,12 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
     try {
       let successRows = 0;
       let failedRows = 0;
+      const failures: string[] = [];
       const chunkSize = 3;
       setProgress({ done: 0, total: preview.rows.length });
       for (let index = 0; index < preview.rows.length; index += chunkSize) {
         const rows = preview.rows.slice(index, index + chunkSize);
-        const result = await api<{ successRows: number; failedRows: number }>("import-commit", {
+        const result = await api<{ successRows: number; failedRows: number; errors: Array<{ row: number; message: string }> }>("import-commit", {
           method: "POST",
           body: JSON.stringify({
             fileName,
@@ -63,9 +65,10 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
         });
         successRows += result.successRows;
         failedRows += result.failedRows;
+        failures.push(...result.errors.map((error) => `Dòng hợp lệ ${index + error.row - 1}: ${error.message}`));
         setProgress({ done: Math.min(index + rows.length, preview.rows.length), total: preview.rows.length });
       }
-      setMessage(`Import hoàn tất: ${successRows} thành công, ${failedRows} lỗi.`);
+      setMessage(`Import hoàn tất: ${successRows} thành công, ${failedRows} lỗi. ${failures.slice(0, 8).join("; ")}`);
       setPreview(null);
       await reloadProducts();
     } catch (error) {
@@ -94,7 +97,7 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
               <span className="mt-4 block font-heading text-2xl tracking-[-0.02em] text-primary-dark">Chọn file CSV hoặc XLSX</span>
               <span className="mt-2 block text-sm text-text-secondary">Tối đa 3 MB và 100 sản phẩm mỗi lần.</span>
             </span>
-            <input className="sr-only" type="file" accept=".csv,.xlsx" onChange={(event) => event.target.files?.[0] && previewFile(event.target.files[0])} />
+            <input disabled={busy} className="sr-only" type="file" accept=".csv,.xlsx" onChange={(event) => event.target.files?.[0] && previewFile(event.target.files[0])} />
           </label>
 
           {preview && (
@@ -102,7 +105,7 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="font-medium text-primary-dark">{fileName}</p>
-                  <p className="mt-1 text-sm text-text-secondary">{preview.totalRows} dòng · {preview.errors.length} lỗi</p>
+                  <p className="mt-1 text-sm text-text-secondary">{preview.totalRows} dòng · {preview.rows.length} hợp lệ · {preview.skippedRows?.length ?? 0} bỏ qua · {preview.errors.length} lỗi</p>
                 </div>
                 <select className="min-h-10 rounded-button border border-border bg-background-main px-3 text-sm" value={mode} onChange={(event) => setMode(event.target.value as "create" | "upsert")}>
                   <option value="upsert">Cập nhật theo slug</option>
@@ -133,7 +136,7 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
               )}
               <button
                 className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-button bg-primary-dark px-5 font-medium text-background-card disabled:opacity-50"
-                disabled={preview.errors.length > 0 || busy}
+                disabled={preview.errors.length > 0 || preview.rows.length === 0 || busy}
                 onClick={commit}
               >
                 {busy && <LoaderCircle className="animate-spin" size={17} />}
@@ -151,6 +154,7 @@ export function ImportManager({ api, reloadProducts, setMessage }: Props) {
           <p className="mt-2 text-sm leading-6 text-text-secondary">
             Dùng đúng tên cột và slug đã cấu hình. Hệ thống xử lý theo từng nhóm nhỏ để tránh timeout.
           </p>
+          <p className="mt-3 text-sm leading-6 text-text-secondary">Hỗ trợ workbook Sugong Catalog: đọc sheet 01_Products, bỏ qua mã đã gộp và giữ Product_ID. Dữ liệu cần xác minh được lưu thành nháp. Ảnh Drive chỉ dùng để đối chiếu; tải ảnh đã duyệt trong form sản phẩm trước khi xuất bản.</p>
           <a className="mt-4 inline-flex text-sm font-medium text-primary-dark underline underline-offset-4" href="/admin/product-import-template.csv" download>
             Tải CSV mẫu
           </a>
